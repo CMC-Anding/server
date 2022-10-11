@@ -17,13 +17,25 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.config.secret.Secret.*;
 import static com.example.demo.utils.ValidationRegex.isRegexEmail;
 
+// swagger add!!!
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
+
 @RestController
 @RequestMapping("/app/users")
+@Api(value = "/app/users", description = "resource가 users인 API입니다") // swagger annotation
 public class UserController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -51,8 +63,14 @@ public class UserController {
      * [POST] /authentication
      * @return BaseResponse<GetAuthenticationRes>
      */
+    @ApiOperation(value="핸드폰 인증번호 요청 API", notes="핸드폰 번호를 입력하면 인증번호를 SMS로 전송합니다.") // swagger annotation
     @ResponseBody
     @PostMapping("/authentication")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청성공"),
+            @ApiResponse(code = 2000 , message = "입력값 오류"),
+            @ApiResponse(code = 4001 , message = "서버와 연결 실패")}
+    )
     public BaseResponse<GetAuthenticationRes> getAuthenticationNumber(@Valid @RequestBody GetAuthenticationReq getAuthenticationReq) {
             // 인증번호 생성
             GetAuthenticationRes getAuthenticationRes = userProvider.createAuthenticationNumber();
@@ -75,9 +93,14 @@ public class UserController {
      * @return BaseResponse<List<GetUserRes>>
      */
     //Query String
+    @ApiOperation(value="회원조회 API", notes="검색하는 회원에 대한 정보를 제공합니다.") // swagger annotation
     @ResponseBody
+    @ApiResponses({
+        @ApiResponse(code = 200 , message = "test"),
+        @ApiResponse(code = 201 , message = "test2")}
+    )
     @GetMapping("") // (GET) 127.0.0.1:9000/app/users
-    public BaseResponse<List<GetUserRes>> getUsers(@RequestParam(required = false) String Email) {
+    public BaseResponse<List<GetUserRes>> getUsers(@ApiParam(value = "검색할 회원의 EMAIL", example = "anding@naver.com") @RequestParam(required = false) String Email) {
         try{
             if(Email == null){
                 List<GetUserRes> getUsersRes = userProvider.getUsers();
