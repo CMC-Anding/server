@@ -89,4 +89,15 @@ public class UserProvider {
 
     }
 
+    /* 인증번호 생성 */
+    public GetAuthenticationRes createAuthenticationNumber() {
+        //난수 생성
+        double randomValue = Math.random()+1;
+        //6자리 정수로 이루어진 문자열 생성
+        String authenticationNumber = Integer.toString((int) (randomValue * 1000000)).substring(1);
+        return new GetAuthenticationRes(authenticationNumber);
+    }
+
+    public void sendAuthenticationNumberBySMS(GetAuthenticationRes getAuthenticationRes) {
+    }
 }

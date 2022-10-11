@@ -56,7 +56,8 @@ dependencies {
     // Validation
     implementation('org.springframework.boot:spring-boot-starter-validation:2.7.2')
 
-
+    // coolSMS
+    implementation 'net.nurigo:sdk:4.2.3'
 
 }
 

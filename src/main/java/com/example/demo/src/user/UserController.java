@@ -1,5 +1,10 @@
 package com.example.demo.src.user;
 
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
@@ -9,10 +14,12 @@ import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
 import static com.example.demo.config.BaseResponseStatus.*;
+import static com.example.demo.config.secret.Secret.*;
 import static com.example.demo.utils.ValidationRegex.isRegexEmail;
 
 @RestController
@@ -27,6 +34,8 @@ public class UserController {
     @Autowired
     private final JwtService jwtService;
 
+    private final DefaultMessageService messageService;
+
 
 
 
@@ -34,6 +43,28 @@ public class UserController {
         this.userProvider = userProvider;
         this.userService = userService;
         this.jwtService = jwtService;
+        this.messageService = NurigoApp.INSTANCE.initialize(COOL_SMS_API_KEY, COOL_SMS_API_SECRET_KEY, "https://api.coolsms.co.kr");
+    }
+
+    /**
+     * 핸드폰 인증 번호 요청 API
+     * [POST] /authentication
+     * @return BaseResponse<GetAuthenticationRes>
+     */
+    @ResponseBody
+    @PostMapping("/authentication")
+    public BaseResponse<GetAuthenticationRes> getAuthenticationNumber(@Valid @RequestBody GetAuthenticationReq getAuthenticationReq) {
+            // 인증번호 생성
+            GetAuthenticationRes getAuthenticationRes = userProvider.createAuthenticationNumber();
+
+            // 인증번호 SMS 보내기
+            Message message = new Message();
+            message.setFrom(SMS_SENDER_PHONE_NUMBER);
+            message.setTo(getAuthenticationReq.getPhone());
+            message.setText("ANDING 인증번호는 "+getAuthenticationRes.getAuthenticationNumber()+"입니다.");
+            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+
+            return new BaseResponse<>(getAuthenticationRes);
     }
 
     /**
@@ -105,12 +136,12 @@ public class UserController {
     }
     /**
      * 로그인 API
-     * [POST] /users/logIn
+     * [POST] /users/login
      * @return BaseResponse<PostLoginRes>
      */
     @ResponseBody
-    @PostMapping("/logIn")
-    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq){
+    @PostMapping("/login")
+    public BaseResponse<PostLoginRes> login(@RequestBody PostLoginReq postLoginReq){
         try{
             // TODO: 로그인 값들에 대한 형식적인 validatin 처리해주셔야합니다!
             // TODO: 유저의 status ex) 비활성화된 유저, 탈퇴한 유저 등을 관리해주고 있다면 해당 부분에 대한 validation 처리도 해주셔야합니다.
