@@ -1,0 +1,22 @@
+### Development ###
+# port: 6660
+# MySQL Database 설정
+# url: AWS RDS 엔드포인트 & 스키마명
+# username: DB의 ID
+# password: DB의 Password
+
+server:
+  port: 6660
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://joeydbinstance.ctulmxlgjovz.ap-northeast-2.rds.amazonaws.com/anding_dev?autoReconnect=true
+    username: master
+    password: yougotmelookingforattention
+    driver-class-name: com.mysql.cj.jdbc.Driver # mysql 8버전
