@@ -75,4 +75,18 @@ public class UserProvider {
         }
 
     }
+
+    public void checkNickname(String nickname) throws BaseException {
+        try {
+            if(userDao.checkNickname(nickname)==1){
+                throw new BaseException(DUPLICATED_NICKNAME);
+            }
+        } catch (BaseException baseException) {
+            logger.error("checkNickname 에러", baseException);
+            throw baseException;
+        } catch (Exception exception) {
+            logger.error("checkNickname 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

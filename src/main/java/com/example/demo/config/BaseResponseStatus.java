@@ -14,6 +14,8 @@ public enum BaseResponseStatus {
 
     VALID_USER_ID(true, 1001, "사용 가능한 아이디입니다."),
 
+    VALID_NICKNAME(true, 1002, "사용 가능한 닉네임입니다."),
+
 
     /**
      * 2000 : Request 오류
@@ -46,6 +48,7 @@ public enum BaseResponseStatus {
     FAILED_TO_LOGIN(false,3014,"없는 아이디거나 비밀번호가 틀렸습니다."),
 
     DUPLICATED_USER_ID(false, 3015, "이미 등록된 아이디입니다."),
+    DUPLICATED_NICKNAME(false, 3016, "이미 등록된 닉네임입니다."),
 
     /**
      * 4000 : Database, Server 오류

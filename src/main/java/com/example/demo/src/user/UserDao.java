@@ -101,10 +101,18 @@ public class UserDao {
     }
 
 
+    /* 사용자 아이디 중복 검사 */
     public int checkUserId(String userId) {
         String query = "SELECT EXISTS(SELECT LOGIN_ID FROM USER WHERE LOGIN_ID = ?)";
 
         return this.jdbcTemplate.queryForObject(query,int.class,userId);
 
+    }
+
+    /* 닉네임 중복 검사 */
+    public int checkNickname(String nickname) {
+        String query = "SELECT EXISTS(SELECT NICKNAME FROM USER WHERE NICKNAME = ?)";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,nickname);
     }
 }

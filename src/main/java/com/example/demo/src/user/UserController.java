@@ -87,10 +87,10 @@ public class UserController {
 
     /**
      * 아이디 중복 확인 API
-     * [POST] /users
-     * @return BaseResponse<PostUserRes>
+     * [POST] /check/id
+     * @return BaseResponse
      */
-    @ApiOperation(value="핸드폰 인증번호 요청 API", notes="핸드폰 번호를 입력하면 인증번호를 SMS로 전송합니다.") // swagger annotation
+    @ApiOperation(value="아이디 중복 확인 API", notes="등록하려는 아이디의 중복 여부를 판단합니다") // swagger annotation
     @ResponseBody
     @PostMapping("/check/id")
     @ApiResponses({
@@ -99,7 +99,7 @@ public class UserController {
             @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
             @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
     )
-    public BaseResponse<PostUserRes> checkUserIdDuplication(@Valid @RequestBody PostUserIdCheckReq postUserIdCheckReq) {
+    public BaseResponse checkUserIdDuplication(@Valid @RequestBody PostUserIdCheckReq postUserIdCheckReq) {
 
         try{
             //아이디 중복 검증
@@ -109,6 +109,32 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 닉네임 중복 확인 API
+     * [POST] /check/nickname
+     * @return BaseResponse
+     */
+    @ApiOperation(value="닉네임 중복 확인 API", notes="등록하려는 닉네임의 중복 여부를 판단합니다.") // swagger annotation
+    @ResponseBody
+    @PostMapping("/check/nickname")
+    @ApiResponses({
+            @ApiResponse(code = 1002 , message = "사용 가능한 닉네임입니다."),
+            @ApiResponse(code = 3016 , message = "이미 등록된 닉네임입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    public BaseResponse checkNicknameDuplication(@Valid @RequestBody PostNicknameCheckReq postNicknameCheckReq) {
+
+        try{
+            //닉네임 중복 검증
+            userProvider.checkNickname(postNicknameCheckReq.getNickname());
+            return new BaseResponse<>(VALID_NICKNAME);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * 회원가입 API
