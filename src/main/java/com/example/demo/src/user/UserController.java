@@ -60,17 +60,17 @@ public class UserController {
 
     /**
      * 핸드폰 인증 번호 요청 API
-     * [POST] /authentication
+     * [POST] app/users/authentication
      * @return BaseResponse<GetAuthenticationRes>
      */
     @ApiOperation(value="핸드폰 인증번호 요청 API", notes="핸드폰 번호를 입력하면 인증번호를 SMS로 전송합니다.") // swagger annotation
-    @ResponseBody
-    @PostMapping("/authentication")
     @ApiResponses({
             @ApiResponse(code = 1000 , message = "요청성공"),
             @ApiResponse(code = 2000 , message = "입력값 오류"),
             @ApiResponse(code = 4001 , message = "서버와 연결 실패")}
     )
+    @ResponseBody
+    @PostMapping("/authentication")
     public BaseResponse<GetAuthenticationRes> getAuthenticationNumber(@Valid @RequestBody GetAuthenticationReq getAuthenticationReq) {
             // 인증번호 생성
             GetAuthenticationRes getAuthenticationRes = userProvider.createAuthenticationNumber();
@@ -87,18 +87,18 @@ public class UserController {
 
     /**
      * 아이디 중복 확인 API
-     * [POST] /check/id
+     * [POST] app/users/check/id
      * @return BaseResponse
      */
     @ApiOperation(value="아이디 중복 확인 API", notes="등록하려는 아이디의 중복 여부를 판단합니다") // swagger annotation
-    @ResponseBody
-    @PostMapping("/check/id")
     @ApiResponses({
             @ApiResponse(code = 1001 , message = "사용 가능한 아이디입니다."),
             @ApiResponse(code = 3015 , message = "이미 등록된 아이디입니다."),
             @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
             @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
     )
+    @ResponseBody
+    @PostMapping("/check/id")
     public BaseResponse checkUserIdDuplication(@Valid @RequestBody PostUserIdCheckReq postUserIdCheckReq) {
 
         try{
@@ -112,18 +112,18 @@ public class UserController {
 
     /**
      * 닉네임 중복 확인 API
-     * [POST] /check/nickname
+     * [POST] app/users/check/nickname
      * @return BaseResponse
      */
     @ApiOperation(value="닉네임 중복 확인 API", notes="등록하려는 닉네임의 중복 여부를 판단합니다.") // swagger annotation
-    @ResponseBody
-    @PostMapping("/check/nickname")
     @ApiResponses({
             @ApiResponse(code = 1002 , message = "사용 가능한 닉네임입니다."),
             @ApiResponse(code = 3016 , message = "이미 등록된 닉네임입니다."),
             @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
             @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
     )
+    @ResponseBody
+    @PostMapping("/check/nickname")
     public BaseResponse checkNicknameDuplication(@Valid @RequestBody PostNicknameCheckReq postNicknameCheckReq) {
 
         try{
@@ -135,31 +135,29 @@ public class UserController {
         }
     }
 
-
     /**
      * 회원가입 API
-     * [POST] /users
-     * @return BaseResponse<PostUserRes>
+     * [POST] /app/users/join
+     * @return BaseResponse
      */
-    // Body
-//    @ResponseBody
-//    @PostMapping("")
-//    public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
-//        // TODO: email 관련한 짧은 validation 예시입니다. 그 외 더 부가적으로 추가해주세요!
-//        if(postUserReq.getEmail() == null){
-//            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
-//        }
-//        //이메일 정규표현
-//        if(!isRegexEmail(postUserReq.getEmail())){
-//            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
-//        }
-//        try{
-//            PostUserRes postUserRes = userService.createUser(postUserReq);
-//            return new BaseResponse<>(postUserRes);
-//        } catch(BaseException exception){
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
+    @ApiOperation(value="회원가입 API", notes="id, 비밀번호, 닉네임, 전화번호를 등록합니다.") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2000 , message = "입력값 오류."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @PostMapping("/join")
+    public BaseResponse createUser(@Valid @RequestBody PostUserReq postUserReq) {
+        try{
+            userService.createUser(postUserReq);
+            return new BaseResponse<>(SUCCESS);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
     /**
      * 로그인 API
      * [POST] /users/login
@@ -183,26 +181,26 @@ public class UserController {
      * [PATCH] /users/:userIdx
      * @return BaseResponse<String>
      */
-    @ResponseBody
-    @PatchMapping("/{userIdx}")
-    public BaseResponse<String> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody User user){
-        try {
-            //jwt에서 idx 추출.
-            int userIdxByJwt = jwtService.getUserIdx();
-            //userIdx와 접근한 유저가 같은지 확인
-            if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
-            }
-            //같다면 유저네임 변경
-            PatchUserReq patchUserReq = new PatchUserReq(userIdx,user.getUserName());
-            userService.modifyUserName(patchUserReq);
-
-            String result = "";
-        return new BaseResponse<>(result);
-        } catch (BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
+//    @ResponseBody
+//    @PatchMapping("/{userIdx}")
+//    public BaseResponse<String> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody User user){
+//        try {
+//            //jwt에서 idx 추출.
+//            int userIdxByJwt = jwtService.getUserIdx();
+//            //userIdx와 접근한 유저가 같은지 확인
+//            if(userIdx != userIdxByJwt){
+//                return new BaseResponse<>(INVALID_USER_JWT);
+//            }
+//            //같다면 유저네임 변경
+//            PatchUserReq patchUserReq = new PatchUserReq(userIdx,user.getUserName());
+//            userService.modifyUserName(patchUserReq);
+//
+//            String result = "";
+//        return new BaseResponse<>(result);
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//    }
 
 
 }

@@ -76,6 +76,7 @@ public class UserProvider {
 
     }
 
+    /* 닉네임 중복 검사 */
     public void checkNickname(String nickname) throws BaseException {
         try {
             if(userDao.checkNickname(nickname)==1){
