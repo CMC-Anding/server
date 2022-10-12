@@ -101,4 +101,10 @@ public class UserDao {
     }
 
 
+    public int checkUserId(String userId) {
+        String query = "SELECT EXISTS(SELECT LOGIN_ID FROM USER WHERE LOGIN_ID = ?)";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,userId);
+
+    }
 }

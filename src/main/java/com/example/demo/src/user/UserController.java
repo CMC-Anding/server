@@ -86,51 +86,28 @@ public class UserController {
     }
 
     /**
-     * 회원 조회 API
-     * [GET] /users
-     * 회원 번호 및 이메일 검색 조회 API
-     * [GET] /users? Email=
-     * @return BaseResponse<List<GetUserRes>>
+     * 아이디 중복 확인 API
+     * [POST] /users
+     * @return BaseResponse<PostUserRes>
      */
-    //Query String
-    @ApiOperation(value="회원조회 API", notes="검색하는 회원에 대한 정보를 제공합니다.") // swagger annotation
+    @ApiOperation(value="핸드폰 인증번호 요청 API", notes="핸드폰 번호를 입력하면 인증번호를 SMS로 전송합니다.") // swagger annotation
     @ResponseBody
+    @PostMapping("/check/id")
     @ApiResponses({
-        @ApiResponse(code = 200 , message = "test"),
-        @ApiResponse(code = 201 , message = "test2")}
+            @ApiResponse(code = 1001 , message = "사용 가능한 아이디입니다."),
+            @ApiResponse(code = 3015 , message = "이미 등록된 아이디입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
     )
-    @GetMapping("") // (GET) 127.0.0.1:9000/app/users
-    public BaseResponse<List<GetUserRes>> getUsers(@ApiParam(value = "검색할 회원의 EMAIL", example = "anding@naver.com") @RequestParam(required = false) String Email) {
+    public BaseResponse<PostUserRes> checkUserIdDuplication(@Valid @RequestBody PostUserIdCheckReq postUserIdCheckReq) {
+
         try{
-            if(Email == null){
-                List<GetUserRes> getUsersRes = userProvider.getUsers();
-                return new BaseResponse<>(getUsersRes);
-            }
-            // Get Users
-            List<GetUserRes> getUsersRes = userProvider.getUsersByEmail(Email);
-            return new BaseResponse<>(getUsersRes);
+            //아이디 중복 검증
+            userProvider.checkUserId(postUserIdCheckReq.getUserId());
+            return new BaseResponse<>(VALID_USER_ID);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
-    }
-
-    /**
-     * 회원 1명 조회 API
-     * [GET] /users/:userIdx
-     * @return BaseResponse<GetUserRes>
-     */
-    // Path-variable
-    @ResponseBody
-    @GetMapping("/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
-    public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
-        // Get Users
-        try{
-            GetUserRes getUserRes = userProvider.getUser(userIdx);
-            return new BaseResponse<>(getUserRes);
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
-        }
-
     }
 
     /**
@@ -139,24 +116,24 @@ public class UserController {
      * @return BaseResponse<PostUserRes>
      */
     // Body
-    @ResponseBody
-    @PostMapping("")
-    public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
-        // TODO: email 관련한 짧은 validation 예시입니다. 그 외 더 부가적으로 추가해주세요!
-        if(postUserReq.getEmail() == null){
-            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
-        }
-        //이메일 정규표현
-        if(!isRegexEmail(postUserReq.getEmail())){
-            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
-        }
-        try{
-            PostUserRes postUserRes = userService.createUser(postUserReq);
-            return new BaseResponse<>(postUserRes);
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
+//    @ResponseBody
+//    @PostMapping("")
+//    public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
+//        // TODO: email 관련한 짧은 validation 예시입니다. 그 외 더 부가적으로 추가해주세요!
+//        if(postUserReq.getEmail() == null){
+//            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+//        }
+//        //이메일 정규표현
+//        if(!isRegexEmail(postUserReq.getEmail())){
+//            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+//        }
+//        try{
+//            PostUserRes postUserRes = userService.createUser(postUserReq);
+//            return new BaseResponse<>(postUserRes);
+//        } catch(BaseException exception){
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//    }
     /**
      * 로그인 API
      * [POST] /users/login

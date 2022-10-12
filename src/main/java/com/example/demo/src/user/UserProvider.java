@@ -31,44 +31,6 @@ public class UserProvider {
         this.jwtService = jwtService;
     }
 
-    public List<GetUserRes> getUsers() throws BaseException{
-        try{
-            List<GetUserRes> getUserRes = userDao.getUsers();
-            return getUserRes;
-        }
-        catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
-        try{
-            List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);
-            return getUsersRes;
-        }
-        catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-                    }
-
-
-    public GetUserRes getUser(int userIdx) throws BaseException {
-        try {
-            GetUserRes getUserRes = userDao.getUser(userIdx);
-            return getUserRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    public int checkEmail(String email) throws BaseException{
-        try{
-            return userDao.checkEmail(email);
-        } catch (Exception exception){
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
     public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException{
         User user = userDao.getPwd(postLoginReq);
         String encryptPwd;
@@ -98,6 +60,19 @@ public class UserProvider {
         return new GetAuthenticationRes(authenticationNumber);
     }
 
-    public void sendAuthenticationNumberBySMS(GetAuthenticationRes getAuthenticationRes) {
+    /* 사용자 ID 중복 검사 */
+    public void checkUserId(String userId) throws BaseException {
+        try {
+            if(userDao.checkUserId(userId)==1){
+                throw new BaseException(DUPLICATED_USER_ID);
+            }
+        } catch (BaseException baseException) {
+            logger.error("checkUserId 에러", baseException);
+            throw baseException;
+        } catch (Exception exception) {
+            logger.error("checkUserId 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+
     }
 }
