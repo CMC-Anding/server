@@ -2,15 +2,17 @@ package com.example.demo.src.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class User {
-    private int id; //테이블 인덱스 값
+@NoArgsConstructor
+public class PostUserIdCheckReq {
+
+    @NotBlank
     private String userId;
-    private String password;
-    private String nickname;
-    private String phone;
 }
