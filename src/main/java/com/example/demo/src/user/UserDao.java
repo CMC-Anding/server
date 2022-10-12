@@ -21,6 +21,7 @@ public class UserDao {
 
     public List<GetUserRes> getUsers(){
         String getUsersQuery = "select * from UserInfo";
+
         return this.jdbcTemplate.query(getUsersQuery,
                 (rs,rowNum) -> new GetUserRes(
                         rs.getInt("userIdx"),
@@ -34,6 +35,7 @@ public class UserDao {
     public List<GetUserRes> getUsersByEmail(String email){
         String getUsersByEmailQuery = "select * from UserInfo where email =?";
         String getUsersByEmailParams = email;
+
         return this.jdbcTemplate.query(getUsersByEmailQuery,
                 (rs, rowNum) -> new GetUserRes(
                         rs.getInt("userIdx"),
@@ -47,6 +49,7 @@ public class UserDao {
     public GetUserRes getUser(int userIdx){
         String getUserQuery = "select * from UserInfo where userIdx = ?";
         int getUserParams = userIdx;
+
         return this.jdbcTemplate.queryForObject(getUserQuery,
                 (rs, rowNum) -> new GetUserRes(
                         rs.getInt("userIdx"),
@@ -65,16 +68,8 @@ public class UserDao {
         this.jdbcTemplate.update(createUserQuery, createUserParams);
 
         String lastInserIdQuery = "select last_insert_id()";
+
         return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
-    }
-
-    public int checkEmail(String email){
-        String checkEmailQuery = "select exists(select email from UserInfo where email = ?)";
-        String checkEmailParams = email;
-        return this.jdbcTemplate.queryForObject(checkEmailQuery,
-                int.class,
-                checkEmailParams);
-
     }
 
     public int modifyUserName(PatchUserReq patchUserReq){
@@ -84,23 +79,20 @@ public class UserDao {
         return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
     }
 
-    public User getPwd(PostLoginReq postLoginReq){
-        String getPwdQuery = "select userIdx, password,email,userName,ID from UserInfo where ID = ?";
-        String getPwdParams = postLoginReq.getId();
+    public User getUser(PostLoginReq postLoginReq){
+        String query = "SELECT ID, LOGIN_ID, LOGIN_PASSWORD, NICKNAME, PHONE_NUMBER FROM USER where LOGIN_ID = ?";
 
-        return this.jdbcTemplate.queryForObject(getPwdQuery,
+        return this.jdbcTemplate.queryForObject(query,
                 (rs,rowNum)-> new User(
-                        rs.getInt("userIdx"),
-                        rs.getString("ID"),
-                        rs.getString("userName"),
-                        rs.getString("password"),
-                        rs.getString("email")
+                        rs.getInt("ID"),
+                        rs.getString("LOGIN_ID"),
+                        rs.getString("LOGIN_PASSWORD"),
+                        rs.getString("NICKNAME"),
+                        rs.getString("PHONE_NUMBER")
                 ),
-                getPwdParams
+                postLoginReq.getUserId()
                 );
-
     }
-
 
     /* 사용자 아이디 중복 검사 */
     public int checkUserId(String userId) {

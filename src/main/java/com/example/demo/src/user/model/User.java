@@ -8,9 +8,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class User {
-    private int userIdx;
-    private String ID;
-    private String userName;
+    private int id; //테이블 인덱스 값
+    private String userId;
     private String password;
-    private String email;
+    private String nickname;
+    private String phone;
 }

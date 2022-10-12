@@ -31,21 +31,36 @@ public class UserProvider {
         this.jwtService = jwtService;
     }
 
-    public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException{
-        User user = userDao.getPwd(postLoginReq);
+    /* 기본 로그인*/
+    public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException{
+
+        // 아이디에 해당하는 User 불러오기
+        User user;
+        try {
+            user = userDao.getUser(postLoginReq);
+        } catch (Exception exception) {
+            logger.error("login 에러",exception);
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+
+        // 비밀번호 암호화
         String encryptPwd;
         try {
             encryptPwd=new SHA256().encrypt(postLoginReq.getPassword());
         } catch (Exception ignored) {
+            logger.error("login 에러",ignored);
             throw new BaseException(PASSWORD_DECRYPTION_ERROR);
         }
 
+        // 비밀번호 검증 및 JWT 생성
         if(user.getPassword().equals(encryptPwd)){
-            int userIdx = user.getUserIdx();
-            String jwt = jwtService.createJwt(userIdx);
-            return new PostLoginRes(userIdx,jwt);
+            int id = user.getId();
+            String jwt = jwtService.createJwt(id);
+
+            return new PostLoginRes(jwt,user.getNickname());
         }
         else{
+            logger.error("login 에러");
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
@@ -57,6 +72,7 @@ public class UserProvider {
         double randomValue = Math.random()+1;
         //6자리 정수로 이루어진 문자열 생성
         String authenticationNumber = Integer.toString((int) (randomValue * 1000000)).substring(1);
+
         return new GetAuthenticationRes(authenticationNumber);
     }
 
