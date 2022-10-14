@@ -1,6 +1,5 @@
 package com.example.demo.src.post.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostPostReq {
+public class Posts {
     private int userId;
     private String contents;
     private String daily_title;
@@ -16,4 +15,5 @@ public class PostPostReq {
     private String filterId;
     private String qnaQuestionId;
     private String questionMadeFromUser;
+
 }

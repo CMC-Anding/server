@@ -20,3 +20,18 @@ spring:
     username: master
     password: yougotmelookingforattention
     driver-class-name: com.mysql.cj.jdbc.Driver # mysql 8버전
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ben-today-s-house
+      # dir: S3 디렉토리 이름 # ex) /gyunny
+    credentials:
+      access-key: AKIAT5PZU2X6AU2MFEFL
+      secret-key: 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    
+    stack:
+      auto: false
+
+      
