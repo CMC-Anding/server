@@ -20,19 +20,19 @@ public class PostDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public int postPost(PostPostReq postPostReq, MultipartFile file){
+    public int postPost(PostPostReq postPostReq){
         String postPostQuery = "insert into POST (USER_ID, CONTENTS, DAILY_TITLE, QNA_BACKGROUND_COLOR, FILTER_ID, QNA_QUESTION_ID, QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?,?)";
-        Object[] postPostParams = new Object[]{};
+        Object[] postPostParams = new Object[]{postPostReq.getUserId(), postPostReq.getContents(), postPostReq.getDaily_title(), postPostReq.getQnaBackgroundColor(), postPostReq.getFilterId(), postPostReq.getQnaQuestionId(), postPostReq.getQuestionMadeFromUser()};
         this.jdbcTemplate.update(postPostQuery, postPostParams);
 
-        if(file != null) {
-            String postFileQuery = ""; //S3에 넣으려면 어떻게 해야하지?
-            Object[] postFileParams = new Object[]{};
-            this.jdbcTemplate.update(postFileQuery, postFileParams);
-        }
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
+    }
 
-        String lastInserIdQuery = "select last_insert_id()";
-        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    public void createImage(String url, int postId){
+        String createImageQuery = "insert into POST_PHOTO (URL, POST_ID) values (?, ?)";
+        Object[] createImageParams = new Object[]{url, postId};
+        this.jdbcTemplate.update(createImageQuery, createImageParams);
     }
 
     // public List<GetUserRes> getUsersByEmail(String email){

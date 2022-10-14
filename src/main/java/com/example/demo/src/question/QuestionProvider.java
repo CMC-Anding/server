@@ -31,7 +31,7 @@ public class QuestionProvider {
         this.jwtService = jwtService;
     }
 
-    public GetQuestionRes getQuestion(int filterId, int userIdxByJwt) throws BaseException{
+    public GetQuestionRes getQuestion(String filterId, int userIdxByJwt) throws BaseException{
         try{
             GetQuestionRes getQuestionRes = questionDao.getQuestion(filterId,userIdxByJwt);
             return getQuestionRes;

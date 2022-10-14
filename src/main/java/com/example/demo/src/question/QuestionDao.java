@@ -19,7 +19,7 @@ public class QuestionDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public GetQuestionRes getQuestion(int filterId, int userIdxByJwt){
+    public GetQuestionRes getQuestion(String filterId, int userIdxByJwt){
         String getQuestionQuery = "select CONTENTS from QUESTION where FILTER_ID = ? and ID NOT IN (select QNA_QUESTION_ID from POST where USER_ID =?) ORDER BY RAND() LIMIT 1";
         return this.jdbcTemplate.queryForObject(getQuestionQuery,
                 (rs,rowNum) -> new GetQuestionRes(

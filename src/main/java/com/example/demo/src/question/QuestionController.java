@@ -60,7 +60,7 @@ public class QuestionController {
         @ApiResponse(code =4050 , message = "사용자가 작성하지않은 질문을 가져오는데에 실패하였습니다.")}
     )
     @GetMapping("/{filter-id}") // (GET) 127.0.0.1:9000/app/questions/:filter-id
-    public BaseResponse<GetQuestionRes> getQuestion(@PathVariable("filter-id") int filterId) {
+    public BaseResponse<GetQuestionRes> getQuestion(@PathVariable("filter-id") String filterId) {
         try{
 
             //jwt에서 idx 추출.

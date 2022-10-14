@@ -29,6 +29,16 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
 
+import java.io.IOException;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import lombok.RequiredArgsConstructor;
+
+//@RequiredArgsConstructor
 @RestController
 @RequestMapping("/app/posts")
 @Api(value = "/app/posts", description = "resource가 Post인 API입니다") // swagger annotation
@@ -51,7 +61,6 @@ public class PostController {
         this.jwtService = jwtService;
     }
 
-
     /**
      * 게시글 등록 API
      * [POST] /app/posts
@@ -59,22 +68,22 @@ public class PostController {
      */
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public BaseResponse<String> postPost(@RequestPart PostPostReq postPostReq, @RequestPart(value="file", required=false) MultipartFile file ){
+    public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
-            // TODO: 로그인 값들에 대한 형식적인 validatin 처리해주셔야합니다!
-            // TODO: 유저의 status ex) 비활성화된 유저, 탈퇴한 유저 등을 관리해주고 있다면 해당 부분에 대한 validation 처리도 해주셔야합니다.
-            postService.postPost(postPostReq, file);
+            PostPostReq postPostReq = new PostPostReq(userIdxByJwt, posts.getContents(), posts.getDaily_title(), posts.getQnaBackgroundColor(), posts.getFilterId(), posts.getQnaQuestionId(), posts.getQuestionMadeFromUser());
+
+            int lastinsertId = postService.postPost(postPostReq); //선
+            postService.upload(file.getInputStream(), file.getOriginalFilename(), lastinsertId); //후
+
             String result = "게시글이 등록되었습니다!";
             return new BaseResponse<>(SUCCESS ,result);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
-
 
     // /**
     //  * 회원 1명 조회 API
