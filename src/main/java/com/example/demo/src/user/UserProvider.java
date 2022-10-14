@@ -31,62 +31,79 @@ public class UserProvider {
         this.jwtService = jwtService;
     }
 
-    public List<GetUserRes> getUsers() throws BaseException{
-        try{
-            List<GetUserRes> getUserRes = userDao.getUsers();
-            return getUserRes;
-        }
-        catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+    /* 기본 로그인*/
+    public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException{
 
-    public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
-        try{
-            List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);
-            return getUsersRes;
-        }
-        catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-                    }
-
-
-    public GetUserRes getUser(int userIdx) throws BaseException {
+        // 아이디에 해당하는 User 불러오기
+        User user;
         try {
-            GetUserRes getUserRes = userDao.getUser(userIdx);
-            return getUserRes;
+            user = userDao.getUser(postLoginReq);
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            logger.error("login 에러",exception);
+            throw new BaseException(FAILED_TO_LOGIN);
         }
-    }
 
-    public int checkEmail(String email) throws BaseException{
-        try{
-            return userDao.checkEmail(email);
-        } catch (Exception exception){
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException{
-        User user = userDao.getPwd(postLoginReq);
+        // 비밀번호 암호화
         String encryptPwd;
         try {
             encryptPwd=new SHA256().encrypt(postLoginReq.getPassword());
         } catch (Exception ignored) {
+            logger.error("login 에러",ignored);
             throw new BaseException(PASSWORD_DECRYPTION_ERROR);
         }
 
+        // 비밀번호 검증 및 JWT 생성
         if(user.getPassword().equals(encryptPwd)){
-            int userIdx = user.getUserIdx();
-            String jwt = jwtService.createJwt(userIdx);
-            return new PostLoginRes(userIdx,jwt);
+            int id = user.getId();
+            String jwt = jwtService.createJwt(id);
+
+            return new PostLoginRes(jwt,user.getNickname());
         }
         else{
+            logger.error("login 에러");
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
     }
 
+    /* 인증번호 생성 */
+    public GetAuthenticationRes createAuthenticationNumber() {
+        //난수 생성
+        double randomValue = Math.random()+1;
+        //6자리 정수로 이루어진 문자열 생성
+        String authenticationNumber = Integer.toString((int) (randomValue * 1000000)).substring(1);
+
+        return new GetAuthenticationRes(authenticationNumber);
+    }
+
+    /* 사용자 ID 중복 검사 */
+    public void checkUserId(String userId) throws BaseException {
+        try {
+            if(userDao.checkUserId(userId)==1){
+                throw new BaseException(DUPLICATED_USER_ID);
+            }
+        } catch (BaseException baseException) {
+            logger.error("checkUserId 에러", baseException);
+            throw baseException;
+        } catch (Exception exception) {
+            logger.error("checkUserId 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+
+    /* 닉네임 중복 검사 */
+    public void checkNickname(String nickname) throws BaseException {
+        try {
+            if(userDao.checkNickname(nickname)==1){
+                throw new BaseException(DUPLICATED_NICKNAME);
+            }
+        } catch (BaseException baseException) {
+            logger.error("checkNickname 에러", baseException);
+            throw baseException;
+        } catch (Exception exception) {
+            logger.error("checkNickname 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
