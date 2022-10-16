@@ -16,7 +16,22 @@ spring:
 
   datasource:
     platform: mysql
-    url: jdbc:mysql://joeydbinstance.ctulmxlgjovz.ap-northeast-2.rds.amazonaws.com/anding_dev?autoReconnect=true
+    url: jdbc:mysql://joeydbinstance.ctulmxlgjovz.ap-northeast-2.rds.amazonaws.com/ANDING_DEV?autoReconnect=true
     username: master
     password: yougotmelookingforattention
     driver-class-name: com.mysql.cj.jdbc.Driver # mysql 8버전
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ben-today-s-house
+      # dir: S3 디렉토리 이름 # ex) /gyunny
+    credentials:
+      access-key: AKIAT5PZU2X6AU2MFEFL
+      secret-key: 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    
+    stack:
+      auto: false
+
+      
