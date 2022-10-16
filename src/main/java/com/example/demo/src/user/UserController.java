@@ -15,11 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.config.secret.Secret.*;
-import static com.example.demo.utils.ValidationRegex.isRegexEmail;
 
 // swagger add!!!
 import org.springframework.http.ResponseEntity;
@@ -80,7 +78,8 @@ public class UserController {
             message.setFrom(SMS_SENDER_PHONE_NUMBER);
             message.setTo(getAuthenticationReq.getPhone());
             message.setText("ANDING 인증번호는 "+getAuthenticationRes.getAuthenticationNumber()+"입니다.");
-            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+            // 요금 부족으로 SMS 전송 잠시 비활성화
+//            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
 
             return new BaseResponse<>(getAuthenticationRes);
     }
@@ -172,7 +171,7 @@ public class UserController {
     )
     @ResponseBody
     @PostMapping("/login")
-    public BaseResponse<PostLoginRes> login(@RequestBody PostLoginReq postLoginReq){
+    public BaseResponse<PostLoginRes> login(@Valid @RequestBody PostLoginReq postLoginReq){
         try{
             // TODO: 유저의 status ex) 비활성화된 유저, 탈퇴한 유저 등을 관리해주고 있다면 해당 부분에 대한 validation 처리도 해주셔야합니다.
             PostLoginRes postLoginRes = userProvider.login(postLoginReq);
