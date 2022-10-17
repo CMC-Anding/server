@@ -49,18 +49,18 @@ public class PostDao {
     // }
 
     public GetPostDetailRes getPostDetail(int postId){
-        String getPostDetailQuery = "select * from UserInfo where userIdx = ?";
+        String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST WHERE ID = ?";
         return this.jdbcTemplate.queryForObject(getPostDetailQuery,
                 (rs, rowNum) -> new GetPostDetailRes(
                         rs.getString("contents"),
                         rs.getString("dailyTitle"),
                         rs.getString("qnaBackgroundColor"),
-                        rs.getString("qnaFilterId"),
+                        rs.getString("filterId"),
                         rs.getString("qnaQuestionId"),
                         rs.getString("qnaQuestion"),
                         rs.getString("dailyImage"),
                         rs.getString("qnaQuestionMadeFromUser")),
-                    postId);
+                    postId, postId, postId);
     }
     
 
