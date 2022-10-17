@@ -11,7 +11,7 @@ public class GetPostDetailRes {
     private String contents;
     private String dailyTitle;
     private String qnaBackgroundColor;
-    private String qnaFilterId;
+    private String filterId;
     private String qnaQuestionId;
     private String qnaQuestion;
     private String dailyImage;
