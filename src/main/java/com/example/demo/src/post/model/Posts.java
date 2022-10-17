@@ -14,6 +14,6 @@ public class Posts {
     private String qnaBackgroundColor;
     private String filterId;
     private String qnaQuestionId;
-    private String questionMadeFromUser;
+    private String qnaQuestionMadeFromUser;
 
 }

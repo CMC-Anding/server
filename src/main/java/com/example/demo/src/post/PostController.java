@@ -70,14 +70,16 @@ public class PostController {
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
-            PostPostReq postPostReq = new PostPostReq(userIdxByJwt, posts.getContents(), posts.getDaily_title(), posts.getQnaBackgroundColor(), posts.getFilterId(), posts.getQnaQuestionId(), posts.getQuestionMadeFromUser());
+            
+            PostPostReq postPostReq = new PostPostReq(userIdxByJwt, posts.getContents(), posts.getDaily_title(), posts.getQnaBackgroundColor(), posts.getFilterId(), posts.getQnaQuestionId(), posts.getQnaQuestionMadeFromUser());
 
-            int lastinsertId = postService.postPost(postPostReq); //선
-            postService.upload(file.getInputStream(), file.getOriginalFilename(), lastinsertId); //후
+            int lastInsertId = postService.postPost(postPostReq); //선
+            postService.upload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후
 
             String result = "게시글이 등록되었습니다!";
-            return new BaseResponse<>(SUCCESS ,result);
-        } catch (BaseException exception){
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }
