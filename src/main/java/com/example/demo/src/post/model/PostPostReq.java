@@ -1,6 +1,5 @@
 package com.example.demo.src.post.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,5 +14,5 @@ public class PostPostReq {
     private String qnaBackgroundColor;
     private String filterId;
     private String qnaQuestionId;
-    private String questionMadeFromUser;
+    private String qnaQuestionMadeFromUser;
 }

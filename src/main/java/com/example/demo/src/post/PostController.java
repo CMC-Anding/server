@@ -52,9 +52,6 @@ public class PostController {
     @Autowired
     private final JwtService jwtService;
 
-
-
-
     public PostController(PostProvider postProvider, PostService postService, JwtService jwtService){
         this.postProvider = postProvider;
         this.postService = postService;
@@ -67,42 +64,44 @@ public class PostController {
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
     public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
-            PostPostReq postPostReq = new PostPostReq(userIdxByJwt, posts.getContents(), posts.getDaily_title(), posts.getQnaBackgroundColor(), posts.getFilterId(), posts.getQnaQuestionId(), posts.getQuestionMadeFromUser());
+            
+            PostPostReq postPostReq = new PostPostReq(userIdxByJwt, posts.getContents(), posts.getDaily_title(), posts.getQnaBackgroundColor(), posts.getFilterId(), posts.getQnaQuestionId(), posts.getQnaQuestionMadeFromUser());
 
-            int lastinsertId = postService.postPost(postPostReq); //선
-            postService.upload(file.getInputStream(), file.getOriginalFilename(), lastinsertId); //후
+            int lastInsertId = postService.postPost(postPostReq); //선
+            postService.upload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후
 
             String result = "게시글이 등록되었습니다!";
-            return new BaseResponse<>(SUCCESS ,result);
-        } catch (BaseException exception){
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
-    // /**
-    //  * 회원 1명 조회 API
-    //  * [GET] /users/:userIdx
-    //  * @return BaseResponse<GetUserRes>
-    //  */
-    // // Path-variable
-    // @ResponseBody
-    // @GetMapping("/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
-    // public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
-    //     // Get Users
-    //     try{
-    //         GetUserRes getUserRes = userProvider.getUser(userIdx);
-    //         return new BaseResponse<>(getUserRes);
-    //     } catch(BaseException exception){
-    //         return new BaseResponse<>((exception.getStatus()));
-    //     }
+    /**
+     * 글 상세보기 API
+     * [GET] /app/posts/detail/:post-id
+     * @return BaseResponse<GetPostDetailRes>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/detail/{post-id}") // (GET) 127.0.0.1:6660/app/posts/detail/:post-id
+    public BaseResponse<GetPostDetailRes> getPostDetail(@PathVariable("post-id") int postId) {
+        // Get Users
+        try{
+            GetPostDetailRes getPostDetailRes = postProvider.getPostDetail(postId);
+            return new BaseResponse<>(getPostDetailRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
 
-    // }
+    }
 
     // /**
     //  * 회원가입 API

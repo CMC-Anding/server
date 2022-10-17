@@ -21,8 +21,8 @@ public class PostDao {
     }
 
     public int postPost(PostPostReq postPostReq){
-        String postPostQuery = "insert into POST (USER_ID, CONTENTS, DAILY_TITLE, QNA_BACKGROUND_COLOR, FILTER_ID, QNA_QUESTION_ID, QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?,?)";
-        Object[] postPostParams = new Object[]{postPostReq.getUserId(), postPostReq.getContents(), postPostReq.getDaily_title(), postPostReq.getQnaBackgroundColor(), postPostReq.getFilterId(), postPostReq.getQnaQuestionId(), postPostReq.getQuestionMadeFromUser()};
+        String postPostQuery = "insert into POST (USER_ID, CONTENTS, DAILY_TITLE, QNA_BACKGROUND_COLOR, FILTER_ID, QNA_QUESTION_ID, QNA_QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?,?)";
+        Object[] postPostParams = new Object[]{postPostReq.getUserId(), postPostReq.getContents(), postPostReq.getDaily_title(), postPostReq.getQnaBackgroundColor(), postPostReq.getFilterId(), postPostReq.getQnaQuestionId(), postPostReq.getQnaQuestionMadeFromUser()};
         this.jdbcTemplate.update(postPostQuery, postPostParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
@@ -48,18 +48,20 @@ public class PostDao {
     //             getUsersByEmailParams);
     // }
 
-    // public GetUserRes getUser(int userIdx){
-    //     String getUserQuery = "select * from UserInfo where userIdx = ?";
-    //     int getUserParams = userIdx;
-    //     return this.jdbcTemplate.queryForObject(getUserQuery,
-    //             (rs, rowNum) -> new GetUserRes(
-    //                     rs.getInt("userIdx"),
-    //                     rs.getString("userName"),
-    //                     rs.getString("ID"),
-    //                     rs.getString("Email"),
-    //                     rs.getString("password")),
-    //             getUserParams);
-    // }
+    public GetPostDetailRes getPostDetail(int postId){
+        String getPostDetailQuery = "select * from UserInfo where userIdx = ?";
+        return this.jdbcTemplate.queryForObject(getPostDetailQuery,
+                (rs, rowNum) -> new GetPostDetailRes(
+                        rs.getString("contents"),
+                        rs.getString("dailyTitle"),
+                        rs.getString("qnaBackgroundColor"),
+                        rs.getString("qnaFilterId"),
+                        rs.getString("qnaQuestionId"),
+                        rs.getString("qnaQuestion"),
+                        rs.getString("dailyImage"),
+                        rs.getString("qnaQuestionMadeFromUser")),
+                    postId);
+    }
     
 
     // public int createUser(PostUserReq postUserReq){
