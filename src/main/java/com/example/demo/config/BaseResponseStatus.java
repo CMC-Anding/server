@@ -11,9 +11,7 @@ public enum BaseResponseStatus {
      * 1000 : 요청 성공
      */
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
-
     VALID_USER_ID(true, 1001, "사용 가능한 아이디입니다."),
-
     VALID_NICKNAME(true, 1002, "사용 가능한 닉네임입니다."),
 
 
