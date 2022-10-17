@@ -48,18 +48,20 @@ public class PostDao {
     //             getUsersByEmailParams);
     // }
 
-    // public GetUserRes getUser(int userIdx){
-    //     String getUserQuery = "select * from UserInfo where userIdx = ?";
-    //     int getUserParams = userIdx;
-    //     return this.jdbcTemplate.queryForObject(getUserQuery,
-    //             (rs, rowNum) -> new GetUserRes(
-    //                     rs.getInt("userIdx"),
-    //                     rs.getString("userName"),
-    //                     rs.getString("ID"),
-    //                     rs.getString("Email"),
-    //                     rs.getString("password")),
-    //             getUserParams);
-    // }
+    public GetPostDetailRes getPostDetail(int postId){
+        String getPostDetailQuery = "select * from UserInfo where userIdx = ?";
+        return this.jdbcTemplate.queryForObject(getPostDetailQuery,
+                (rs, rowNum) -> new GetPostDetailRes(
+                        rs.getString("contents"),
+                        rs.getString("dailyTitle"),
+                        rs.getString("qnaBackgroundColor"),
+                        rs.getString("qnaFilterId"),
+                        rs.getString("qnaQuestionId"),
+                        rs.getString("qnaQuestion"),
+                        rs.getString("dailyImage"),
+                        rs.getString("qnaQuestionMadeFromUser")),
+                    postId);
+    }
     
 
     // public int createUser(PostUserReq postUserReq){

@@ -7,12 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostPostReq {
-    private int userId;
+public class GetPostDetailRes {
     private String contents;
-    private String daily_title;
+    private String dailyTitle;
     private String qnaBackgroundColor;
-    private String filterId;
+    private String qnaFilterId;
     private String qnaQuestionId;
-    private String questionMadeFromUser;
+    private String qnaQuestion;
+    private String dailyImage;
+    private String qnaQuestionMadeFromUser;
 }

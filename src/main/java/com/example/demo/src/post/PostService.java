@@ -28,16 +28,11 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.transaction.annotation.Transactional;
 
 // Service Create, Update, Delete 의 로직 처리
-@Slf4j
-@Component
 @Service
-//@Transactional(rollbackFor = )
+@Transactional(rollbackFor =  Exception.class)
 public class PostService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 

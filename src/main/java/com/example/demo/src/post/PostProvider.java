@@ -31,16 +31,14 @@ public class PostProvider {
         this.jwtService = jwtService;
     }
 
-
-    // public PostPostReq getQuestion(int filterId, int userIdxByJwt) throws BaseException{
-    //     try{
-    //         PostPostReq getQuestionRes = userDao.getQuestion(filterId,userIdxByJwt);
-    //         return getQuestionRes;
-    //     }
-    //     catch (Exception exception) {
-    //         throw new BaseException(GET_QUESTION_ERROR);
-    //     }
-    // }
+        public GetPostDetailRes getPostDetail(int postId) throws BaseException {
+        try {
+            GetPostDetailRes getPostDetailRes = postDao.getPostDetail(postId);
+            return getPostDetailRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
@@ -51,16 +49,6 @@ public class PostProvider {
     //         throw new BaseException(DATABASE_ERROR);
     //     }
     //                 }
-
-
-    // public GetUserRes getUser(int userIdx) throws BaseException {
-    //     try {
-    //         GetUserRes getUserRes = userDao.getUser(userIdx);
-    //         return getUserRes;
-    //     } catch (Exception exception) {
-    //         throw new BaseException(DATABASE_ERROR);
-    //     }
-    // }
 
     // public int checkEmail(String email) throws BaseException{
     //     try{
