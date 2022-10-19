@@ -108,4 +108,23 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(query,int.class,nickname);
     }
+
+    public int checkPhoneNumber(String phoneNumber) {
+        String query = "SELECT EXISTS(SELECT PHONE_NUMBER FROM USER WHERE PHONE_NUMBER = ?)";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,phoneNumber);
+    }
+
+    public void modifyUserProfile(int userIdx, UserProfile userProfile) {
+        String query = "update USER set NICKNAME = ?";
+
+        if (userProfile != null) {
+            query+=", INTRODUCTION = ?";
+        }
+        query+=" where ID = ?";
+
+        Object[] params = new Object[]{userProfile.getNickname(), userProfile.getIntroduction(), userIdx};
+
+        this.jdbcTemplate.update(query,params);
+    }
 }

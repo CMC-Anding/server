@@ -10,10 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
 // Service Create, Update, Delete 의 로직 처리
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class UserService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -39,7 +41,7 @@ public class UserService {
         //닉네임 중복 체크
         userProvider.checkNickname(postUserReq.getNickname());
 
-        try{
+        try {
             //비밀번호 암호화
             String pwd = new SHA256().encrypt(postUserReq.getPassword());
             postUserReq.setPassword(pwd);
@@ -47,13 +49,24 @@ public class UserService {
             throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
         }
 
-        try{
+        try {
             //회원 등록
             int userIdx = userDao.createUser(postUserReq);
         } catch (Exception exception) {
-            logger.error("createUser 에러",exception);
+            logger.error("createUser 에러", exception);
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    /* 프로필 수정 */
+    public void modifyUserProfile(int userIdx, UserProfile userProfile) throws BaseException {
+        try {
+            userDao.modifyUserProfile(userIdx, userProfile);
+        } catch (Exception exception) {
+            logger.error("modifyUserProfile 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+
     }
 
 //    public void modifyUserName(PatchUserReq patchUserReq) throws BaseException {

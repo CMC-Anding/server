@@ -21,7 +21,7 @@ public class PostDao {
     }
 
     public int postPost(PostPostReq postPostReq){
-        String postPostQuery = "insert into POST (USER_ID, CONTENTS, DAILY_TITLE, QNA_BACKGROUND_COLOR, FILTER_ID, QNA_QUESTION_ID, QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?,?)";
+        String postPostQuery = "insert into POST (USER_ID, CONTENTS, DAILY_TITLE, QNA_BACKGROUND_COLOR, FILTER_ID, QNA_QUESTION_ID, QNA_QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?,?)";
         Object[] postPostParams = new Object[]{postPostReq.getUserId(), postPostReq.getContents(), postPostReq.getDaily_title(), postPostReq.getQnaBackgroundColor(), postPostReq.getFilterId(), postPostReq.getQnaQuestionId(), postPostReq.getQuestionMadeFromUser()};
         this.jdbcTemplate.update(postPostQuery, postPostParams);
 
