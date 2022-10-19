@@ -67,7 +67,6 @@ public class PostController {
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
     public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
         try{
-            logger.error("들어왔습니다!");
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
@@ -76,9 +75,7 @@ public class PostController {
                 PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDaily_title(), posts.getContents(), posts.getFilterId());
 
                 int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                logger.error("게시글 입력완료!");
                 postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
-                logger.error("게시글 사진입력완료!");
             }
             // 문답 게시글 
             else {
@@ -86,6 +83,7 @@ public class PostController {
 
                 postService.postQnaPost(postQnaPostReq);
             }
+
             String result = "게시글이 등록되었습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
         }
