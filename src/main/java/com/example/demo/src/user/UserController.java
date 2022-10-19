@@ -78,8 +78,7 @@ public class UserController {
             message.setFrom(SMS_SENDER_PHONE_NUMBER);
             message.setTo(getAuthenticationReq.getPhone());
             message.setText("ANDING 인증번호는 "+getAuthenticationRes.getAuthenticationNumber()+"입니다.");
-            // 요금 부족으로 SMS 전송 잠시 비활성화
-//            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
 
             return new BaseResponse<>(getAuthenticationRes);
     }
@@ -165,7 +164,7 @@ public class UserController {
     @ApiOperation(value="기본 로그인 API", notes="id, 비밀번호로 로그인을 요청하면 jwt 토큰을 반환합니다") // swagger annotation
     @ApiResponses({
             @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
-            @ApiResponse(code = 2000 , message = "입력값 오류."),
+            @ApiResponse(code = 3014 , message = "없는 아이디거나 비밀번호가 틀렸습니다."),
             @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
             @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
     )
@@ -180,6 +179,45 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 아이디 찾기 API
+     * [GET] /app/users/id
+     * @return BaseResponse<PostLoginRes>
+     */
+//    @ApiOperation(value="아이디 찾기 API", notes="핸드폰 번호 인증을 통해 사용자 id를 반환합니다")
+//    @ApiResponses({
+//            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+//            @ApiResponse(code = 2000 , message = "입력값 오류."),
+//            @ApiResponse(code = 3017 , message = "등록되지 않은 전화번호 입니다."),
+//            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+//            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+//    )
+//    @ResponseBody
+//    @GetMapping("/id")
+//    public BaseResponse<GetAuthenticationRes> searchUserId(@Valid @RequestBody GetAuthenticationReq getAuthenticationReq){
+//
+//        try{
+//            String phoneNumber = getAuthenticationReq.getPhone();
+//            // 등록된 핸드폰 번호인지 체크
+//            userProvider.checkPhoneNumber(phoneNumber);
+//
+//            // 인증번호 생성
+//            GetAuthenticationRes getAuthenticationRes = userProvider.createAuthenticationNumber();
+//
+//            // 인증번호 SMS 보내기
+//            Message message = new Message();
+//            message.setFrom(SMS_SENDER_PHONE_NUMBER);
+//            message.setTo(phoneNumber);
+//            message.setText("ANDING 인증번호는 "+getAuthenticationRes.getAuthenticationNumber()+"입니다.");
+//            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+//
+//            return new BaseResponse<>(getAuthenticationRes);
+//        } catch (BaseException exception){
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
+
 
     /**
      * 유저정보변경 API
@@ -206,6 +244,29 @@ public class UserController {
 //            return new BaseResponse<>((exception.getStatus()));
 //        }
 //    }
+
+    /**
+     * 프로필수정 API
+     * [PATCH] /app/users/profile
+     * @return BaseResponse<String>
+     */
+    @ResponseBody
+    @PatchMapping("/profile")
+    public BaseResponse<String> modifyUserProfile(@RequestBody UserProfile userProfile){
+        try {
+            //jwt에서 idx 추출.
+            int userIdx = jwtService.getUserIdx();
+
+            //닉네임 중복 확인
+            userProvider.checkNickname(userProfile.getNickname());
+
+            userService.modifyUserProfile(userIdx, userProfile);
+
+         return new BaseResponse<>(userProfile.getNickname());
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 
 }

@@ -29,8 +29,8 @@ cloud:
       bucket: ben-today-s-house
       # dir: S3 디렉토리 이름 # ex) /gyunny
     credentials:
-      access-key: AKIAT5PZU2X6AU2MFEFL
-      secret-key: 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    
+      access-key: AKIAT5PZU2X6FLUV55XU
+      secret-key: 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
     stack:
       auto: false
 
