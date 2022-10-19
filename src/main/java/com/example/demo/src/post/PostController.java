@@ -70,13 +70,16 @@ public class PostController {
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
         try{
+            logger.error("들어왔습니다!");
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
             PostPostReq postPostReq = new PostPostReq(userIdxByJwt, posts.getContents(), posts.getDaily_title(), posts.getQnaBackgroundColor(), posts.getFilterId(), posts.getQnaQuestionId(), posts.getQuestionMadeFromUser());
+            logger.error("게시글 입력완료!");
 
             int lastinsertId = postService.postPost(postPostReq); //선
             postService.upload(file.getInputStream(), file.getOriginalFilename(), lastinsertId); //후
+            logger.error("게시글 사진입력완료!");
 
             String result = "게시글이 등록되었습니다!";
             return new BaseResponse<>(SUCCESS ,result);
