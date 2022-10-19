@@ -70,11 +70,19 @@ public class PostController {
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
-            
-            PostPostReq postPostReq = new PostPostReq(userIdxByJwt, posts.getContents(), posts.getDaily_title(), posts.getQnaBackgroundColor(), posts.getFilterId(), posts.getQnaQuestionId(), posts.getQnaQuestionMadeFromUser());
+            // 일상 게시글 
+            if(file != null) {
+                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDaily_title(), posts.getContents(), posts.getFilterId());
 
-            int lastInsertId = postService.postPost(postPostReq); //선
-            postService.upload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후
+                int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
+                postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
+            }
+            // 문답 게시글 
+            else {
+                PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser());
+
+                postService.postQnaPost(postQnaPostReq);
+            }
 
             String result = "게시글이 등록되었습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
