@@ -1,10 +1,10 @@
-package com.example.demo.src.post;
+package com.example.demo.src.feed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.post.model.*;
+import com.example.demo.src.feed.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,71 +39,43 @@ import lombok.RequiredArgsConstructor;
 
 //@RequiredArgsConstructor
 @RestController
-@RequestMapping("/app/posts")
+@RequestMapping("/app/feeds")
 @Api(value = "/app/posts", description = "resource가 Post인 API입니다") // swagger annotation
-public class PostController {
+public class FeedController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private final PostProvider postProvider;
+    private final FeedProvider feedProvider;
     @Autowired
-    private final PostService postService;
+    private final FeedService feedService;
     @Autowired
     private final JwtService jwtService;
 
-    public PostController(PostProvider postProvider, PostService postService, JwtService jwtService){
-        this.postProvider = postProvider;
-        this.postService = postService;
+    public FeedController(FeedProvider feedProvider, FeedService feedService, JwtService jwtService){
+        this.feedProvider = feedProvider;
+        this.feedService = feedService;
         this.jwtService = jwtService;
     }
 
     /**
-     * 게시글 등록 API
-     * [POST] /app/posts
-     * @return BaseResponse<String>
+     * 피드 게시글 목록 조회 API
+     * [GET] /app/feeds?filter-id
+     * @return BaseResponse<List<GetFeedListRes>>
      */
+    //Query String
     @ResponseBody
-    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
-    public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
+    @GetMapping(" ") // (GET) 127.0.0.1:6660/app/feeds?filterId
+    public BaseResponse<List<GetFeedListRes>> getFeedList(@RequestParam(required = false) String filterId) {
         try{
-            //jwt에서 idx 추출.
-            int userIdxByJwt = jwtService.getUserIdx();
-
-            // 일상 게시글 
-            if(file != null) {
-                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDaily_title(), posts.getContents(), posts.getFilterId());
-
-                int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
-            }
-            // 문답 게시글 
-            else {
-                PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser());
-
-                postService.postQnaPost(postQnaPostReq);
+            // Get Feed List
+            if(filterId == null){
+                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedList();
+                return new BaseResponse<>(getFeedListRes);
             }
 
-            String result = "게시글이 등록되었습니다!";
-            return new BaseResponse<>(SUCCESS ,result); 
-        }
-        catch (BaseException exception){
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
-     * 글 상세보기 API
-     * [GET] /app/posts/detail/:post-id
-     * @return BaseResponse<GetPostDetailRes>
-     */
-    // Path-variable
-    @ResponseBody
-    @GetMapping("/detail/{post-id}") // (GET) 127.0.0.1:6660/app/posts/detail/:post-id
-    public BaseResponse<GetPostDetailRes> getPostDetail(@PathVariable("post-id") int postId) {
-        // Get Users
-        try{
-            GetPostDetailRes getPostDetailRes = postProvider.getPostDetail(postId);
-            return new BaseResponse<>(getPostDetailRes);
+            // Get Feed List By FilterId
+            List<GetFeedListRes> getFeedListRes = feedProvider.getFeedListByFilterId(filterId);
+            return new BaseResponse<>(getFeedListRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }

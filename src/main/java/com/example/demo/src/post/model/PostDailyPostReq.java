@@ -7,13 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Posts {
+public class PostDailyPostReq {
     private int userId;
+    private String dailyTitle;
     private String contents;
-    private String daily_title;
-    private String qnaBackgroundColor;
     private String filterId;
-    private String qnaQuestionId;
-    private String qnaQuestionMadeFromUser;
-
 }

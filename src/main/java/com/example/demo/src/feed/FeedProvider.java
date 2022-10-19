@@ -1,9 +1,9 @@
-package com.example.demo.src.post;
+package com.example.demo.src.feed;
 
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponseStatus;
-import com.example.demo.src.post.model.*;
+import com.example.demo.src.feed.model.*;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.SHA256;
 import org.slf4j.Logger;
@@ -17,27 +17,36 @@ import static com.example.demo.config.BaseResponseStatus.*;
 
 //Provider : Read의 비즈니스 로직 처리
 @Service
-public class PostProvider {
+public class FeedProvider {
 
-    private final PostDao postDao;
+    private final FeedDao postDao;
     private final JwtService jwtService;
 
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public PostProvider(PostDao postDao, JwtService jwtService) {
+    public FeedProvider(FeedDao postDao, JwtService jwtService) {
         this.postDao = postDao;
         this.jwtService = jwtService;
     }
 
-        public GetPostDetailRes getPostDetail(int postId) throws BaseException {
+    public List<GetFeedListRes> getFeedList() throws BaseException {
         try {
-            GetPostDetailRes getPostDetailRes = postDao.getPostDetail(postId);
-            return getPostDetailRes;
+            List<GetFeedListRes> getFeedListRes = postDao.getFeedList();
+            return getFeedListRes;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
+        }
+
+    public List<GetFeedListRes> getFeedListByFilterId(String filterId) throws BaseException {
+    try {
+        List<GetFeedListRes> getFeedListRes = postDao.getFeedListByFilterId(filterId);
+        return getFeedListRes;
+    } catch (Exception exception) {
+        throw new BaseException(DATABASE_ERROR);
+    }
     }
 
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{

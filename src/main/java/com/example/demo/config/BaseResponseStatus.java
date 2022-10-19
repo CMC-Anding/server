@@ -3,7 +3,7 @@ package com.example.demo.config;
 import lombok.Getter;
 
 /**
- * 에러 코드 관리
+ * status 코드 관리
  */
 @Getter
 public enum BaseResponseStatus {

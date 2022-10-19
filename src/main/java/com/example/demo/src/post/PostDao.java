@@ -20,10 +20,11 @@ public class PostDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public int postPost(PostPostReq postPostReq){
-        String postPostQuery = "insert into POST (USER_ID, CONTENTS, DAILY_TITLE, QNA_BACKGROUND_COLOR, FILTER_ID, QNA_QUESTION_ID, QNA_QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?,?)";
-        Object[] postPostParams = new Object[]{postPostReq.getUserId(), postPostReq.getContents(), postPostReq.getDaily_title(), postPostReq.getQnaBackgroundColor(), postPostReq.getFilterId(), postPostReq.getQnaQuestionId(), postPostReq.getQuestionMadeFromUser()};
-        this.jdbcTemplate.update(postPostQuery, postPostParams);
+
+    public int postDailyPost(PostDailyPostReq postDailyPostReq){
+        String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID) VALUES (?,?,?,?)";
+        Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), postDailyPostReq.getFilterId()};
+        this.jdbcTemplate.update(postDailyPostQuery, postDailyPostParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
@@ -33,6 +34,27 @@ public class PostDao {
         String createImageQuery = "insert into POST_PHOTO (URL, POST_ID) values (?, ?)";
         Object[] createImageParams = new Object[]{url, postId};
         this.jdbcTemplate.update(createImageQuery, createImageParams);
+    }
+
+    public int postQnaPost(PostQnaPostReq postQnaPostReq){
+        String postQnaPostQuery = "insert into POST (USER_ID, FILTER_ID, QNA_QUESTION_ID, CONTENTS, QNA_BACKGROUND_COLOR, QNA_QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?)";
+        Object[] postQnaPostParams = new Object[]{postQnaPostReq.getUserId(), postQnaPostReq.getFilterId(), postQnaPostReq.getQnaQuestionId(), postQnaPostReq.getContents(), postQnaPostReq.getQnaBackgroundColor(), postQnaPostReq.getQnaQuestionMadeFromUser()};
+        return this.jdbcTemplate.update(postQnaPostQuery, postQnaPostParams);
+    }
+
+    public GetPostDetailRes getPostDetail(int postId){
+        String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST WHERE ID = ?";
+        return this.jdbcTemplate.queryForObject(getPostDetailQuery,
+                (rs, rowNum) -> new GetPostDetailRes(
+                        rs.getString("contents"),
+                        rs.getString("dailyTitle"),
+                        rs.getString("qnaBackgroundColor"),
+                        rs.getString("filterId"),
+                        rs.getString("qnaQuestionId"),
+                        rs.getString("qnaQuestion"),
+                        rs.getString("dailyImage"),
+                        rs.getString("qnaQuestionMadeFromUser")),
+                    postId, postId, postId);
     }
 
     // public List<GetUserRes> getUsersByEmail(String email){
@@ -46,19 +68,6 @@ public class PostDao {
     //                     rs.getString("Email"),
     //                     rs.getString("password")),
     //             getUsersByEmailParams);
-    // }
-
-    // public GetUserRes getUser(int userIdx){
-    //     String getUserQuery = "select * from UserInfo where userIdx = ?";
-    //     int getUserParams = userIdx;
-    //     return this.jdbcTemplate.queryForObject(getUserQuery,
-    //             (rs, rowNum) -> new GetUserRes(
-    //                     rs.getInt("userIdx"),
-    //                     rs.getString("userName"),
-    //                     rs.getString("ID"),
-    //                     rs.getString("Email"),
-    //                     rs.getString("password")),
-    //             getUserParams);
     // }
     
 

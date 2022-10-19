@@ -7,13 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Posts {
-    private int userId;
+public class GetPostDetailRes {
     private String contents;
-    private String daily_title;
+    private String dailyTitle;
     private String qnaBackgroundColor;
     private String filterId;
-    private String qnaQuestionId;
+    private String qnaQuestionId; //추후 질문별 이미지 다르게 할 경우 대비
+    private String qnaQuestion;
+    private String dailyImage;
     private String qnaQuestionMadeFromUser;
-
 }
