@@ -48,6 +48,8 @@ public enum BaseResponseStatus {
     DUPLICATED_USER_ID(false, 3015, "이미 등록된 아이디입니다."),
     DUPLICATED_NICKNAME(false, 3016, "이미 등록된 닉네임입니다."),
 
+    UNREGISTERED_PHONE_NUMBER(false, 3017, "등록되지 않은 전화번호 입니다."),
+
     /**
      * 4000 : Database, Server 오류
      */

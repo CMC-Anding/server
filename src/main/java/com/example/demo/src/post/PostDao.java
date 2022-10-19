@@ -20,6 +20,7 @@ public class PostDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+
     public int postDailyPost(PostDailyPostReq postDailyPostReq){
         String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID) VALUES (?,?,?,?)";
         Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), postDailyPostReq.getFilterId()};

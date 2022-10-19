@@ -106,4 +106,19 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    /* 핸드폰 번호 등록 여부 검사 */
+    public void checkPhoneNumber(String phoneNumber) throws BaseException {
+        try {
+            if(userDao.checkPhoneNumber(phoneNumber)!=1){
+                throw new BaseException(UNREGISTERED_PHONE_NUMBER);
+            }
+        } catch (BaseException baseException) {
+            logger.error("checkPhoneNumber 에러", baseException);
+            throw baseException;
+        } catch (Exception exception) {
+            logger.error("checkPhoneNumber 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
