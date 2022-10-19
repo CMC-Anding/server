@@ -80,9 +80,9 @@ public class PostService {
     //     }
     // }
 
-    public int postPost(PostPostReq postPostReq) throws IOException,BaseException {
+    public int postDailyPost(PostDailyPostReq postDailyPostReq) throws IOException,BaseException {
         try{
-            int lastInsertId = postDao.postPost(postPostReq);
+            int lastInsertId = postDao.postDailyPost(postDailyPostReq);
 
             if(lastInsertId == 0){
                 throw new BaseException(MODIFY_FAIL_USERNAME);
@@ -92,12 +92,9 @@ public class PostService {
             exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
-
-        
-
     }
 
-    public String upload(InputStream inputStream, String originalFilename, int postId) throws IOException,BaseException {
+    public String fileUpload(InputStream inputStream, String originalFilename, int postId) throws IOException,BaseException {
         String s3FileName = UUID.randomUUID() + "-" + originalFilename;
 
         ObjectMetadata objMeta = new ObjectMetadata();
@@ -116,4 +113,18 @@ public class PostService {
 
         return amazonS3.getUrl(bucket, s3FileName).toString();
     }    
+
+    public int postQnaPost(PostQnaPostReq postQnaPostReq) throws IOException,BaseException {
+        try{
+            int lastInsertId = postDao.postQnaPost(postQnaPostReq);
+
+            if(lastInsertId == 0){
+                throw new BaseException(MODIFY_FAIL_USERNAME);
+            }
+        return lastInsertId;
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
