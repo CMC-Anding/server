@@ -5,6 +5,7 @@ import com.example.demo.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -115,16 +116,31 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(query,int.class,phoneNumber);
     }
 
-    public void modifyUserProfile(int userIdx, UserProfile userProfile) {
+    public void modifyUserProfile(int userIdx, UserProfile userProfile, MultipartFile image) {
         String query = "update USER set NICKNAME = ?";
 
-        if (userProfile != null) {
+        if (userProfile.getIntroduction() != null) {
             query+=", INTRODUCTION = ?";
+        }
+        if (image != null) {
+            query+=", image = ?";
         }
         query+=" where ID = ?";
 
         Object[] params = new Object[]{userProfile.getNickname(), userProfile.getIntroduction(), userIdx};
 
         this.jdbcTemplate.update(query,params);
+    }
+
+    public UserProfile getUserProfile(int userId) {
+        String query = "SELECT PROFILE_PHOTO, NICKNAME, INTRODUCTION FROM USER WHERE ID = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs,rowNum)-> new UserProfile(
+                        rs.getString("PROFILE_PHOTO"),
+                        rs.getString("NICKNAME"),
+                        rs.getString("INTRODUCTION")
+                ),
+                userId);
     }
 }

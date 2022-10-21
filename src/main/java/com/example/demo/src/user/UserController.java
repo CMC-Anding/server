@@ -1,5 +1,8 @@
 package com.example.demo.src.user;
 
+import com.example.demo.src.post.model.PostDailyPostReq;
+import com.example.demo.src.post.model.PostQnaPostReq;
+import com.example.demo.src.post.model.Posts;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
@@ -12,6 +15,7 @@ import com.example.demo.config.BaseResponse;
 import com.example.demo.src.user.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,6 +34,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/app/users")
@@ -248,25 +255,52 @@ public class UserController {
     /**
      * 프로필수정 API
      * [PATCH] /app/users/profile
-     * @return BaseResponse<String>
+     * @return BaseResponse
      */
+//    @ResponseBody
+//    @PatchMapping(value = "/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public BaseResponse modifyUserProfile(@RequestPart UserProfile userProfile, @RequestPart(value="image", required=false) MultipartFile image) throws IOException {
+//        try{
+//            //jwt에서 idx 추출.
+//            int userIdx = jwtService.getUserIdx();
+//
+//            //닉네임 중복 확인
+//            userProvider.checkNickname(userProfile.getNickname());
+//
+//            //프로필 수정
+//            userService.modifyUserProfile(userIdx, userProfile, image);
+//
+//            return new BaseResponse(SUCCESS);
+//        }
+//        catch (BaseException exception){
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
+
+    /**
+     * 프로필 조회 API
+     * [GET] /app/users/profile
+     * @return BaseResponse<>
+     */
+    @ApiOperation(value="프로필 조회 API", notes="사용자의 프로필 이미지 url, 닉네임, 소개를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
     @ResponseBody
-    @PatchMapping("/profile")
-    public BaseResponse<String> modifyUserProfile(@RequestBody UserProfile userProfile){
-        try {
-            //jwt에서 idx 추출.
-            int userIdx = jwtService.getUserIdx();
+    @GetMapping("/profile")
+    public BaseResponse<UserProfile> getUserProfile( ){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
 
-            //닉네임 중복 확인
-            userProvider.checkNickname(userProfile.getNickname());
-
-            userService.modifyUserProfile(userIdx, userProfile);
-
-         return new BaseResponse<>(userProfile.getNickname());
-        } catch (BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
+            UserProfile userProfile = userProvider.getUserProfile(userId);
+            return new BaseResponse<>(userProfile);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
         }
     }
-
-
 }
