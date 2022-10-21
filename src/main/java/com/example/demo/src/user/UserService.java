@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -59,9 +60,9 @@ public class UserService {
     }
 
     /* 프로필 수정 */
-    public void modifyUserProfile(int userIdx, UserProfile userProfile) throws BaseException {
+    public void modifyUserProfile(int userIdx, UserProfile userProfile, MultipartFile image) throws BaseException {
         try {
-            userDao.modifyUserProfile(userIdx, userProfile);
+            userDao.modifyUserProfile(userIdx, userProfile, image);
         } catch (Exception exception) {
             logger.error("modifyUserProfile 에러", exception);
             throw new BaseException(DATABASE_ERROR);
