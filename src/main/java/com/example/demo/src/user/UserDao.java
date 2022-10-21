@@ -155,4 +155,13 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(query, int.class, userId);
     }
+
+    /* 나의 자서전 개수 조회 */
+    public int getNumberOfMyAutobiographies(int userId) {
+        String query = "SELECT COUNT(ID)\n" +
+                "FROM AUTOBIOGRAPHY\n" +
+                "WHERE USER_ID = ?";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, userId);
+    }
 }

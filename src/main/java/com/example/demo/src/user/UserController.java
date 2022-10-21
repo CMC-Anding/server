@@ -309,7 +309,7 @@ public class UserController {
      * [GET] /app/users/my-posts/number
      * @return BaseResponse<Integer>
      */
-    @ApiOperation(value="나의 기록 개수 조회 API", notes="사용자의 프로필 이미지 url, 닉네임, 소개를 반환합니다")
+    @ApiOperation(value="나의 기록 개수 조회 API", notes="사용자가 작성한 게시글의 개수를 반환합니다")
     @ApiResponses({
             @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
             @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
@@ -326,6 +326,33 @@ public class UserController {
 
             int numberOfMyPosts = userProvider.getNumberOfMyPosts(userId);
             return new BaseResponse<>(numberOfMyPosts);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 나의 자서전 개수 조회 API
+     * [GET] /app/users/my-autobiographies/number
+     * @return BaseResponse<Integer>
+     */
+    @ApiOperation(value="나의 자서전 개수 조회 API", notes="사용자가 작성한 자서전의 개수를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/my-autobiographies/number")
+    public BaseResponse<Integer> getNumberOfMyAutobiographies( ){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
+
+            int numberOfMyAutobiographies = userProvider.getNumberOfMyAutobiographies(userId);
+            return new BaseResponse<>(numberOfMyAutobiographies);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }

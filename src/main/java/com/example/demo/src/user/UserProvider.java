@@ -142,4 +142,15 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    /* 나의 자서전 수 조회 */
+    public int getNumberOfMyAutobiographies(int userId) throws BaseException {
+        try {
+            int numberOfMyAutobiographies = userDao.getNumberOfMyAutobiographies(userId);
+            return numberOfMyAutobiographies;
+        } catch (Exception exception) {
+            logger.error("getNumberOfMyAutobiographies 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
