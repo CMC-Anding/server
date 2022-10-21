@@ -121,12 +121,24 @@ public class UserProvider {
         }
     }
 
+    /* 프로필 조회 */
     public UserProfile getUserProfile(int userId) throws BaseException {
         try {
             UserProfile userProfile = userDao.getUserProfile(userId);
             return userProfile;
         } catch (Exception exception) {
             logger.error("getUserProfile 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /* 나의 게시글 수 조회 */
+    public int getNumberOfMyPosts(int userId) throws BaseException {
+        try {
+            int numberOfMyPosts = userDao.getNumberOfMyPosts(userId);
+            return numberOfMyPosts;
+        } catch (Exception exception) {
+            logger.error("getNumberOfMyPosts 에러", exception);
             throw new BaseException(DATABASE_ERROR);
         }
     }

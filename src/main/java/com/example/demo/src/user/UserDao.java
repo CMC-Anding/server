@@ -132,8 +132,11 @@ public class UserDao {
         this.jdbcTemplate.update(query,params);
     }
 
+    /* 프로필 조회 */
     public UserProfile getUserProfile(int userId) {
-        String query = "SELECT PROFILE_PHOTO, NICKNAME, INTRODUCTION FROM USER WHERE ID = ?";
+        String query = "SELECT PROFILE_PHOTO, NICKNAME, INTRODUCTION\n" +
+                "FROM USER\n" +
+                "WHERE ID = ?";
 
         return this.jdbcTemplate.queryForObject(query,
                 (rs,rowNum)-> new UserProfile(
@@ -142,5 +145,14 @@ public class UserDao {
                         rs.getString("INTRODUCTION")
                 ),
                 userId);
+    }
+
+    /* 나의 게시글 수 조회 */
+    public int getNumberOfMyPosts(int userId) {
+        String query = "SELECT COUNT(ID)\n" +
+                "FROM POST\n" +
+                "WHERE USER_ID = ?;";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, userId);
     }
 }

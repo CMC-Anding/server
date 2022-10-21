@@ -303,4 +303,31 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 나의 게시글 수 조회 API
+     * [GET] /app/users/my-posts/number
+     * @return BaseResponse<Integer>
+     */
+    @ApiOperation(value="나의 기록 개수 조회 API", notes="사용자의 프로필 이미지 url, 닉네임, 소개를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/my-posts/number")
+    public BaseResponse<Integer> getNumberOfMyPosts( ){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
+
+            int numberOfMyPosts = userProvider.getNumberOfMyPosts(userId);
+            return new BaseResponse<>(numberOfMyPosts);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
