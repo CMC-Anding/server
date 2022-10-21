@@ -164,4 +164,25 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(query, int.class, userId);
     }
+
+    /* 선물받은 자서전 목록 조회 */
+    public List<GiftedAutobiography> getGiftedAutobiographies(int userId) {
+        String query = "SELECT A.ID, TITLE, TITLE_COLOR, COVER_COLOR, DETAIL, G.CREATED_AT\n" +
+                "FROM AUTOBIOGRAPHY A\n" +
+                "JOIN GIFT G on A.ID = G.AUTOBIOGRAPHY_ID\n" +
+                "JOIN USER U on G.GUEST_PHONE_NUMBER = U.PHONE_NUMBER\n" +
+                "WHERE U.ID = ?\n" +
+                "ORDER BY G.CREATED_AT DESC";
+
+        return this.jdbcTemplate.query(query,
+                (rs,rowNum)-> new GiftedAutobiography(
+                        rs.getInt("ID"),
+                        rs.getString("TITLE"),
+                        rs.getString("TITLE_COLOR"),
+                        rs.getString("COVER_COLOR"),
+                        rs.getString("DETAIL"),
+                        rs.getString("CREATED_AT")
+                ),
+                userId);
+    }
 }

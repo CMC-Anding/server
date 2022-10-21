@@ -357,4 +357,31 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 내가 선물 받은 자서전 조회 API
+     * [GET] /app/users/gifted-autobiographies
+     * @return BaseResponse<>
+     */
+    @ApiOperation(value="내가 선물 받은 자서전 조회 API", notes="사용자가 선물받은 자서전들과 그 개수를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/gifted-autobiographies")
+    public BaseResponse<GetGiftedAutobiographiesRes> getGiftedAutobiographies(){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
+
+            GetGiftedAutobiographiesRes getGiftedAutobiographiesRes = userProvider.getGiftedAutobiographies(userId);
+            return new BaseResponse<>(getGiftedAutobiographiesRes);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

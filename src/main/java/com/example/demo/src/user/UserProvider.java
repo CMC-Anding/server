@@ -153,4 +153,15 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    /* 선물받은 자서전 목록 조회 */
+    public GetGiftedAutobiographiesRes getGiftedAutobiographies(int userId) throws BaseException {
+        try {
+            List<GiftedAutobiography> giftedAutobiographiesList = userDao.getGiftedAutobiographies(userId);
+            return new GetGiftedAutobiographiesRes(giftedAutobiographiesList.size(), giftedAutobiographiesList);
+        } catch (Exception exception) {
+            logger.error("getGiftedAutobiographies 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
