@@ -14,4 +14,5 @@ public class PostQnaPostReq {
     private String contents;
     private String qnaBackgroundColor;
     private String qnaQuestionMadeFromUser;
+    private String feedShare;
 }

@@ -20,24 +20,36 @@ public class PostDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /* 
+     * 게시글 등록 API 
+     * 일상 게시글
+    */
     public int postDailyPost(PostDailyPostReq postDailyPostReq){
-        String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID) VALUES (?,?,?,?)";
-        Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), postDailyPostReq.getFilterId()};
+        String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID, FEED_SHARE) VALUES (?,?,?,?,?)";
+        Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), postDailyPostReq.getFilterId(), postDailyPostReq.getFeedShare()};
         this.jdbcTemplate.update(postDailyPostQuery, postDailyPostParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
     }
 
+    /* 
+     * 게시글 등록 API 
+     * 일상 게시글의 사진 업로드
+    */
     public void createImage(String url, int postId){
         String createImageQuery = "insert into POST_PHOTO (URL, POST_ID) values (?, ?)";
         Object[] createImageParams = new Object[]{url, postId};
         this.jdbcTemplate.update(createImageQuery, createImageParams);
     }
 
+    /* 
+     * 게시글 등록 API 
+     * 문답 게시글
+    */
     public int postQnaPost(PostQnaPostReq postQnaPostReq){
-        String postQnaPostQuery = "insert into POST (USER_ID, FILTER_ID, QNA_QUESTION_ID, CONTENTS, QNA_BACKGROUND_COLOR, QNA_QUESTION_MADE_FROM_USER) VALUES (?,?,?,?,?,?)";
-        Object[] postQnaPostParams = new Object[]{postQnaPostReq.getUserId(), postQnaPostReq.getFilterId(), postQnaPostReq.getQnaQuestionId(), postQnaPostReq.getContents(), postQnaPostReq.getQnaBackgroundColor(), postQnaPostReq.getQnaQuestionMadeFromUser()};
+        String postQnaPostQuery = "insert into POST (USER_ID, FILTER_ID, QNA_QUESTION_ID, CONTENTS, QNA_BACKGROUND_COLOR, QNA_QUESTION_MADE_FROM_USER, FEED_SHARE) VALUES (?,?,?,?,?,?,?)";
+        Object[] postQnaPostParams = new Object[]{postQnaPostReq.getUserId(), postQnaPostReq.getFilterId(), postQnaPostReq.getQnaQuestionId(), postQnaPostReq.getContents(), postQnaPostReq.getQnaBackgroundColor(), postQnaPostReq.getQnaQuestionMadeFromUser(), postQnaPostReq.getFeedShare()};
         return this.jdbcTemplate.update(postQnaPostQuery, postQnaPostParams);
     }
 

@@ -12,4 +12,5 @@ public class PostDailyPostReq {
     private String dailyTitle;
     private String contents;
     private String filterId;
+    private String feedShare;
 }

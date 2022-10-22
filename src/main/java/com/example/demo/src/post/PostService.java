@@ -80,6 +80,10 @@ public class PostService {
     //     }
     // }
 
+    /* 
+     * 게시글 등록 API 
+     * 일상 게시글
+    */
     public int postDailyPost(PostDailyPostReq postDailyPostReq) throws IOException,BaseException {
         try{
             int lastInsertId = postDao.postDailyPost(postDailyPostReq);
@@ -94,6 +98,10 @@ public class PostService {
         }
     }
 
+    /* 
+     * 게시글 등록 API 
+     * 일상 게시글의 사진 업로드
+    */
     public String fileUpload(InputStream inputStream, String originalFilename, int postId) throws IOException,BaseException {
         String s3FileName = UUID.randomUUID() + "-" + originalFilename;
 
@@ -114,6 +122,10 @@ public class PostService {
         return amazonS3.getUrl(bucket, s3FileName).toString();
     }    
 
+    /* 
+     * 게시글 등록 API 
+     * 문답 게시글
+    */
     public int postQnaPost(PostQnaPostReq postQnaPostReq) throws IOException,BaseException {
         try{
             int lastInsertId = postDao.postQnaPost(postQnaPostReq);
