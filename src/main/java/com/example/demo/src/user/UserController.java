@@ -1,5 +1,8 @@
 package com.example.demo.src.user;
 
+import com.example.demo.src.post.model.PostDailyPostReq;
+import com.example.demo.src.post.model.PostQnaPostReq;
+import com.example.demo.src.post.model.Posts;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
@@ -12,6 +15,7 @@ import com.example.demo.config.BaseResponse;
 import com.example.demo.src.user.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,6 +34,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/app/users")
@@ -78,8 +85,7 @@ public class UserController {
             message.setFrom(SMS_SENDER_PHONE_NUMBER);
             message.setTo(getAuthenticationReq.getPhone());
             message.setText("ANDING 인증번호는 "+getAuthenticationRes.getAuthenticationNumber()+"입니다.");
-            // 요금 부족으로 SMS 전송 잠시 비활성화
-//            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
 
             return new BaseResponse<>(getAuthenticationRes);
     }
@@ -165,7 +171,7 @@ public class UserController {
     @ApiOperation(value="기본 로그인 API", notes="id, 비밀번호로 로그인을 요청하면 jwt 토큰을 반환합니다") // swagger annotation
     @ApiResponses({
             @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
-            @ApiResponse(code = 2000 , message = "입력값 오류."),
+            @ApiResponse(code = 3014 , message = "없는 아이디거나 비밀번호가 틀렸습니다."),
             @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
             @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
     )
@@ -180,6 +186,45 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 아이디 찾기 API
+     * [GET] /app/users/id
+     * @return BaseResponse<PostLoginRes>
+     */
+//    @ApiOperation(value="아이디 찾기 API", notes="핸드폰 번호 인증을 통해 사용자 id를 반환합니다")
+//    @ApiResponses({
+//            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+//            @ApiResponse(code = 2000 , message = "입력값 오류."),
+//            @ApiResponse(code = 3017 , message = "등록되지 않은 전화번호 입니다."),
+//            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+//            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+//    )
+//    @ResponseBody
+//    @GetMapping("/id")
+//    public BaseResponse<GetAuthenticationRes> searchUserId(@Valid @RequestBody GetAuthenticationReq getAuthenticationReq){
+//
+//        try{
+//            String phoneNumber = getAuthenticationReq.getPhone();
+//            // 등록된 핸드폰 번호인지 체크
+//            userProvider.checkPhoneNumber(phoneNumber);
+//
+//            // 인증번호 생성
+//            GetAuthenticationRes getAuthenticationRes = userProvider.createAuthenticationNumber();
+//
+//            // 인증번호 SMS 보내기
+//            Message message = new Message();
+//            message.setFrom(SMS_SENDER_PHONE_NUMBER);
+//            message.setTo(phoneNumber);
+//            message.setText("ANDING 인증번호는 "+getAuthenticationRes.getAuthenticationNumber()+"입니다.");
+//            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+//
+//            return new BaseResponse<>(getAuthenticationRes);
+//        } catch (BaseException exception){
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
+
 
     /**
      * 유저정보변경 API
@@ -207,5 +252,136 @@ public class UserController {
 //        }
 //    }
 
+    /**
+     * 프로필수정 API
+     * [PATCH] /app/users/profile
+     * @return BaseResponse
+     */
+//    @ResponseBody
+//    @PatchMapping(value = "/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public BaseResponse modifyUserProfile(@RequestPart UserProfile userProfile, @RequestPart(value="image", required=false) MultipartFile image) throws IOException {
+//        try{
+//            //jwt에서 idx 추출.
+//            int userIdx = jwtService.getUserIdx();
+//
+//            //닉네임 중복 확인
+//            userProvider.checkNickname(userProfile.getNickname());
+//
+//            //프로필 수정
+//            userService.modifyUserProfile(userIdx, userProfile, image);
+//
+//            return new BaseResponse(SUCCESS);
+//        }
+//        catch (BaseException exception){
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
 
+    /**
+     * 프로필 조회 API
+     * [GET] /app/users/profile
+     * @return BaseResponse<>
+     */
+    @ApiOperation(value="프로필 조회 API", notes="사용자의 프로필 이미지 url, 닉네임, 소개를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/profile")
+    public BaseResponse<UserProfile> getUserProfile( ){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
+
+            UserProfile userProfile = userProvider.getUserProfile(userId);
+            return new BaseResponse<>(userProfile);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 나의 게시글 수 조회 API
+     * [GET] /app/users/my-posts/number
+     * @return BaseResponse<Integer>
+     */
+    @ApiOperation(value="나의 기록 개수 조회 API", notes="사용자가 작성한 게시글의 개수를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/my-posts/number")
+    public BaseResponse<Integer> getNumberOfMyPosts( ){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
+
+            int numberOfMyPosts = userProvider.getNumberOfMyPosts(userId);
+            return new BaseResponse<>(numberOfMyPosts);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 나의 자서전 개수 조회 API
+     * [GET] /app/users/my-autobiographies/number
+     * @return BaseResponse<Integer>
+     */
+    @ApiOperation(value="나의 자서전 개수 조회 API", notes="사용자가 작성한 자서전의 개수를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/my-autobiographies/number")
+    public BaseResponse<Integer> getNumberOfMyAutobiographies( ){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
+
+            int numberOfMyAutobiographies = userProvider.getNumberOfMyAutobiographies(userId);
+            return new BaseResponse<>(numberOfMyAutobiographies);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 내가 선물 받은 자서전 조회 API
+     * [GET] /app/users/gifted-autobiographies
+     * @return BaseResponse<>
+     */
+    @ApiOperation(value="내가 선물 받은 자서전 조회 API", notes="사용자가 선물받은 자서전들과 그 개수를 반환합니다")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/gifted-autobiographies")
+    public BaseResponse<GetGiftedAutobiographiesRes> getGiftedAutobiographies(){
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
+
+            GetGiftedAutobiographiesRes getGiftedAutobiographiesRes = userProvider.getGiftedAutobiographies(userId);
+            return new BaseResponse<>(getGiftedAutobiographiesRes);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

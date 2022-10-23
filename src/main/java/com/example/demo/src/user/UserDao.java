@@ -5,6 +5,7 @@ import com.example.demo.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -107,5 +108,81 @@ public class UserDao {
         String query = "SELECT EXISTS(SELECT NICKNAME FROM USER WHERE NICKNAME = ?)";
 
         return this.jdbcTemplate.queryForObject(query,int.class,nickname);
+    }
+
+    public int checkPhoneNumber(String phoneNumber) {
+        String query = "SELECT EXISTS(SELECT PHONE_NUMBER FROM USER WHERE PHONE_NUMBER = ?)";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,phoneNumber);
+    }
+
+    public void modifyUserProfile(int userIdx, UserProfile userProfile, MultipartFile image) {
+        String query = "update USER set NICKNAME = ?";
+
+        if (userProfile.getIntroduction() != null) {
+            query+=", INTRODUCTION = ?";
+        }
+        if (image != null) {
+            query+=", image = ?";
+        }
+        query+=" where ID = ?";
+
+        Object[] params = new Object[]{userProfile.getNickname(), userProfile.getIntroduction(), userIdx};
+
+        this.jdbcTemplate.update(query,params);
+    }
+
+    /* 프로필 조회 */
+    public UserProfile getUserProfile(int userId) {
+        String query = "SELECT PROFILE_PHOTO, NICKNAME, INTRODUCTION\n" +
+                "FROM USER\n" +
+                "WHERE ID = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs,rowNum)-> new UserProfile(
+                        rs.getString("PROFILE_PHOTO"),
+                        rs.getString("NICKNAME"),
+                        rs.getString("INTRODUCTION")
+                ),
+                userId);
+    }
+
+    /* 나의 게시글 수 조회 */
+    public int getNumberOfMyPosts(int userId) {
+        String query = "SELECT COUNT(ID)\n" +
+                "FROM POST\n" +
+                "WHERE USER_ID = ?;";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, userId);
+    }
+
+    /* 나의 자서전 개수 조회 */
+    public int getNumberOfMyAutobiographies(int userId) {
+        String query = "SELECT COUNT(ID)\n" +
+                "FROM AUTOBIOGRAPHY\n" +
+                "WHERE USER_ID = ?";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, userId);
+    }
+
+    /* 선물받은 자서전 목록 조회 */
+    public List<GiftedAutobiography> getGiftedAutobiographies(int userId) {
+        String query = "SELECT A.ID, TITLE, TITLE_COLOR, COVER_COLOR, DETAIL, G.CREATED_AT\n" +
+                "FROM AUTOBIOGRAPHY A\n" +
+                "JOIN GIFT G on A.ID = G.AUTOBIOGRAPHY_ID\n" +
+                "JOIN USER U on G.GUEST_PHONE_NUMBER = U.PHONE_NUMBER\n" +
+                "WHERE U.ID = ?\n" +
+                "ORDER BY G.CREATED_AT DESC";
+
+        return this.jdbcTemplate.query(query,
+                (rs,rowNum)-> new GiftedAutobiography(
+                        rs.getInt("ID"),
+                        rs.getString("TITLE"),
+                        rs.getString("TITLE_COLOR"),
+                        rs.getString("COVER_COLOR"),
+                        rs.getString("DETAIL"),
+                        rs.getString("CREATED_AT")
+                ),
+                userId);
     }
 }
