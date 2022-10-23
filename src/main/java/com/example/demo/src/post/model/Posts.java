@@ -10,10 +10,10 @@ import lombok.Setter;
 public class Posts {
     private int userId;
     private String contents;
-    private String daily_title;
+    private String dailyTitle;
     private String qnaBackgroundColor;
     private String filterId;
     private String qnaQuestionId;
     private String qnaQuestionMadeFromUser;
-
+    private String feedShare;
 }

@@ -48,7 +48,7 @@ public class QuestionController {
         this.jwtService = jwtService;
     }
 
-     /**
+     /*
      * 각 필터의 질문 가져오기 API
      * [GET] /app/questions/:filter-id
      * @return BaseResponse<List<GetUserRes>>
