@@ -5,6 +5,7 @@ package com.example.demo.src.user;
 import com.example.demo.config.BaseException;
 import com.example.demo.src.user.model.*;
 import com.example.demo.utils.JwtService;
+import com.example.demo.utils.S3Service;
 import com.example.demo.utils.SHA256;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +24,15 @@ public class UserService {
 
     private final UserDao userDao;
     private final UserProvider userProvider;
-    private final JwtService jwtService;
+
+    private final S3Service s3Service;
 
 
     @Autowired
-    public UserService(UserDao userDao, UserProvider userProvider, JwtService jwtService) {
+    public UserService(UserDao userDao, UserProvider userProvider, S3Service s3Service) {
         this.userDao = userDao;
         this.userProvider = userProvider;
-        this.jwtService = jwtService;
-
+        this.s3Service = s3Service;
     }
 
     /* 회원가입 */
@@ -60,9 +61,14 @@ public class UserService {
     }
 
     /* 프로필 수정 */
-    public void modifyUserProfile(int userIdx, UserProfile userProfile, MultipartFile image) throws BaseException {
+    public void modifyUserProfile(int userId, PatchUserProfileReq patchUserProfileReq, MultipartFile image) throws BaseException {
         try {
-            userDao.modifyUserProfile(userIdx, userProfile, image);
+            String profileImageUrl=null;
+            if (image != null) {
+                //새 이미지 추가
+                profileImageUrl = s3Service.fileUpload(image);
+            }
+            userDao.modifyUserProfile(userId, patchUserProfileReq, profileImageUrl);
         } catch (Exception exception) {
             logger.error("modifyUserProfile 에러", exception);
             throw new BaseException(DATABASE_ERROR);
