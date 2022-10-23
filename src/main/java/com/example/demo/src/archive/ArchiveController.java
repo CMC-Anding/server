@@ -1,10 +1,10 @@
-package com.example.demo.src.feed;
+package com.example.demo.src.archive;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.feed.model.*;
+import com.example.demo.src.archive.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,48 +39,76 @@ import lombok.RequiredArgsConstructor;
 
 //@RequiredArgsConstructor
 @RestController
-@RequestMapping("/app/feeds")
-@Api(value = "/app/posts", description = "resource가 Post인 API입니다") // swagger annotation
-public class FeedController {
+@RequestMapping("/app/archives")
+@Api(value = "/app/archives", description = "resource가 Archives인 API입니다") // swagger annotation
+public class ArchiveController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private final FeedProvider feedProvider;
+    private final ArchiveProvider archiveProvider;
     @Autowired
-    private final FeedService feedService;
+    private final ArchiveService archiveService;
     @Autowired
     private final JwtService jwtService;
 
-    public FeedController(FeedProvider feedProvider, FeedService feedService, JwtService jwtService){
-        this.feedProvider = feedProvider;
-        this.feedService = feedService;
+    public ArchiveController(ArchiveProvider archiveProvider, ArchiveService archiveService, JwtService jwtService){
+        this.archiveProvider = archiveProvider;
+        this.archiveService = archiveService;
         this.jwtService = jwtService;
     }
 
     /**
-     * 피드 게시글 목록 조회 API
-     * [GET] /app/feeds?filter-id
-     * @return BaseResponse<List<GetFeedListRes>>
+     * 아카이브 문답 조회 API
+     * [GET] /app/archives/qnas?filterId
+     * @return BaseResponse<List<GetArchiveQnaRes>>
      */
     //Query String
     @ResponseBody
-    @GetMapping(" ") // (GET) 127.0.0.1:6660/app/feeds?filterId
-    public BaseResponse<List<GetFeedListRes>> getFeedList(@RequestParam(required = false) String filterId) {
+    @GetMapping("qnas") // (GET) 127.0.0.1:6660/app/archives/qnas?filterId
+    public BaseResponse<List<GetArchiveQnaRes>> getArchiveQnaList(@RequestParam(required = false) String filterId) {
         try{
-            // Get Feed List
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            // Get Archive Qna List
             if(filterId == null){
-                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedList();
-                return new BaseResponse<>(getFeedListRes);
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveProvider.getArchiveQnaList(userIdxByJwt);
+                return new BaseResponse<>(getArchiveQnaRes);
             } else {
-                // Get Feed List By FilterId
-                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedListByFilterId(filterId);
-                return new BaseResponse<>(getFeedListRes);
+                // Get Archive Qna List By FilterId
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveProvider.getArchiveQnaListByFilterId(filterId, userIdxByJwt);
+                return new BaseResponse<>(getArchiveQnaRes);
             }
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
 
     }
+
+    /**
+     * 아카이브 일상 조회 API
+     * [GET] /app/archives/daily
+     * @return BaseResponse<List<GetArchiveDailyRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("daily") // (GET) 127.0.0.1:6660/app/archives/daily
+    public BaseResponse<List<GetArchiveDailyRes>> getArchiveDailyList(@RequestParam(required = false) String filterId) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            // Get Archive Daily List
+            List<GetArchiveDailyRes> getArchiveDailyRes = archiveProvider.getArchiveDailyList(userIdxByJwt);
+            return new BaseResponse<>(getArchiveDailyRes);
+            
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    
+
+
 
     // /**
     //  * 회원가입 API

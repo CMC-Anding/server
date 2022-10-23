@@ -72,14 +72,14 @@ public class PostController {
 
             // 일상 게시글 
             if(file != null) {
-                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDaily_title(), posts.getContents(), posts.getFilterId());
+                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFilterId(), posts.getFeedShare());
 
                 int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
                 postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
             }
             // 문답 게시글 
             else {
-                PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser());
+                PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser(), posts.getFeedShare());
 
                 postService.postQnaPost(postQnaPostReq);
             }

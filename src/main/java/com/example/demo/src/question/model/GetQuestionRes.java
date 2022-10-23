@@ -10,4 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class GetQuestionRes {
     private String contents;
+    private int numberOfRemaning;
 }
