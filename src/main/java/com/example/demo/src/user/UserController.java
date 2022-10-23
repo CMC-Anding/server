@@ -37,6 +37,7 @@ import io.swagger.annotations.ApiResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/app/users")
@@ -253,29 +254,33 @@ public class UserController {
 //    }
 
     /**
-     * 프로필수정 API
+     * 프로필 수정 API
      * [PATCH] /app/users/profile
      * @return BaseResponse
      */
-//    @ResponseBody
-//    @PatchMapping(value = "/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public BaseResponse modifyUserProfile(@RequestPart UserProfile userProfile, @RequestPart(value="image", required=false) MultipartFile image) throws IOException {
-//        try{
-//            //jwt에서 idx 추출.
-//            int userIdx = jwtService.getUserIdx();
-//
-//            //닉네임 중복 확인
-//            userProvider.checkNickname(userProfile.getNickname());
-//
-//            //프로필 수정
-//            userService.modifyUserProfile(userIdx, userProfile, image);
-//
-//            return new BaseResponse(SUCCESS);
-//        }
-//        catch (BaseException exception){
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
+    @ApiOperation(value="프로필 수정 API", notes="사용자의 프로필(프로필이미지, 닉네임, 소개)를 수정합니다. 값이 변경된 부분만 request body에 넣어서 보내주면 됩니다.")
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다."),
+            @ApiResponse(code = 4002 , message = "S3 업로드에 실패했습니다.")
+    })
+    @ResponseBody
+    @PatchMapping(value = "/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public BaseResponse modifyUserProfile(@RequestPart(value="patchUserProfileReq", required=false) PatchUserProfileReq patchUserProfileReq, @ApiParam(value = "image", type = "MultipartFile", required = false, example = "이미지 파일") @RequestPart(value="image", required=false) MultipartFile image) throws IOException {
+        try{
+            //jwt에서 idx 추출.
+            int userId = jwtService.getUserIdx();
+
+            //프로필 수정
+            userService.modifyUserProfile(userId, patchUserProfileReq, image);
+
+            return new BaseResponse(SUCCESS);
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
     /**
      * 프로필 조회 API
@@ -383,5 +388,28 @@ public class UserController {
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
+    }
+
+    /**
+     * 멀티파트폼 테스트 API
+     * [PATCH] /app/users/profile-test
+     * @return BaseResponse
+     */
+    @ResponseBody
+    @PatchMapping(value = "/profile-test", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public BaseResponse testModifyUserProfile(@RequestPart(value="userProfile", required=false) UserProfile userProfile, @RequestPart(value="image", required=false) MultipartFile image) throws IOException {
+        System.out.println(image==null);
+        System.out.println(Objects.isNull(image));
+        System.out.println(image);
+
+        System.out.println(userProfile);
+        System.out.println(userProfile==null);
+        System.out.println(userProfile.getIntroduction());
+        System.out.println(userProfile.getNickname());
+
+
+
+        return new BaseResponse(SUCCESS);
+
     }
 }

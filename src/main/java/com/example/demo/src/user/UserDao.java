@@ -5,10 +5,11 @@ import com.example.demo.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class UserDao {
@@ -116,20 +117,42 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(query,int.class,phoneNumber);
     }
 
-    public void modifyUserProfile(int userIdx, UserProfile userProfile, MultipartFile image) {
-        String query = "update USER set NICKNAME = ?";
+    /* 프로필 수정 */
+    public void modifyUserProfile(int userId, PatchUserProfileReq patchUserProfileReq, String imageUrl) {
+        String query = "update USER set ";
+        boolean isPreviousColumnExist = false;
 
-        if (userProfile.getIntroduction() != null) {
-            query+=", INTRODUCTION = ?";
+        if (!Objects.isNull(patchUserProfileReq.getNickname())) {
+            query += " NICKNAME = " + "'"+patchUserProfileReq.getNickname()+"'";
+            isPreviousColumnExist = true;
         }
-        if (image != null) {
-            query+=", image = ?";
+
+        if (!Objects.isNull(patchUserProfileReq.getIntroduction())) {
+            if (isPreviousColumnExist) {
+                query += ",";
+            }
+            query += " INTRODUCTION = " +"'"+patchUserProfileReq.getIntroduction()+"'";
+            isPreviousColumnExist = true;
         }
-        query+=" where ID = ?";
 
-        Object[] params = new Object[]{userProfile.getNickname(), userProfile.getIntroduction(), userIdx};
+        if (!Objects.isNull(imageUrl)) {
+            if (isPreviousColumnExist) {
+                query += ",";
+            }
+            query+=" PROFILE_PHOTO= "+"'"+imageUrl+"'";
+            isPreviousColumnExist = true;
+        } else if (patchUserProfileReq.isImageDeleted()) {
+            if (isPreviousColumnExist) {
+                query += ",";
+            }
+            query+=" PROFILE_PHOTO= null";
+            isPreviousColumnExist = true;
+        }
 
-        this.jdbcTemplate.update(query,params);
+        query+=" \n where ID = ?";
+
+
+        this.jdbcTemplate.update(query,userId);
     }
 
     /* 프로필 조회 */
