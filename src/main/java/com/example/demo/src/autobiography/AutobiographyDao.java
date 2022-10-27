@@ -3,10 +3,13 @@ package com.example.demo.src.autobiography;
 
 import com.example.demo.src.autobiography.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -85,5 +88,31 @@ public class AutobiographyDao {
 
     // }
 
+    /* 자서전 틀 생성*/
+    public int createAutobiography(int userId, PostAutobiographyReq postAutobiographyReq) {
+        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR) values (?, ?, ?, ?, ?)";
+        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor()};
 
+        this.jdbcTemplate.update(query, params);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+
+    }
+
+
+    /* 자서전에 게시글들 연결*/
+    public int connectPostsToAutobiography(int autobiographyId, PostAutobiographyReq postAutobiographyReq) {
+        String query = "insert into AUTOBIOGRAPHY_POST (AUTOBIOGRAPHY_ID, POST_ID, PAGE_ORDER) VALUES (?,?,?) ";
+        return this.jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, autobiographyId);
+                ps.setInt(2, postAutobiographyReq.getPostIds().get(i));
+                ps.setInt(3, i+1);
+            }
+            @Override
+            public int getBatchSize() {return postAutobiographyReq.getPostIds().size();}
+        }).length;
+    }
 }
