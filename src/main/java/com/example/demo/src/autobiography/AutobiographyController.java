@@ -100,19 +100,9 @@ public class AutobiographyController {
     @ResponseBody
     @PatchMapping("/posts/{autobiography-id}")
     public BaseResponse<String> modifyAutobiographyPost(@PathVariable("autobiography-id") int autobiographyId, @RequestBody ModifyAutobiographyPostReq modifyAutobiographyPostReq) {
-        try {
-            // for(int i=0; i<ModifyAutobiographyPostReqArr.length; i++){
-            //     System.out.println("vals(" + i + ") : " + ids.get(i));
-            // }
-
-            //modifyAutobiographyPostReq.postId = new int[modifyAutobiographyPostReq.getPostId().length];
-
-            //Integer[] arrayParam = modifyAutobiographyPostReq.getModifyAutobiographyPostReqList("postId");
-        
-            
+        try {            
             autobiographyService.modifyAutobiographyPost(autobiographyId, modifyAutobiographyPostReq);
             
-
             return new BaseResponse<>("자서전을 구성하는 게시글정보 수정에 성공했습니다!");
 
         } catch(BaseException exception) {
