@@ -9,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Posts {
     private int userId;
+    private int postId;
     private String contents;
     private String dailyTitle;
     private String qnaBackgroundColor;

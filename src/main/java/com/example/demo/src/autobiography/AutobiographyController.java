@@ -1,14 +1,16 @@
-package com.example.demo.src.post;
+package com.example.demo.src.autobiography;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.post.model.*;
+import com.example.demo.src.autobiography.model.*;
 import com.example.demo.utils.JwtService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
@@ -21,12 +23,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.models.auth.In;
 import io.swagger.annotations.ApiResponse;
 
 import java.io.IOException;
@@ -40,106 +42,89 @@ import lombok.RequiredArgsConstructor;
 
 //@RequiredArgsConstructor
 @RestController
-@RequestMapping("/app/posts")
-@Api(value = "/app/posts", description = "resource가 Post인 API입니다") // swagger annotation
-public class PostController {
+@RequestMapping("/app/autobiographies")
+@Api(value = "/app/autobiographies", description = "resource가 Autobiography인 API입니다") // swagger annotation
+public class AutobiographyController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private final PostProvider postProvider;
+    private final AutobiographyProvider autobiographyProvider;
     @Autowired
-    private final PostService postService;
+    private final AutobiographyService autobiographyService;
     @Autowired
     private final JwtService jwtService;
 
-    public PostController(PostProvider postProvider, PostService postService, JwtService jwtService){
-        this.postProvider = postProvider;
-        this.postService = postService;
+    public AutobiographyController(AutobiographyProvider autobiographyProvider, AutobiographyService autobiographyService, JwtService jwtService){
+        this.autobiographyProvider = autobiographyProvider;
+        this.autobiographyService = autobiographyService;
         this.jwtService = jwtService;
     }
 
-    /**
-     * 게시글 등록 API
-     * [POST] /app/posts
-     * @return BaseResponse<String>
+    /*
+     * 자서전의 게시글구성 제외한 요소 수정 API
+     * [PATCH] /app/autobiographies/etc/:autobiography-id
+     * @return BaseRespone<String>
      */
-    @ResponseBody
-    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
-    public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
-        try{
-            //jwt에서 idx 추출.
-            int userIdxByJwt = jwtService.getUserIdx();
-
-            // 일상 게시글 
-            if(file != null) {
-                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFilterId(), posts.getFeedShare());
-
-                int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
-            }
-            // 문답 게시글 
-            else {
-                PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser(), posts.getFeedShare());
-
-                postService.postQnaPost(postQnaPostReq);
-            }
-
-            String result = "게시글이 등록되었습니다!";
-            return new BaseResponse<>(SUCCESS ,result); 
-        }
-        catch (BaseException exception){
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
-     * 글 상세보기 API
-     * [GET] /app/posts/detail/:post-id
-     * @return BaseResponse<GetPostDetailRes>
-     */
-    // Path-variable
-    @ResponseBody
-    @GetMapping("/detail/{post-id}") // (GET) 127.0.0.1:6660/app/posts/detail/:post-id
-    public BaseResponse<GetPostDetailRes> getPostDetail(@PathVariable("post-id") int postId) {
-        // Get Users
-        try{
-            GetPostDetailRes getPostDetailRes = postProvider.getPostDetail(postId);
-            return new BaseResponse<>(getPostDetailRes);
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
-        }
-
-    }
-
-    /**
-     * 스크랩 API
-     * [POST] /app/posts/clip
-     * @return BaseResponse<String>
-     */
-    @ApiOperation(value="스크랩 API", notes="내가 작성한 글과 다른 사용자가 작성한 글을 스크랩합니다.") // swagger annotation
+    // Body
+    @ApiOperation(value="자서전의 게시글구성 제외한 요소 수정 API", notes="자서전의 제목, 추가설명, 제목색상, 표지색상을 수정합니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4505 , message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
+        @ApiResponse(code = 4502 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다.")}
     )
     @ResponseBody
-    @PostMapping(value = "/clip") // (POST) 127.0.0.1:6660/app/posts/clip
-    public BaseResponse<String> postClip(@RequestBody PostClipReq postClipReq) throws IOException{
-        try{
-            //jwt에서 idx 추출.
-            int userIdxByJwt = jwtService.getUserIdx();
+    @PatchMapping("/etc/{autobiography-id}")
+    public BaseResponse<String> modifyAutobiographyEtc(@PathVariable("autobiography-id") int autobiographyId, @RequestBody ModifyAutobiographyEtcReq modifyAutobiographyEtcReq) {
+        try {
+            autobiographyService.modifyAutobiographyEtc(autobiographyId, modifyAutobiographyEtcReq);
+            return new BaseResponse<>("자서전 정보수정에 성공했습니다!");
 
-            postService.postClip(userIdxByJwt, postClipReq);
-
-            String result = "스크랩에 성공했습니다!";
-            return new BaseResponse<>(SUCCESS ,result); 
-        }
-        catch (BaseException exception){
+        } catch(BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
-    // /**
+    /*
+     * 자서전의 게시글 구성 수정 API
+     * [PATCH] /app/autobiographies/posts/:autobiography-id
+     * @return BaseRespone<String>
+     */
+    // Body
+    @ApiOperation(value="자서전의 게시글 구성 수정 API", notes="자서전의 게시글 구성과 게시글 순서를 수정합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4503 , message = "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
+        @ApiResponse(code = 4504 , message = "자서전의 게시글 구성 생성에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @PatchMapping("/posts/{autobiography-id}")
+    public BaseResponse<String> modifyAutobiographyPost(@PathVariable("autobiography-id") int autobiographyId, @RequestBody ModifyAutobiographyPostReq modifyAutobiographyPostReq) {
+        try {
+            // for(int i=0; i<ModifyAutobiographyPostReqArr.length; i++){
+            //     System.out.println("vals(" + i + ") : " + ids.get(i));
+            // }
+
+            //modifyAutobiographyPostReq.postId = new int[modifyAutobiographyPostReq.getPostId().length];
+
+            //Integer[] arrayParam = modifyAutobiographyPostReq.getModifyAutobiographyPostReqList("postId");
+        
+            
+            autobiographyService.modifyAutobiographyPost(autobiographyId, modifyAutobiographyPostReq);
+            
+
+            return new BaseResponse<>("자서전을 구성하는 게시글정보 수정에 성공했습니다!");
+
+        } catch(BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
+
+
+
+    // /*
     //  * 회원가입 API
     //  * [POST] /users
     //  * @return BaseResponse<PostUserRes>

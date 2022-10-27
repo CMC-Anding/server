@@ -57,7 +57,7 @@ public class QuestionController {
     @ApiOperation(value="각 필터의 질문 가져오기 API", notes="홈(문답 게시글 작성)에서 특정 필터 선택시, 나올 수 있는 질문입니다.") // swagger annotation
     @ResponseBody
     @ApiResponses({
-        @ApiResponse(code =4050 , message = "사용자가 작성하지않은 질문을 가져오는데에 실패하였습니다.")}
+        @ApiResponse(code =4501 , message = "사용자가 작성하지않은 질문을 가져오는데에 실패하였습니다.")}
     )
     @GetMapping("/{filter-id}") // (GET) 127.0.0.1:9000/app/questions/:filter-id
     public BaseResponse<GetQuestionRes> getQuestion(@PathVariable("filter-id") String filterId) {

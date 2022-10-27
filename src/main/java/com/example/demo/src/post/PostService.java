@@ -54,6 +54,8 @@ public class PostService {
         this.amazonS3 = amazonS3;
     }
 
+
+
     // //POST
     // public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
     //     //중복
@@ -136,6 +138,20 @@ public class PostService {
         return lastInsertId;
         } catch(Exception exception){
             exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 스크랩 API 
+    public int postClip(int userIdxByJwt, PostClipReq postClipReq) throws BaseException {
+        try{
+            int lastInsertId = postDao.postClip(userIdxByJwt, postClipReq);
+
+            if(lastInsertId == 0){
+                throw new BaseException(CLIP_FAIL);
+            }
+        return lastInsertId;
+        } catch(Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }
     }

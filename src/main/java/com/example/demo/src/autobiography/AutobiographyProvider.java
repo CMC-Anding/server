@@ -1,9 +1,9 @@
-package com.example.demo.src.post;
+package com.example.demo.src.autobiography;
 
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponseStatus;
-import com.example.demo.src.post.model.*;
+import com.example.demo.src.autobiography.model.*;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.SHA256;
 import org.slf4j.Logger;
@@ -11,35 +11,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Executable;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
 //Provider : Read의 비즈니스 로직 처리
 @Service
-public class PostProvider {
+public class AutobiographyProvider {
 
-    private final PostDao postDao;
+    private final AutobiographyDao autobiographyDao;
     private final JwtService jwtService;
 
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public PostProvider(PostDao postDao, JwtService jwtService) {
-        this.postDao = postDao;
+    public AutobiographyProvider(AutobiographyDao autobiographyDao, JwtService jwtService) {
+        this.autobiographyDao = autobiographyDao;
         this.jwtService = jwtService;
     }
 
-    //글 상세보기
-    public GetPostDetailRes getPostDetail(int postId) throws BaseException {
-        try {
-            GetPostDetailRes getPostDetailRes = postDao.getPostDetail(postId);
-            return getPostDetailRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+
 
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
