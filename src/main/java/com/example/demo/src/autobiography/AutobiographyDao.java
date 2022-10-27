@@ -2,6 +2,7 @@ package com.example.demo.src.autobiography;
 
 
 import com.example.demo.src.autobiography.model.*;
+import com.example.demo.src.user.model.GetUserRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -114,5 +115,23 @@ public class AutobiographyDao {
             @Override
             public int getBatchSize() {return postAutobiographyReq.getPostIds().size();}
         }).length;
+    }
+
+    /* 자서전 목록 조회 */
+    public List<Autobiography> getMyAutobiographyList(int userId) {
+        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, CREATED_AT\n" +
+                "FROM AUTOBIOGRAPHY\n" +
+                "WHERE USER_ID=?";
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new Autobiography(
+                        rs.getInt("ID"),
+                        rs.getString("TITLE"),
+                        rs.getString("DETAIL"),
+                        rs.getString("COVER_COLOR"),
+                        rs.getString("TITLE_COLOR"),
+                        rs.getString("CREATED_AT")
+                ),
+                userId);
     }
 }

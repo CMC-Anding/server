@@ -33,7 +33,6 @@ public class AutobiographyProvider {
     }
 
 
-
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
     //         List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);
@@ -71,5 +70,14 @@ public class AutobiographyProvider {
     //     }
 
     // }
+
+    public List<Autobiography> getMyAutobiographyList(int userId) throws BaseException {
+        try {
+            return autobiographyDao.getMyAutobiographyList(userId);
+        } catch (Exception exception) {
+            logger.error("getMyAutobiographyList 에러");
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 }

@@ -205,6 +205,29 @@ public class AutobiographyController {
         }
     }
 
-
-
+    /**
+     * 자서전 목록 조회 API
+     * [GET] /app/autobiographies
+     * @return BaseRespone
+     */
+    // Body
+    @ApiOperation(value="자서전 목록 조회 API", notes="내가 작성한 자서전 리스트를 조회합니다.") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청성공"),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")
+    })
+    @ResponseBody
+    @GetMapping("")
+    public BaseResponse<List<Autobiography>> getMyAutobiographyList() {
+        try {
+            int userId = jwtService.getUserIdx();
+            List<Autobiography> myAutobiographyList =  autobiographyProvider.getMyAutobiographyList(userId);
+            return new BaseResponse<>(myAutobiographyList);
+        } catch(BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
