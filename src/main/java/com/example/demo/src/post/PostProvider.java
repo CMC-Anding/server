@@ -31,7 +31,8 @@ public class PostProvider {
         this.jwtService = jwtService;
     }
 
-        public GetPostDetailRes getPostDetail(int postId) throws BaseException {
+    //글 상세보기
+    public GetPostDetailRes getPostDetail(int postId) throws BaseException {
         try {
             GetPostDetailRes getPostDetailRes = postDao.getPostDetail(postId);
             return getPostDetailRes;

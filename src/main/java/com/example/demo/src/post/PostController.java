@@ -111,6 +111,34 @@ public class PostController {
 
     }
 
+    /**
+     * 스크랩 API
+     * [POST] /app/posts/clip
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="스크랩 API", notes="내가 작성한 글과 다른 사용자가 작성한 글을 스크랩합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4505 , message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
+    )
+    @ResponseBody
+    @PostMapping(value = "/clip") // (POST) 127.0.0.1:6660/app/posts/clip
+    public BaseResponse<String> postClip(@RequestBody PostClipReq postClipReq) throws IOException{
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            postService.postClip(userIdxByJwt, postClipReq);
+
+            String result = "스크랩에 성공했습니다!";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
     // /**
     //  * 회원가입 API
     //  * [POST] /users

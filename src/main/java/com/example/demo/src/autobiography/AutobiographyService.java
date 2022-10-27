@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -49,15 +51,17 @@ public class AutobiographyService {
     // 자서전 게시글 구성 수정
     public void modifyAutobiographyPost(int autobiographyId, ModifyAutobiographyPostReq modifyAutobiographyPostReq) throws BaseException {
         try{
+            //기존 구성정보 삭제
             int deleteResult = autobiographyDao.deleteAutobiographyPost(autobiographyId);
             if(deleteResult == 0){
                 throw new BaseException(DELETE_FAIL_AUTOGRAPHY_POST);
             }
 
+            //새로운 구성정보 추가
             try{
                 autobiographyDao.insertAutobiographyPost(autobiographyId, modifyAutobiographyPostReq);
             } catch(Exception exception) {
-                exception.getStackTrace();
+                exception.printStackTrace();
                 throw new BaseException(INSERT_FAIL_AUTOGRAPHY_POST);
             }
 

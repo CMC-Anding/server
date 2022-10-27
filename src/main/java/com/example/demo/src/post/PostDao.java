@@ -54,6 +54,7 @@ public class PostDao {
         return this.jdbcTemplate.update(postQnaPostQuery, postQnaPostParams);
     }
 
+    // 글 상세보기 
     public GetPostDetailRes getPostDetail(int postId){
         String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST WHERE ID = ?";
         return this.jdbcTemplate.queryForObject(getPostDetailQuery,
@@ -67,6 +68,13 @@ public class PostDao {
                         rs.getString("dailyImage"),
                         rs.getString("qnaQuestionMadeFromUser")),
                     postId, postId, postId);
+    }
+    
+    // 스크랩 
+    public int postClip(int userIdxByJwt, PostClipReq postClipReq){
+        String postQnaPostQuery = "insert into CLIP(USER_ID, WRITER_ID, POST_ID) values (?,(select USER_ID from POST where ID = ?),?)";
+        Object[] postQnaPostParams = new Object[]{userIdxByJwt, postClipReq.getPostId(), postClipReq.getPostId()};
+        return this.jdbcTemplate.update(postQnaPostQuery, postQnaPostParams);
     }
 
     // public List<GetUserRes> getUsersByEmail(String email){

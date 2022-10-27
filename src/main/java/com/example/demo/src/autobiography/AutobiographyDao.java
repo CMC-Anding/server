@@ -35,14 +35,13 @@ public class AutobiographyDao {
 
     //자서전 게시글구성 수정 새로운 구성 생성
     public void insertAutobiographyPost(int autobiographyId, ModifyAutobiographyPostReq modifyAutobiographyPostReq) {
-        for (int i=0 ; i<modifyAutobiographyPostReq.getPostId().length; i++) {
-            String insertAutobiographyPostQuery = "insert into AUTOBIOGRAPHY_POST(POST_ID, PAGE_ORDER) values(?,?) where AUTOBIOGRAPHY_ID =?";
-            Object[] insertAutobiographyPostParams = new Object[] {modifyAutobiographyPostReq.getPostId()[i], i+1, autobiographyId};
-            this.jdbcTemplate.update(insertAutobiographyPostQuery, insertAutobiographyPostParams);
+        for (int i=0 ; i < modifyAutobiographyPostReq.getPostId().size(); i++) {
+        String insertAutobiographyPostQuery = "insert into AUTOBIOGRAPHY_POST(AUTOBIOGRAPHY_ID, POST_ID, PAGE_ORDER) values (?, ?, ?)";
+        Object[] insertAutobiographyPostParams = new Object[] {autobiographyId, modifyAutobiographyPostReq.getPostId().get(i), i+1};
+        this.jdbcTemplate.update(insertAutobiographyPostQuery, insertAutobiographyPostParams);
         }
+        
     }
-
-
 
     // public int createUser(PostUserReq postUserReq){
     //     String createUserQuery = "insert into UserInfo (userName, ID, password, email) VALUES (?,?,?,?)";

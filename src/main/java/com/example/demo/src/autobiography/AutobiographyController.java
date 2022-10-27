@@ -6,9 +6,11 @@ import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.autobiography.model.*;
 import com.example.demo.utils.JwtService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
@@ -26,6 +28,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.models.auth.In;
 import io.swagger.annotations.ApiResponse;
 
 import java.io.IOException;
@@ -98,8 +101,18 @@ public class AutobiographyController {
     @PatchMapping("/posts/{autobiography-id}")
     public BaseResponse<String> modifyAutobiographyPost(@PathVariable("autobiography-id") int autobiographyId, @RequestBody ModifyAutobiographyPostReq modifyAutobiographyPostReq) {
         try {
-            modifyAutobiographyPostReq.postId = new int[modifyAutobiographyPostReq.getPostId().length];
+            // for(int i=0; i<ModifyAutobiographyPostReqArr.length; i++){
+            //     System.out.println("vals(" + i + ") : " + ids.get(i));
+            // }
+
+            //modifyAutobiographyPostReq.postId = new int[modifyAutobiographyPostReq.getPostId().length];
+
+            //Integer[] arrayParam = modifyAutobiographyPostReq.getModifyAutobiographyPostReqList("postId");
+        
+            
             autobiographyService.modifyAutobiographyPost(autobiographyId, modifyAutobiographyPostReq);
+            
+
             return new BaseResponse<>("자서전을 구성하는 게시글정보 수정에 성공했습니다!");
 
         } catch(BaseException exception) {
