@@ -143,9 +143,9 @@ public class PostService {
     }
 
     // 스크랩 API 
-    public int postClip(int userIdxByJwt, PostClipReq postClipReq) throws BaseException {
+    public int postClip(int userIdxByJwt, int postId) throws BaseException {
         try{
-            int lastInsertId = postDao.postClip(userIdxByJwt, postClipReq);
+            int lastInsertId = postDao.postClip(userIdxByJwt, postId);
 
             if(lastInsertId == 0){
                 throw new BaseException(CLIP_FAIL);
@@ -153,6 +153,16 @@ public class PostService {
         return lastInsertId;
         } catch(Exception exception){
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 스크랩 취소 API 
+    public void deleteClip(int postId, int userIdxByJwt) throws BaseException {
+        try{
+            postDao.deleteClip(postId, userIdxByJwt);
+
+        } catch(Exception exception){
+            throw new BaseException(DELETE_CLIP_FAIL);
         }
     }
 }

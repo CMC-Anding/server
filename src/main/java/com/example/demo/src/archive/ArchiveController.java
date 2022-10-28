@@ -59,23 +59,23 @@ public class ArchiveController {
 
     /**
      * 아카이브 문답 조회 API
-     * [GET] /app/archives/qnas?filterId
+     * [GET] /app/archives/qnas?filterId&chronological
      * @return BaseResponse<List<GetArchiveQnaRes>>
      */
     //Query String
     @ResponseBody
-    @GetMapping("qnas") // (GET) 127.0.0.1:6660/app/archives/qnas?filterId
-    public BaseResponse<List<GetArchiveQnaRes>> getArchiveQnaList(@RequestParam(required = false) String filterId) {
+    @GetMapping("qnas") // (GET) 127.0.0.1:6660/app/archives/qnas?filterId&chronological
+    public BaseResponse<List<GetArchiveQnaRes>> getArchiveQnaList(@RequestParam(required = false) String filterId, @RequestParam(required = true, defaultValue="desc") String chronological) {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
 
             // Get Archive Qna List
             if(filterId == null){
-                List<GetArchiveQnaRes> getArchiveQnaRes = archiveProvider.getArchiveQnaList(userIdxByJwt);
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveProvider.getArchiveQnaList(userIdxByJwt, chronological);
                 return new BaseResponse<>(getArchiveQnaRes);
             } else {
                 // Get Archive Qna List By FilterId
-                List<GetArchiveQnaRes> getArchiveQnaRes = archiveProvider.getArchiveQnaListByFilterId(filterId, userIdxByJwt);
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveProvider.getArchiveQnaListByFilterId(filterId, userIdxByJwt, chronological);
                 return new BaseResponse<>(getArchiveQnaRes);
             }
         } catch(BaseException exception){
@@ -86,18 +86,18 @@ public class ArchiveController {
 
     /**
      * 아카이브 일상 조회 API
-     * [GET] /app/archives/daily
+     * [GET] /app/archives/daily?chronological
      * @return BaseResponse<List<GetArchiveDailyRes>>
      */
     //Query String
     @ResponseBody
-    @GetMapping("daily") // (GET) 127.0.0.1:6660/app/archives/daily
-    public BaseResponse<List<GetArchiveDailyRes>> getArchiveDailyList(@RequestParam(required = false) String filterId) {
+    @GetMapping("daily") // (GET) 127.0.0.1:6660/app/archives/daily?chronological
+    public BaseResponse<List<GetArchiveDailyRes>> getArchiveDailyList(@RequestParam(required = true, defaultValue="desc") String chronological) {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
 
             // Get Archive Daily List
-            List<GetArchiveDailyRes> getArchiveDailyRes = archiveProvider.getArchiveDailyList(userIdxByJwt);
+            List<GetArchiveDailyRes> getArchiveDailyRes = archiveProvider.getArchiveDailyList(userIdxByJwt, chronological);
             return new BaseResponse<>(getArchiveDailyRes);
             
         } catch(BaseException exception){

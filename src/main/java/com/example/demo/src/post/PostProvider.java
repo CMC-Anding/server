@@ -41,6 +41,16 @@ public class PostProvider {
         }
     }
 
+    //내 게시글 스크랩 조회
+    public List<GetMyClipRes> getMyPostClip(int userIdxByJwt) throws BaseException {
+        try {
+            List<GetMyClipRes> getMyClipRes = postDao.getMyPostClip(userIdxByJwt);
+            return getMyClipRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
     //         List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);

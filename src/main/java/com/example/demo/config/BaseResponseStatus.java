@@ -69,7 +69,8 @@ public enum BaseResponseStatus {
     MODIFY_FAIL_AUTOGRAPHY_ETC(false, 4502, "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다."),
     DELETE_FAIL_AUTOGRAPHY_POST(false, 4503, "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
     INSERT_FAIL_AUTOGRAPHY_POST(false, 4504, "자서전의 게시글 구성 생성에 실패하였습니다."),
-    CLIP_FAIL(false, 4505,"나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.");
+    CLIP_FAIL(false, 4505,"나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다."),
+    DELETE_CLIP_FAIL(false, 4506, "스크랩 취소에 실패하였습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요

@@ -31,12 +31,19 @@ public class ArchiveProvider {
         this.archiveDao = archiveDao;
         this.jwtService = jwtService;
     }
+
     // 아카이브 문답 조회 API
     // Get Archive Qna List (전체필터)
-    public List<GetArchiveQnaRes> getArchiveQnaList(int userIdxByJwt) throws BaseException {
+    public List<GetArchiveQnaRes> getArchiveQnaList(int userIdxByJwt, String chronological) throws BaseException {
         try {
-            List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaList(userIdxByJwt);
-            return getArchiveQnaRes;
+            // 시간순
+            if(chronological == "asc") {
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListChronological(userIdxByJwt);
+                return getArchiveQnaRes;
+            }else{ // 최신순
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListReverseChronological(userIdxByJwt);
+                return getArchiveQnaRes;
+            }
         } catch (Exception exception) {
             exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
@@ -45,21 +52,33 @@ public class ArchiveProvider {
 
     // 아카이브 문답 조회 API
     // Get Archive Qna List By FilterId (개별필터)
-    public List<GetArchiveQnaRes> getArchiveQnaListByFilterId(String filterId, int userIdxByJwt) throws BaseException {
+    public List<GetArchiveQnaRes> getArchiveQnaListByFilterId(String filterId, int userIdxByJwt, String chronological) throws BaseException {
         try {
-            List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListByFilterId(filterId, userIdxByJwt);
-            return getArchiveQnaRes;
+            // 시간순
+            if(chronological =="asc") {
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListByFilterIdChronological(filterId, userIdxByJwt);
+                return getArchiveQnaRes;
+            }else { //최신순
+                List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListByFilterIdReverseChronological(filterId, userIdxByJwt);
+                return getArchiveQnaRes;
+            }
         } catch (Exception exception) {
             exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
         }
     
-    //아카이브 일상 조회 API
-    public List<GetArchiveDailyRes> getArchiveDailyList(int userIdxByJwt) throws BaseException {
+    // 아카이브 일상 조회 API
+    public List<GetArchiveDailyRes> getArchiveDailyList(int userIdxByJwt, String chronological) throws BaseException {
     try {
-        List<GetArchiveDailyRes> getArchiveDailyRes = archiveDao.getArchiveDailyList(userIdxByJwt);
-        return getArchiveDailyRes;
+        // 시간순
+        if(chronological =="asc") {
+            List<GetArchiveDailyRes> getArchiveDailyRes = archiveDao.getArchiveDailyListChronological(userIdxByJwt);
+            return getArchiveDailyRes;
+        }else{ //최신순
+            List<GetArchiveDailyRes> getArchiveDailyRes = archiveDao.getArchiveDailyListReverseChronological(userIdxByJwt);
+            return getArchiveDailyRes;
+        }
     } catch (Exception exception) {
         exception.printStackTrace();
         throw new BaseException(DATABASE_ERROR);
