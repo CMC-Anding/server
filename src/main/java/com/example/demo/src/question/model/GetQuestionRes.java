@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetQuestionRes {
-    private int qnaQuestionId;
+    private String qnaQuestionId;
     private String contents;
     private int numberOfRemaning;
 }

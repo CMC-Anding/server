@@ -66,6 +66,7 @@ public class PostController {
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
     public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
+
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
@@ -73,13 +74,12 @@ public class PostController {
             // 일상 게시글 
             if(posts.getDailyTitle() != null) {
                 PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
-
                 int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                //후 (사진 업로드)
-                if(file != null) {
-                    postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); 
+                if(file.isEmpty() == false) {   
+                    postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
                 }
             }
+            
             // 문답 게시글 
             else {
                 PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser(), posts.getFeedShare());
