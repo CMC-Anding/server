@@ -24,10 +24,9 @@ public class PostDao {
      * 게시글 등록 API 
      * 일상 게시글
     */
-
     public int postDailyPost(PostDailyPostReq postDailyPostReq){
-        String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID, FEED_SHARE) VALUES (?,?,?,?,?)";
-        Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), postDailyPostReq.getFilterId(), postDailyPostReq.getFeedShare()};
+        String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID, FEED_SHARE) VALUES (?, ?, ?, ?, ?);";
+        Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), "e", postDailyPostReq.getFeedShare()};
         this.jdbcTemplate.update(postDailyPostQuery, postDailyPostParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
