@@ -91,7 +91,7 @@ public class PostService {
             int lastInsertId = postDao.postDailyPost(postDailyPostReq);
 
             if(lastInsertId == 0){
-                throw new BaseException(MODIFY_FAIL_USERNAME);
+                throw new BaseException(POST_DAILY_POST_FAIL);
             }
         return lastInsertId;
         } catch(Exception exception){

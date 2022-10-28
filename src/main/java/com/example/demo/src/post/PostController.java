@@ -71,11 +71,14 @@ public class PostController {
             int userIdxByJwt = jwtService.getUserIdx();
 
             // 일상 게시글 
-            if(file != null) {
-                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFilterId(), posts.getFeedShare());
+            if(posts.getDailyTitle() != null) {
+                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
 
                 int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
+                //후 (사진 업로드)
+                if(file != null) {
+                    postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); 
+                }
             }
             // 문답 게시글 
             else {
