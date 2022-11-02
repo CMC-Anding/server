@@ -230,4 +230,30 @@ public class AutobiographyController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 자서전 보기 API
+     * [GET] /app/autobiographies/:autobiography-id/pages/:page
+     * @return BaseRespone
+     */
+    @ApiOperation(value="자서전 보기 API", notes="선택한 자서전에 포함된 첫 페이지를 반환합니다.") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청성공"),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")
+    })
+    @ResponseBody
+    @GetMapping("/{autobiography-id}/pages/{page}")
+    public BaseResponse<PostDetail> getMyAutographyPage(@PathVariable(value = "autobiography-id", required = true) int autobiographyId, @PathVariable(value = "page", required = true) int page) {
+        try {
+            int userId = jwtService.getUserIdx();
+            PostDetail requestedPage = autobiographyProvider.getMyAutographyPage(autobiographyId, page);
+
+            return new BaseResponse(requestedPage);
+        } catch(BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

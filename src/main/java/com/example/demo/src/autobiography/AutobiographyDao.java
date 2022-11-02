@@ -134,4 +134,32 @@ public class AutobiographyDao {
                 ),
                 userId);
     }
+
+    public PostDetail getMyAutobiographyPage(int autobiographyId, int page) {
+        String query = "SELECT P.FILTER_ID AS FILTER_ID, QNA_BACKGROUND_COLOR, QNA_QUESTION_ID, Q.CONTENTS AS QNA_QUESTION, QNA_QUESTION_MADE_FROM_USER, P.CONTENTS AS CONTENTS, DAILY_TITLE, URL AS DAILY_IMAGE, P.CREATED_AT AS CREATED_AT, LAST_PAGE\n" +
+                "FROM AUTOBIOGRAPHY_POST AP\n" +
+                "JOIN POST P on AP.POST_ID = P.ID\n" +
+                "LEFT JOIN QUESTION Q on P.QNA_QUESTION_ID = Q.ID\n" +
+                "LEFT JOIN POST_PHOTO PP on P.ID = PP.POST_ID\n" +
+                "JOIN (SELECT AUTOBIOGRAPHY_ID, MAX(PAGE_ORDER) AS LAST_PAGE\n" +
+                "FROM AUTOBIOGRAPHY_POST AP\n" +
+                "GROUP BY AUTOBIOGRAPHY_ID) AS LP on AP.AUTOBIOGRAPHY_ID=LP.AUTOBIOGRAPHY_ID\n" +
+                "WHERE AP.AUTOBIOGRAPHY_ID=? AND AP.PAGE_ORDER=?;";
+        Object[] params = new Object[]{autobiographyId,page};
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new PostDetail(
+                        rs.getString("FILTER_ID"),
+                        rs.getString("QNA_BACKGROUND_COLOR"),
+                        rs.getString("QNA_QUESTION_ID"),
+                        rs.getString("QNA_QUESTION"),
+                        rs.getString("QNA_QUESTION_MADE_FROM_USER"),
+                        rs.getString("CONTENTS"),
+                        rs.getString("DAILY_TITLE"),
+                        rs.getString("DAILY_IMAGE"),
+                        rs.getString("CREATED_AT"),
+                        rs.getInt("LAST_PAGE")
+                ),
+                params);
+    }
 }

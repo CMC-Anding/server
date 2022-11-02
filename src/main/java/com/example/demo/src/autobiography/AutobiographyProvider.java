@@ -2,16 +2,13 @@ package com.example.demo.src.autobiography;
 
 
 import com.example.demo.config.BaseException;
-import com.example.demo.config.BaseResponseStatus;
 import com.example.demo.src.autobiography.model.*;
 import com.example.demo.utils.JwtService;
-import com.example.demo.utils.SHA256;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Executable;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
@@ -80,4 +77,14 @@ public class AutobiographyProvider {
         }
     }
 
+    public PostDetail getMyAutographyPage(int autobiographyId, int page) throws BaseException {
+        try {
+            PostDetail postDetail = autobiographyDao.getMyAutobiographyPage(autobiographyId, page);
+            postDetail.setCurrentPage(page);
+            return postDetail;
+        } catch (Exception exception) {
+            logger.error("getMyAutographyPage 에러");
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
