@@ -68,6 +68,7 @@ public class AutobiographyProvider {
 
     // }
 
+    /* 내 자서전 목록 조회*/
     public List<Autobiography> getMyAutobiographyList(int userId) throws BaseException {
         try {
             return autobiographyDao.getMyAutobiographyList(userId);
@@ -77,6 +78,7 @@ public class AutobiographyProvider {
         }
     }
 
+    /* 자서전 보기 */
     public PostDetail getMyAutographyPage(int autobiographyId, int page) throws BaseException {
         try {
             PostDetail postDetail = autobiographyDao.getMyAutobiographyPage(autobiographyId, page);
@@ -84,6 +86,16 @@ public class AutobiographyProvider {
             return postDetail;
         } catch (Exception exception) {
             logger.error("getMyAutographyPage 에러");
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /* 내가 선물한 자서전 개수 조회 */
+    public int getNumberOfAutographiesGiftedFromMe(int userId) throws BaseException {
+        try {
+            return autobiographyDao.getNumberOfAutographiesGiftedFromMe(userId);
+        } catch (Exception exception) {
+            logger.error("getNumberOfAutographiesGiftedFromMe 에러");
             throw new BaseException(DATABASE_ERROR);
         }
     }

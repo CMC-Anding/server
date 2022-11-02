@@ -234,9 +234,9 @@ public class AutobiographyController {
     /**
      * 자서전 보기 API
      * [GET] /app/autobiographies/:autobiography-id/pages/:page
-     * @return BaseRespone
+     * @return BaseRespone<PostDetail>
      */
-    @ApiOperation(value="자서전 보기 API", notes="선택한 자서전에 포함된 첫 페이지를 반환합니다.") // swagger annotation
+    @ApiOperation(value="자서전 보기 API", notes="선택한 자서전에 포함된 특정 페이지를 반환합니다.") // swagger annotation
     @ApiResponses({
             @ApiResponse(code = 1000 , message = "요청성공"),
             @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
@@ -252,6 +252,31 @@ public class AutobiographyController {
             PostDetail requestedPage = autobiographyProvider.getMyAutographyPage(autobiographyId, page);
 
             return new BaseResponse(requestedPage);
+        } catch(BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 내가 선물한 자서전 개수 API
+     * [GET] /app/autobiographies/gifted-from-me/number
+     * @return BaseRespone<Integer>
+     */
+    @ApiOperation(value="내가 선물한 자서전 개수 API", notes="내가 선물한 자서전의 개수를 반환합니다.") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청성공"),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")
+    })
+    @ResponseBody
+    @GetMapping("/gifted-from-me/number")
+    public BaseResponse<Integer> getNumberOfAutographiesGiftedFromMe() {
+        try {
+            int userId = jwtService.getUserIdx();
+            int numberOfAutographiesGiftedFromMe = autobiographyProvider.getNumberOfAutographiesGiftedFromMe(userId);
+            return new BaseResponse(numberOfAutographiesGiftedFromMe);
         } catch(BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

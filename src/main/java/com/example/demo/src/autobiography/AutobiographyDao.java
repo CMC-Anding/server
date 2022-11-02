@@ -135,6 +135,7 @@ public class AutobiographyDao {
                 userId);
     }
 
+    /* 자서전 보기 */
     public PostDetail getMyAutobiographyPage(int autobiographyId, int page) {
         String query = "SELECT P.FILTER_ID AS FILTER_ID, QNA_BACKGROUND_COLOR, QNA_QUESTION_ID, Q.CONTENTS AS QNA_QUESTION, QNA_QUESTION_MADE_FROM_USER, P.CONTENTS AS CONTENTS, DAILY_TITLE, URL AS DAILY_IMAGE, P.CREATED_AT AS CREATED_AT, LAST_PAGE\n" +
                 "FROM AUTOBIOGRAPHY_POST AP\n" +
@@ -161,5 +162,14 @@ public class AutobiographyDao {
                         rs.getInt("LAST_PAGE")
                 ),
                 params);
+    }
+
+    /* 내가 선물한 자서전 개수 조회*/
+    public int getNumberOfAutographiesGiftedFromMe(int userId) {
+        String query = "SELECT COUNT(ID) AS NUMBER_OF_GIFTED_AUTOGRAPHIES_FROM_ME\n" +
+                "FROM GIFT\n" +
+                "WHERE USER_ID=?";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,userId);
     }
 }
