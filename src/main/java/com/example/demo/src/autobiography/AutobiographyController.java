@@ -281,4 +281,29 @@ public class AutobiographyController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 선물받은 자서전 개수 API
+     * [GET] /app/autobiographies/gifted-from-others/number
+     * @return BaseRespone<Integer>
+     */
+    @ApiOperation(value="선물받은 자서전 개수 API", notes="선물받은 자서전의 개수를 반환합니다.") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청성공"),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")
+    })
+    @ResponseBody
+    @GetMapping("/gifted-from-others/number")
+    public BaseResponse<Integer> getNumberOfAutographiesGiftedFromOthers() {
+        try {
+            int userId = jwtService.getUserIdx();
+            int numberOfAutographiesGiftedFromMe = autobiographyProvider.getNumberOfAutographiesGiftedFromOthers(userId);
+            return new BaseResponse(numberOfAutographiesGiftedFromMe);
+        } catch(BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

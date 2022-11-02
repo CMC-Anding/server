@@ -99,4 +99,14 @@ public class AutobiographyProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    /* 선물받은 자서전 개수 조회 */
+    public int getNumberOfAutographiesGiftedFromOthers(int userId) throws BaseException {
+        try {
+            return autobiographyDao.getNumberOfAutographiesGiftedFromOthers(userId);
+        } catch (Exception exception) {
+            logger.error("getNumberOfAutographiesGiftedFromOthers 에러");
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

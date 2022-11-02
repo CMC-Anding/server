@@ -172,4 +172,13 @@ public class AutobiographyDao {
 
         return this.jdbcTemplate.queryForObject(query,int.class,userId);
     }
+
+    /* 선물받은 자서전 개수 조회*/
+    public int getNumberOfAutographiesGiftedFromOthers(int userId) {
+        String query = "SELECT COUNT(ID) AS NUMBER_OF_GIFTED_AUTOGRAPHIES_FROM_OTHERS\n" +
+                "FROM GIFTED_AUTOBIOGRAPHY\n" +
+                "WHERE USER_ID=?";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,userId);
+    }
 }
