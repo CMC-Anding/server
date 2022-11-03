@@ -109,4 +109,30 @@ public class AutobiographyProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    /* 자서전 제작할 게시글 목록 조회 */
+    public GetPostsForAutographyRes getPostsForAutography(int userId, String filterId, String sort, String lastCreatedAt) throws BaseException {
+        try {
+            List<Post> postList = autobiographyDao.getPostsForAutography(userId, filterId, sort, lastCreatedAt);
+
+            GetPostsForAutographyRes getPostsForAutographyRes = new GetPostsForAutographyRes();
+
+            // 다음페이지 존재 여부에 따른 반환 객체 데이터 작성
+            if (postList.size() < 19) {
+                getPostsForAutographyRes.setHasMorePost(false);
+                getPostsForAutographyRes.setPostList(postList);
+                getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size()-1).getCreatedAt());
+            } else {
+                getPostsForAutographyRes.setHasMorePost(true);
+                getPostsForAutographyRes.setPostList(postList.subList(0,postList.size()-1));
+                getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size()-2).getCreatedAt());
+            }
+
+            return getPostsForAutographyRes;
+
+        } catch (Exception exception) {
+            logger.error("getPostsForAutography 에러");
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

@@ -306,4 +306,35 @@ public class AutobiographyController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 자서전 제작할 내용 조회 API
+     * [GET] /app/autobiographies/posts?filter-id={filter-id}&sort={sort}&last-created-at={last-created-at}
+     * @return BaseRespone<GetPostsForAutographyRes>
+     */
+    @ApiOperation(value="자서전 제작할 내용 조회 API", notes="자서전 제작에 사용될 게시글 목록을 조회합니다") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청성공"),
+            @ApiResponse(code = 2001 , message = "JWT를 입력해주세요."),
+            @ApiResponse(code = 2002 , message = "유효하지 않은 JWT입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")
+    })
+    @ResponseBody
+    @GetMapping("/posts")
+    public BaseResponse<GetPostsForAutographyRes> getPostsForAutography(
+            @ApiParam(value = "filter-id", type = "String", required = false, example = "d")
+            @RequestParam(value="filter-id", required = false) String filterId,
+            @ApiParam(value = "sort", type = "String", required = true, example = "newest")
+            @RequestParam(value="sort", required = true) String sort,
+            @ApiParam(value = "last-created-at", type = "String", required = false, example = "2022-11-01 02:39:11")
+            @RequestParam(value="last-created-at", required = false) String lastCreatedAt) {
+        try {
+            int userId = jwtService.getUserIdx();
+            GetPostsForAutographyRes getPostsForAutographyRes = autobiographyProvider.getPostsForAutography(userId, filterId, sort, lastCreatedAt);
+            return new BaseResponse(getPostsForAutographyRes);
+        } catch(BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

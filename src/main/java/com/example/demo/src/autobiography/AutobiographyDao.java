@@ -2,7 +2,6 @@ package com.example.demo.src.autobiography;
 
 
 import com.example.demo.src.autobiography.model.*;
-import com.example.demo.src.user.model.GetUserRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -180,5 +180,54 @@ public class AutobiographyDao {
                 "WHERE USER_ID=?";
 
         return this.jdbcTemplate.queryForObject(query,int.class,userId);
+    }
+
+    /* 자서전 제작할 게시글 목록 조회 */
+    public List<Post> getPostsForAutography(int userId, String filterId, String sort, String lastCreatedAt) {
+        String query = "SELECT P.ID, P.FILTER_ID, QNA_BACKGROUND_COLOR, QNA_QUESTION_ID, Q.CONTENTS AS QNA_QUESTION, QNA_QUESTION_MADE_FROM_USER, DAILY_TITLE, URL AS DAILY_IMAGE, P.CREATED_AT\n" +
+                "FROM POST P\n" +
+                "LEFT JOIN POST_PHOTO PP on P.ID = PP.POST_ID\n" +
+                "LEFT JOIN QUESTION Q on P.QNA_QUESTION_ID = Q.ID\n" +
+                "WHERE USER_ID=? AND P.STATUS='ACTIVE'\n";
+        List<Object> paramsList = new ArrayList<>();
+        paramsList.add(userId);
+
+        //필터링
+        if (filterId != null) {
+            query +="AND P.FILTER_ID=?\n";
+            paramsList.add(filterId);
+        }
+
+        // 최신순, 시간순 정렬
+        if (sort.equals("newest")) {
+            if (lastCreatedAt != null) {
+                query +="AND P.CREATED_AT<?\n";
+                paramsList.add(lastCreatedAt);
+            }
+            query +="ORDER BY P.CREATED_AT DESC\n" +
+                    "LIMIT 19;";
+        } else {
+            if (lastCreatedAt != null) {
+                query +="AND P.CREATED_AT>?\n";
+                paramsList.add(lastCreatedAt);
+            }
+            query +="ORDER BY P.CREATED_AT ASC\n" +
+                    "LIMIT 19;";
+        }
+
+
+        Object[] params = paramsList.toArray();
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new Post(
+                        rs.getInt("ID"),
+                        rs.getString("FILTER_ID"),
+                        rs.getString("QNA_BACKGROUND_COLOR"),
+                        rs.getString("QNA_QUESTION_ID"),
+                        rs.getString("QNA_QUESTION"),
+                        rs.getString("QNA_QUESTION_MADE_FROM_USER"),
+                        rs.getString("DAILY_TITLE"),
+                        rs.getString("DAILY_IMAGE"),
+                        rs.getString("CREATED_AT")
+                ),params);
     }
 }
