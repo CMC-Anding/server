@@ -24,10 +24,9 @@ public class PostDao {
      * 게시글 등록 API 
      * 일상 게시글
     */
-
     public int postDailyPost(PostDailyPostReq postDailyPostReq){
-        String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID, FEED_SHARE) VALUES (?,?,?,?,?)";
-        Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), postDailyPostReq.getFilterId(), postDailyPostReq.getFeedShare()};
+        String postDailyPostQuery = "insert into POST (USER_ID, DAILY_TITLE, CONTENTS, FILTER_ID, FEED_SHARE) VALUES (?, ?, ?, ?, ?);";
+        Object[] postDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), "e", postDailyPostReq.getFeedShare()};
         this.jdbcTemplate.update(postDailyPostQuery, postDailyPostParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
@@ -71,10 +70,33 @@ public class PostDao {
     }
     
     // 스크랩 
-    public int postClip(int userIdxByJwt, PostClipReq postClipReq){
-        String postQnaPostQuery = "insert into CLIP(USER_ID, WRITER_ID, POST_ID) values (?,(select USER_ID from POST where ID = ?),?)";
-        Object[] postQnaPostParams = new Object[]{userIdxByJwt, postClipReq.getPostId(), postClipReq.getPostId()};
-        return this.jdbcTemplate.update(postQnaPostQuery, postQnaPostParams);
+    public int postClip(int userIdxByJwt, int postId){
+        String postClipQuery = "insert into CLIP(USER_ID, WRITER_ID, POST_ID) values (?,(select USER_ID from POST where ID = ?),?)";
+        Object[] postClipParams = new Object[]{userIdxByJwt, postId, postId};
+        return this.jdbcTemplate.update(postClipQuery, postClipParams);
+    }
+
+    // 스크랩 취소
+    public int deleteClip(int postId, int userIdxByJwt){
+        String deleteClipQuery = "delete from CLIP where POST_ID = ? and USER_ID = ?";
+        Object[] deleteClipParams = new Object[]{postId, userIdxByJwt};
+        return this.jdbcTemplate.update(deleteClipQuery, deleteClipParams);
+    }
+
+    // 내 게시글 스크랩 조회
+    public List<GetMyClipRes> getMyPostClip(int userIdxByJwt){
+        String getFeedListQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT desc";
+        return this.jdbcTemplate.query(getFeedListQuery,
+                (rs, rowNum) -> new GetMyClipRes(
+                    rs.getInt("postId"),
+                    rs.getString("dailyTitle"),
+                    rs.getString("qnaBackgroundColor"),
+                    rs.getString("filterId"),
+                    rs.getString("qnaQuestionId"),
+                    rs.getString("qnaQuestion"),
+                    rs.getString("dailyImage"),
+                    rs.getString("qnaQuestionMadeFromUser")),
+                userIdxByJwt, userIdxByJwt);
     }
 
     // public List<GetUserRes> getUsersByEmail(String email){

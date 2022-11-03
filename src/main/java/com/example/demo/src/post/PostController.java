@@ -66,17 +66,20 @@ public class PostController {
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
     public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
+
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
             // 일상 게시글 
-            if(file != null) {
-                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFilterId(), posts.getFeedShare());
-
+            if(posts.getDailyTitle() != null) {
+                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
                 int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
+                if(file.isEmpty() == false) {   
+                    postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
+                }
             }
+            
             // 문답 게시글 
             else {
                 PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser(), posts.getFeedShare());
@@ -113,23 +116,23 @@ public class PostController {
 
     /**
      * 스크랩 API
-     * [POST] /app/posts/clip
+     * [POST] /app/posts/clip/:post-id
      * @return BaseResponse<String>
      */
     @ApiOperation(value="스크랩 API", notes="내가 작성한 글과 다른 사용자가 작성한 글을 스크랩합니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4505 , message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
+        @ApiResponse(code = 4505, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
     )
     @ResponseBody
-    @PostMapping(value = "/clip") // (POST) 127.0.0.1:6660/app/posts/clip
-    public BaseResponse<String> postClip(@RequestBody PostClipReq postClipReq) throws IOException{
+    @PostMapping(value = "/clip/{post-id}") // (POST) 127.0.0.1:6660/app/posts/clip/:post-id
+    public BaseResponse<String> postClip(@PathVariable("post-id") int postId) throws BaseException{
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
 
-            postService.postClip(userIdxByJwt, postClipReq);
+            postService.postClip(userIdxByJwt, postId);
 
             String result = "스크랩에 성공했습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
@@ -138,6 +141,63 @@ public class PostController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 스크랩 취소 API
+     * [DELETE] /app/posts/clip/:post-id
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="스크랩 취소 API", notes="내가 작성한 글과 다른 사용자가 작성한 글의 스크랩을 취소합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4506, message = "스크랩 취소에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @DeleteMapping(value = "/clip/{post-id}") // (DELETE) 127.0.0.1:6660/app/posts/clip/:post-id
+    public BaseResponse<String> deleteClip(@PathVariable("post-id") int postId) throws BaseException{
+        try{
+
+            int userIdxByJwt = jwtService.getUserIdx();
+            
+            postService.deleteClip(postId, userIdxByJwt);
+
+            String result = "스크랩을 취소하였습니다!";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 내 게시글 스크랩 조회 API
+     * [GET] /app/posts/my-clip
+     * @return BaseResponse<GetPostDetailRes>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/my-clip") // (GET) 127.0.0.1:6660/app/posts/my-clip
+    public BaseResponse<List<GetMyClipRes>> getMyPostClip() throws BaseException{
+
+        int userIdxByJwt = jwtService.getUserIdx();
+        
+        try{
+            List<GetMyClipRes> getMyClipRes = postProvider.getMyPostClip(userIdxByJwt);
+            return new BaseResponse<>(getMyClipRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    /**
+     * 상대 게시글 스크랩 조회 API
+     * [GET] /app/posts/other-clip
+     * @return BaseResponse<GetPostDetailRes>
+     */
+    // Path-variable
+    
 
     // /**
     //  * 회원가입 API
