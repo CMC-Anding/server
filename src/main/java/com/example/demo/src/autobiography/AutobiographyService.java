@@ -95,5 +95,15 @@ public class AutobiographyService {
     //         throw new BaseException(DATABASE_ERROR);
     //     }
     // }
-   
+
+    /* 자서전 등록 */
+    public void createAutobiography(int userId, PostAutobiographyReq postAutobiographyReq) throws BaseException {
+        try {
+            int autobiographyId = autobiographyDao.createAutobiography(userId, postAutobiographyReq);
+            autobiographyDao.connectPostsToAutobiography(autobiographyId, postAutobiographyReq);
+        } catch (Exception exception) {
+            logger.error("createAutobiography 에러");
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

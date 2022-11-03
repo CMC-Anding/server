@@ -3,10 +3,14 @@ package com.example.demo.src.autobiography;
 
 import com.example.demo.src.autobiography.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -85,5 +89,145 @@ public class AutobiographyDao {
 
     // }
 
+    /* 자서전 틀 생성*/
+    public int createAutobiography(int userId, PostAutobiographyReq postAutobiographyReq) {
+        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR) values (?, ?, ?, ?, ?)";
+        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor()};
 
+        this.jdbcTemplate.update(query, params);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+
+    }
+
+
+    /* 자서전에 게시글들 연결*/
+    public int connectPostsToAutobiography(int autobiographyId, PostAutobiographyReq postAutobiographyReq) {
+        String query = "insert into AUTOBIOGRAPHY_POST (AUTOBIOGRAPHY_ID, POST_ID, PAGE_ORDER) VALUES (?,?,?) ";
+        return this.jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, autobiographyId);
+                ps.setInt(2, postAutobiographyReq.getPostIds().get(i));
+                ps.setInt(3, i+1);
+            }
+            @Override
+            public int getBatchSize() {return postAutobiographyReq.getPostIds().size();}
+        }).length;
+    }
+
+    /* 자서전 목록 조회 */
+    public List<Autobiography> getMyAutobiographyList(int userId) {
+        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, CREATED_AT\n" +
+                "FROM AUTOBIOGRAPHY\n" +
+                "WHERE USER_ID=?";
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new Autobiography(
+                        rs.getInt("ID"),
+                        rs.getString("TITLE"),
+                        rs.getString("DETAIL"),
+                        rs.getString("COVER_COLOR"),
+                        rs.getString("TITLE_COLOR"),
+                        rs.getString("CREATED_AT")
+                ),
+                userId);
+    }
+
+    /* 자서전 보기 */
+    public PostDetail getMyAutobiographyPage(int autobiographyId, int page) {
+        String query = "SELECT P.FILTER_ID AS FILTER_ID, QNA_BACKGROUND_COLOR, QNA_QUESTION_ID, Q.CONTENTS AS QNA_QUESTION, QNA_QUESTION_MADE_FROM_USER, P.CONTENTS AS CONTENTS, DAILY_TITLE, URL AS DAILY_IMAGE, P.CREATED_AT AS CREATED_AT, LAST_PAGE\n" +
+                "FROM AUTOBIOGRAPHY_POST AP\n" +
+                "JOIN POST P on AP.POST_ID = P.ID\n" +
+                "LEFT JOIN QUESTION Q on P.QNA_QUESTION_ID = Q.ID\n" +
+                "LEFT JOIN POST_PHOTO PP on P.ID = PP.POST_ID\n" +
+                "JOIN (SELECT AUTOBIOGRAPHY_ID, MAX(PAGE_ORDER) AS LAST_PAGE\n" +
+                "FROM AUTOBIOGRAPHY_POST AP\n" +
+                "GROUP BY AUTOBIOGRAPHY_ID) AS LP on AP.AUTOBIOGRAPHY_ID=LP.AUTOBIOGRAPHY_ID\n" +
+                "WHERE AP.AUTOBIOGRAPHY_ID=? AND AP.PAGE_ORDER=?;";
+        Object[] params = new Object[]{autobiographyId,page};
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new PostDetail(
+                        rs.getString("FILTER_ID"),
+                        rs.getString("QNA_BACKGROUND_COLOR"),
+                        rs.getString("QNA_QUESTION_ID"),
+                        rs.getString("QNA_QUESTION"),
+                        rs.getString("QNA_QUESTION_MADE_FROM_USER"),
+                        rs.getString("CONTENTS"),
+                        rs.getString("DAILY_TITLE"),
+                        rs.getString("DAILY_IMAGE"),
+                        rs.getString("CREATED_AT"),
+                        rs.getInt("LAST_PAGE")
+                ),
+                params);
+    }
+
+    /* 내가 선물한 자서전 개수 조회*/
+    public int getNumberOfAutographiesGiftedFromMe(int userId) {
+        String query = "SELECT COUNT(ID) AS NUMBER_OF_GIFTED_AUTOGRAPHIES_FROM_ME\n" +
+                "FROM GIFT\n" +
+                "WHERE USER_ID=?";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,userId);
+    }
+
+    /* 선물받은 자서전 개수 조회*/
+    public int getNumberOfAutographiesGiftedFromOthers(int userId) {
+        String query = "SELECT COUNT(ID) AS NUMBER_OF_GIFTED_AUTOGRAPHIES_FROM_OTHERS\n" +
+                "FROM GIFTED_AUTOBIOGRAPHY\n" +
+                "WHERE USER_ID=?";
+
+        return this.jdbcTemplate.queryForObject(query,int.class,userId);
+    }
+
+    /* 자서전 제작할 게시글 목록 조회 */
+    public List<Post> getPostsForAutography(int userId, String filterId, String sort, String lastCreatedAt) {
+        String query = "SELECT P.ID, P.FILTER_ID, QNA_BACKGROUND_COLOR, QNA_QUESTION_ID, Q.CONTENTS AS QNA_QUESTION, QNA_QUESTION_MADE_FROM_USER, DAILY_TITLE, URL AS DAILY_IMAGE, P.CREATED_AT\n" +
+                "FROM POST P\n" +
+                "LEFT JOIN POST_PHOTO PP on P.ID = PP.POST_ID\n" +
+                "LEFT JOIN QUESTION Q on P.QNA_QUESTION_ID = Q.ID\n" +
+                "WHERE USER_ID=? AND P.STATUS='ACTIVE'\n";
+        List<Object> paramsList = new ArrayList<>();
+        paramsList.add(userId);
+
+        //필터링
+        if (filterId != null) {
+            query +="AND P.FILTER_ID=?\n";
+            paramsList.add(filterId);
+        }
+
+        // 최신순, 시간순 정렬
+        if (sort.equals("newest")) {
+            if (lastCreatedAt != null) {
+                query +="AND P.CREATED_AT<?\n";
+                paramsList.add(lastCreatedAt);
+            }
+            query +="ORDER BY P.CREATED_AT DESC\n" +
+                    "LIMIT 19;";
+        } else {
+            if (lastCreatedAt != null) {
+                query +="AND P.CREATED_AT>?\n";
+                paramsList.add(lastCreatedAt);
+            }
+            query +="ORDER BY P.CREATED_AT ASC\n" +
+                    "LIMIT 19;";
+        }
+
+
+        Object[] params = paramsList.toArray();
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new Post(
+                        rs.getInt("ID"),
+                        rs.getString("FILTER_ID"),
+                        rs.getString("QNA_BACKGROUND_COLOR"),
+                        rs.getString("QNA_QUESTION_ID"),
+                        rs.getString("QNA_QUESTION"),
+                        rs.getString("QNA_QUESTION_MADE_FROM_USER"),
+                        rs.getString("DAILY_TITLE"),
+                        rs.getString("DAILY_IMAGE"),
+                        rs.getString("CREATED_AT")
+                ),params);
+    }
 }
