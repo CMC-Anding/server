@@ -77,6 +77,26 @@ public class PostProvider {
         }
     }
 
+    // 스크랩북의 내 게시글 개수 
+    public GetMyPostOfClipCountRes getMyPostOfClipCount(int userIdxByJwt) throws BaseException {
+        try {
+            GetMyPostOfClipCountRes getMyPostOfClipCountRes = postDao.getMyPostOfClipCount(userIdxByJwt);
+            return getMyPostOfClipCountRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 스크랩북의 타인 게시글 개수 
+    public GetOtherPostOfClipCountRes getOtherPostOfClipCount(int userIdxByJwt) throws BaseException {
+        try {
+            GetOtherPostOfClipCountRes getOtherPostOfClipCountRes = postDao.getOtherPostOfClipCount(userIdxByJwt);
+            return getOtherPostOfClipCountRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
     //         List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);

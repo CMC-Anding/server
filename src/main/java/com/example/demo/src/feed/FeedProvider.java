@@ -31,29 +31,20 @@ public class FeedProvider {
         this.jwtService = jwtService;
     }
 
-    public List<GetFeedListRes> getFeedList(String chronological) throws BaseException {
+    public List<GetFeedListRes> getFeedList() throws BaseException {
         try {
-            if(chronological == "asc") {
-                List<GetFeedListRes> getFeedListRes = postDao.getFeedListChronological();
-                return getFeedListRes;
-            }else{
-                List<GetFeedListRes> getFeedListRes = postDao.getFeedListReverseChronological();
-                return getFeedListRes;
-            }
+            List<GetFeedListRes> getFeedListRes = postDao.getFeedList();
+            return getFeedListRes;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
         }
 
-    public List<GetFeedListRes> getFeedListByFilterId(String filterId, String chronological) throws BaseException {
+    public List<GetFeedListRes> getFeedListByFilterId(String filterId) throws BaseException {
     try {
-        if(chronological == "asc") {
-            List<GetFeedListRes> getFeedListRes = postDao.getFeedListByFilterIdChronological(filterId);
-            return getFeedListRes;
-        }else{
-            List<GetFeedListRes> getFeedListRes = postDao.getFeedListByFilterIdReverseChronological(filterId);
-            return getFeedListRes;
-        }
+        List<GetFeedListRes> getFeedListRes = 
+        postDao.getFeedListByFilterId(filterId);
+        return getFeedListRes;   
     } catch (Exception exception) {
         throw new BaseException(DATABASE_ERROR);
     }

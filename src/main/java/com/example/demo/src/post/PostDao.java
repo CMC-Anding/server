@@ -147,6 +147,29 @@ public class PostDao {
                 userIdxByJwt, userIdxByJwt);
     }
 
+    // 스크랩북의 내 게시글 개수 
+    public GetMyPostOfClipCountRes getMyPostOfClipCount(int userIdxByJwt) {
+        String getMyPostOfClipCountQuery = "select count(*) as myPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID = ?";
+        int getMyPostOfClipCountParam = userIdxByJwt;
+
+        return this.jdbcTemplate.queryForObject(getMyPostOfClipCountQuery, 
+            (rs,rowNum) -> new GetMyPostOfClipCountRes(
+                rs.getInt("myPostOfClipCount")),
+            getMyPostOfClipCountParam, getMyPostOfClipCountParam);
+    }
+
+
+    // 스크랩북의 타인 게시글 개수 
+    public GetOtherPostOfClipCountRes getOtherPostOfClipCount(int userIdxByJwt) {
+        String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID != ?";
+        int getOtherPostOfClipCountParam = userIdxByJwt;
+
+        return this.jdbcTemplate.queryForObject(getOtherPostOfClipCountQuery, 
+            (rs,rowNum) -> new GetOtherPostOfClipCountRes(
+                rs.getInt("otherPostOfClipCount")),
+            getOtherPostOfClipCountParam, getOtherPostOfClipCountParam);
+    }
+
     // public List<GetUserRes> getUsersByEmail(String email){
     //     String getUsersByEmailQuery = "select * from UserInfo where email =?";
     //     String getUsersByEmailParams = email;

@@ -111,7 +111,6 @@ public class PostController {
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
-
     }
 
     /**
@@ -188,7 +187,6 @@ public class PostController {
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
-
     }
 
     /**
@@ -209,7 +207,44 @@ public class PostController {
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
+    }
 
+    /**
+     * 스크랩북의 내 게시글 개수 API
+     * [GET] /app/posts/clip/my-post/cnt
+     * @return BaseResponse<GetMyPostOfClipCountRes>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/clip/my-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/my-post/cnt
+    public BaseResponse<GetMyPostOfClipCountRes> getMyPostOfClipCount() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            GetMyPostOfClipCountRes getMyPostOfClipCountRes = postProvider.getMyPostOfClipCount(userIdxByJwt);
+
+            return new BaseResponse<>(getMyPostOfClipCountRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 스크랩북의 타인 게시글 개수 API
+     * [GET] /app/posts/clip/other-post/cnt
+     * @return BaseResponse<GetArchiveCntRes>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/clip/other-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/other-post/cnt
+    public BaseResponse<GetOtherPostOfClipCountRes> getOtherPostOfClipCount() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            GetOtherPostOfClipCountRes getOtherPostOfClipCountRes = postProvider.getOtherPostOfClipCount(userIdxByJwt);
+
+            return new BaseResponse<>(getOtherPostOfClipCountRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
     }
 
     // /**
