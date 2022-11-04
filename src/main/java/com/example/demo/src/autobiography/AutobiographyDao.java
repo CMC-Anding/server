@@ -189,6 +189,7 @@ public class AutobiographyDao {
                 "LEFT JOIN POST_PHOTO PP on P.ID = PP.POST_ID\n" +
                 "LEFT JOIN QUESTION Q on P.QNA_QUESTION_ID = Q.ID\n" +
                 "WHERE USER_ID=? AND P.STATUS='ACTIVE'\n";
+
         List<Object> paramsList = new ArrayList<>();
         paramsList.add(userId);
 
@@ -214,7 +215,6 @@ public class AutobiographyDao {
             query +="ORDER BY P.CREATED_AT ASC\n" +
                     "LIMIT 19;";
         }
-
 
         Object[] params = paramsList.toArray();
         return this.jdbcTemplate.query(query,

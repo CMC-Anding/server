@@ -121,7 +121,10 @@ public class AutobiographyProvider {
             if (postList.size() < 19) {
                 getPostsForAutographyRes.setHasMorePost(false);
                 getPostsForAutographyRes.setPostList(postList);
-                getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size()-1).getCreatedAt());
+                if (postList.size() > 0) {
+                    getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size() - 1).getCreatedAt());
+                }
+
             } else {
                 getPostsForAutographyRes.setHasMorePost(true);
                 getPostsForAutographyRes.setPostList(postList.subList(0,postList.size()-1));
