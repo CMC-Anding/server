@@ -37,10 +37,11 @@ public class ArchiveProvider {
     public List<GetArchiveQnaRes> getArchiveQnaList(int userIdxByJwt, String chronological) throws BaseException {
         try {
             // 시간순
-            if(chronological == "asc") {
+            if(chronological.equals("asc")) {
                 List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListChronological(userIdxByJwt);
                 return getArchiveQnaRes;
-            }else{ // 최신순
+            }
+            else {// 최신순
                 List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListReverseChronological(userIdxByJwt);
                 return getArchiveQnaRes;
             }
@@ -54,8 +55,9 @@ public class ArchiveProvider {
     // Get Archive Qna List By FilterId (개별필터)
     public List<GetArchiveQnaRes> getArchiveQnaListByFilterId(String filterId, int userIdxByJwt, String chronological) throws BaseException {
         try {
+            System.out.println(chronological);
             // 시간순
-            if(chronological =="asc") {
+            if(chronological.equals("asc")) {
                 List<GetArchiveQnaRes> getArchiveQnaRes = archiveDao.getArchiveQnaListByFilterIdChronological(filterId, userIdxByJwt);
                 return getArchiveQnaRes;
             }else { //최신순
@@ -72,7 +74,7 @@ public class ArchiveProvider {
     public List<GetArchiveDailyRes> getArchiveDailyList(int userIdxByJwt, String chronological) throws BaseException {
     try {
         // 시간순
-        if(chronological =="asc") {
+        if(chronological.equals("asc")) {
             List<GetArchiveDailyRes> getArchiveDailyRes = archiveDao.getArchiveDailyListChronological(userIdxByJwt);
             return getArchiveDailyRes;
         }else{ //최신순

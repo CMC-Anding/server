@@ -19,7 +19,6 @@ public class GetArchiveDailyRes {
     private int postId;
     private String dailyTitle;
     private String dailyImage;
-    @JsonFormat(pattern = "yyyy-MM-DD HH:mm:ss")
-    private Date createdAt;
-    private int dailyPostCount;
+    // @JsonFormat(pattern = "yyyy-MM-DD HH:mm:ss")
+    // private Date createdAt;
 }

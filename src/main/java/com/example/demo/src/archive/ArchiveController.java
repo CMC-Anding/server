@@ -59,13 +59,13 @@ public class ArchiveController {
 
     /**
      * 아카이브 문답 조회 API
-     * [GET] /app/archives/qnas?filterId&chronological
+     * [GET] /app/archives/qnas?filter-id&chronological
      * @return BaseResponse<List<GetArchiveQnaRes>>
      */
     //Query String
     @ResponseBody
-    @GetMapping("qnas") // (GET) 127.0.0.1:6660/app/archives/qnas?filterId&chronological
-    public BaseResponse<List<GetArchiveQnaRes>> getArchiveQnaList(@RequestParam(required = false) String filterId, @RequestParam(required = true, defaultValue="desc") String chronological) {
+    @GetMapping("qnas") // (GET) 127.0.0.1:6660/app/archives/qnas?filter-id&chronological
+    public BaseResponse<List<GetArchiveQnaRes>> getArchiveQnaList(@RequestParam(value = "filter-id", required = false) String filterId, @RequestParam(value = "chronological", required = false, defaultValue = "desc" ) String chronological) {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
 

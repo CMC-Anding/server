@@ -110,6 +110,33 @@ public class AutobiographyController {
         }
     }
 
+    /*
+     * 자서전 선물하기 API
+     * [POST] /app/autobiographies/gift/:autobiography-id
+     * @return BaseResponse<String>
+     */
+    // Body
+    // @ApiOperation(value="자서전 선물하기 API", notes="사용자가 선물하고싶은 자서전의 일회성 선물코드를 생성합니다.") // swagger annotation
+    // @ApiResponses({
+    //     @ApiResponse(code = 1000 , message = "요청성공"),
+    //     @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다.")}
+    // )
+    // @ResponseBody
+    // @PostMapping("/gift/{autobiography-id}")
+    // public BaseResponse<PostGiftAutobiographyRes> giftAutobiography(@PathVariable("autobiography-id") int autobiographyId) {
+    //     try{
+    //         //jwt에서 idx 추출.
+    //         int userIdxByJwt = jwtService.getUserIdx();
+
+    //         autobiographyService.giftAutobiography(autobiographyId);
+    //         PostGiftAutobiographyRes postGiftAutobiographyRes = autobiographyProvider.getGiftCode();
+
+    //         return new BaseResponse<>(postGiftAutobiographyRes);
+    //     } catch(BaseException exception){
+    //         return new BaseResponse<>((exception.getStatus()));
+    //     }
+    // }
+
 
 
 
