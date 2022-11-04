@@ -109,6 +109,28 @@ public class ArchiveDao {
                 userIdxByJwt, "e");
     }
 
+    //아카이브 문답 게시글 개수 API
+    public GetQnaPostCountRes getQnaPostCount(int userIdxByJwt) {
+        String getQnaPostCountQuery = "select count(*) as qnaPostCount from POST where USER_ID = ? and FILTER_ID NOT IN (?);";
+        int getQnaPostCountParam = userIdxByJwt;
+
+        return this.jdbcTemplate.queryForObject(getQnaPostCountQuery, 
+            (rs,rowNum) -> new GetQnaPostCountRes(
+                rs.getInt("qnaPostCount")),
+            getQnaPostCountParam, "e");
+    }
+
+    //아카이브 일상 게시글 개수 API
+    public GetDailyPostCountRes getDailyPostCount(int userIdxByJwt) {
+        String getDailyPostCountQuery = "select count(*) as dailyPostCount from POST where USER_ID = ? and FILTER_ID IN (?);";
+        int getDailyPostCountParam = userIdxByJwt;
+
+        return this.jdbcTemplate.queryForObject(getDailyPostCountQuery, 
+            (rs,rowNum) -> new GetDailyPostCountRes(
+                rs.getInt("dailyPostCount")),
+            getDailyPostCountParam, "e");
+    }
+
 
     // public int createUser(PostUserReq postUserReq){
     //     String createUserQuery = "insert into UserInfo (userName, ID, password, email) VALUES (?,?,?,?)";

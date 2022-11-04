@@ -1,19 +1,19 @@
 package com.example.demo.src.archive.model;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-import java.security.Timestamp;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.List;
 
-@ToString
 @Getter
 @Setter
 @AllArgsConstructor
-
+@NoArgsConstructor
+@ApiModel
 public class GetArchiveQnaRes {
     private int postId;
     private String qnaBackgroundColor;

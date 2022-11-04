@@ -106,6 +106,44 @@ public class ArchiveController {
 
     }
 
+    /**
+     * 아카이브 문답 게시글 개수 API
+     * [GET] /app/archives/qna-post/cnt
+     * @return BaseResponse<GetArchiveCntRes>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/qna-post/cnt") // (GET) 127.0.0.1:6660/app/archives/qna-post/cnt
+    public BaseResponse<GetQnaPostCountRes> getQnaPostCount() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            GetQnaPostCountRes getQnaPostCountRes = archiveProvider.getQnaPostCount(userIdxByJwt);
+
+            return new BaseResponse<>(getQnaPostCountRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 아카이브 일상 게시글 개수 API
+     * [GET] /app/archives/daily-post/cnt
+     * @return BaseResponse<GetArchiveCntRes>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/daily-post/cnt") // (GET) 127.0.0.1:6660/app/archives/daily-post/cnt
+    public BaseResponse<GetDailyPostCountRes> getDailyPostCount() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            GetDailyPostCountRes getDailyPostCountRes = archiveProvider.getDailyPostCount(userIdxByJwt);
+
+            return new BaseResponse<>(getDailyPostCountRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
     
 
 
