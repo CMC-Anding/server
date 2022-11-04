@@ -42,10 +42,36 @@ public class PostProvider {
     }
 
     //내 게시글 스크랩 조회
-    public List<GetMyClipRes> getMyPostClip(int userIdxByJwt) throws BaseException {
+    public List<GetMyClipRes> getMyPostClip(int userIdxByJwt, String chronological) throws BaseException {
         try {
-            List<GetMyClipRes> getMyClipRes = postDao.getMyPostClip(userIdxByJwt);
-            return getMyClipRes;
+            //시간순
+            if(chronological.equals("asc")) {
+                List<GetMyClipRes> getMyClipRes = postDao.getMyPostClipChronological(userIdxByJwt);
+                return getMyClipRes;
+            }
+            //최신순
+            else {
+                List<GetMyClipRes> getMyClipRes = postDao.getMyPostClipReverseChronological(userIdxByJwt);
+                return getMyClipRes;
+            }
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //타인 게시글 스크랩 조회
+    public List<GetMyClipRes> getOtherPostClip(int userIdxByJwt, String chronological) throws BaseException {
+        try {
+            //시간순
+            if(chronological.equals("asc")) {
+                List<GetMyClipRes> getMyClipRes = postDao.getOtherPostClipChronological(userIdxByJwt);
+                return getMyClipRes;
+            }
+            //최신순
+            else {
+                List<GetMyClipRes> getMyClipRes = postDao.getOtherPostClipReverseChronological(userIdxByJwt);
+                return getMyClipRes;
+            }
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

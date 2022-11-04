@@ -172,18 +172,18 @@ public class PostController {
 
     /**
      * 내 게시글 스크랩 조회 API
-     * [GET] /app/posts/my-clip
+     * [GET] /app/posts/my-clip?chronological
      * @return BaseResponse<GetPostDetailRes>
      */
     // Path-variable
     @ResponseBody
-    @GetMapping("/my-clip") // (GET) 127.0.0.1:6660/app/posts/my-clip
-    public BaseResponse<List<GetMyClipRes>> getMyPostClip() throws BaseException{
+    @GetMapping("/my-clip") // (GET) 127.0.0.1:6660/app/posts/my-clip?chronological
+    public BaseResponse<List<GetMyClipRes>> getMyPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
 
         int userIdxByJwt = jwtService.getUserIdx();
         
         try{
-            List<GetMyClipRes> getMyClipRes = postProvider.getMyPostClip(userIdxByJwt);
+            List<GetMyClipRes> getMyClipRes = postProvider.getMyPostClip(userIdxByJwt, chronological);
             return new BaseResponse<>(getMyClipRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -193,11 +193,24 @@ public class PostController {
 
     /**
      * 상대 게시글 스크랩 조회 API
-     * [GET] /app/posts/other-clip
+     * [GET] /app/posts/other-clip?chronological
      * @return BaseResponse<GetPostDetailRes>
      */
     // Path-variable
-    
+    @ResponseBody
+    @GetMapping("/other-clip") // (GET) 127.0.0.1:6660/app/posts/other-clip?chronological
+    public BaseResponse<List<GetMyClipRes>> getOtherPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
+
+        int userIdxByJwt = jwtService.getUserIdx();
+        
+        try{
+            List<GetMyClipRes> getMyClipRes = postProvider.getOtherPostClip(userIdxByJwt, chronological);
+            return new BaseResponse<>(getMyClipRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
 
     // /**
     //  * 회원가입 API

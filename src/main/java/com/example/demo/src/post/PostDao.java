@@ -83,10 +83,58 @@ public class PostDao {
         return this.jdbcTemplate.update(deleteClipQuery, deleteClipParams);
     }
 
-    // 내 게시글 스크랩 조회
-    public List<GetMyClipRes> getMyPostClip(int userIdxByJwt){
-        String getFeedListQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT desc";
-        return this.jdbcTemplate.query(getFeedListQuery,
+    // 내 게시글 스크랩 조회 (최신순)
+    public List<GetMyClipRes> getMyPostClipReverseChronological(int userIdxByJwt){
+        String getMyPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT desc";
+        return this.jdbcTemplate.query(getMyPostClipReverseChronologicalQuery,
+                (rs, rowNum) -> new GetMyClipRes(
+                    rs.getInt("postId"),
+                    rs.getString("dailyTitle"),
+                    rs.getString("qnaBackgroundColor"),
+                    rs.getString("filterId"),
+                    rs.getString("qnaQuestionId"),
+                    rs.getString("qnaQuestion"),
+                    rs.getString("dailyImage"),
+                    rs.getString("qnaQuestionMadeFromUser")),
+                userIdxByJwt, userIdxByJwt);
+    }
+
+    // 내 게시글 스크랩 조회 (시간순)
+    public List<GetMyClipRes> getMyPostClipChronological(int userIdxByJwt){
+        String getMyPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT";
+        return this.jdbcTemplate.query(getMyPostClipChronologicalQuery,
+                (rs, rowNum) -> new GetMyClipRes(
+                    rs.getInt("postId"),
+                    rs.getString("dailyTitle"),
+                    rs.getString("qnaBackgroundColor"),
+                    rs.getString("filterId"),
+                    rs.getString("qnaQuestionId"),
+                    rs.getString("qnaQuestion"),
+                    rs.getString("dailyImage"),
+                    rs.getString("qnaQuestionMadeFromUser")),
+                userIdxByJwt, userIdxByJwt);
+    }
+
+    // 타인 게시글 스크랩 조회 (최신순)
+    public List<GetMyClipRes> getOtherPostClipReverseChronological(int userIdxByJwt){
+        String getOtherPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) ORDER BY p.CREATED_AT desc";
+        return this.jdbcTemplate.query(getOtherPostClipReverseChronologicalQuery,
+                (rs, rowNum) -> new GetMyClipRes(
+                    rs.getInt("postId"),
+                    rs.getString("dailyTitle"),
+                    rs.getString("qnaBackgroundColor"),
+                    rs.getString("filterId"),
+                    rs.getString("qnaQuestionId"),
+                    rs.getString("qnaQuestion"),
+                    rs.getString("dailyImage"),
+                    rs.getString("qnaQuestionMadeFromUser")),
+                userIdxByJwt, userIdxByJwt);
+    }
+
+    // 타인 게시글 스크랩 조회 (시간순)
+    public List<GetMyClipRes> getOtherPostClipChronological(int userIdxByJwt){
+        String getOtherPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) ORDER BY p.CREATED_AT";
+        return this.jdbcTemplate.query(getOtherPostClipChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
                     rs.getInt("postId"),
                     rs.getString("dailyTitle"),
