@@ -142,26 +142,23 @@ public class PostController {
     }
 
     /**
-     * 스크랩 취소 API
-     * [DELETE] /app/posts/clip/:post-id
+     * 스크랩북의 게시글 삭제 API
+     * [DELETE] /app/posts/clip
      * @return BaseResponse<String>
      */
-    @ApiOperation(value="스크랩 취소 API", notes="내가 작성한 글과 다른 사용자가 작성한 글의 스크랩을 취소합니다.") // swagger annotation
+    @ApiOperation(value="스크랩북의 게시글 삭제 API", notes="스크랩북에서 내가 원하는 게시글을 삭제합니다.(내 게시글, 타인 게시글 모두 가능)") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4506, message = "스크랩 취소에 실패하였습니다.")}
+        @ApiResponse(code = 4506, message = "스크랩북 수정(구성 게시글 삭제)에 실패하였습니다.")}
     )
     @ResponseBody
-    @DeleteMapping(value = "/clip/{post-id}") // (DELETE) 127.0.0.1:6660/app/posts/clip/:post-id
-    public BaseResponse<String> deleteClip(@PathVariable("post-id") int postId) throws BaseException{
+    @DeleteMapping(value = "/clip") // (DELETE) 127.0.0.1:6660/app/posts/clip
+    public BaseResponse<String> deletePostsOfClipBook(@RequestBody DeletePostsOfClipBookReq deletePostsOfClipBookReq) throws BaseException{
         try{
-
             int userIdxByJwt = jwtService.getUserIdx();
-            
-            postService.deleteClip(postId, userIdxByJwt);
-
-            String result = "스크랩을 취소하였습니다!";
+            postService.deletePostsOfClipBook(userIdxByJwt, deletePostsOfClipBookReq);
+            String result = "스크랩북을 수정(구성 게시글 삭제)하였습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
         }
         catch (BaseException exception){

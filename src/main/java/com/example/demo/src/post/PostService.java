@@ -157,10 +157,9 @@ public class PostService {
     }
 
     // 스크랩 취소 API 
-    public void deleteClip(int postId, int userIdxByJwt) throws BaseException {
+    public void deletePostsOfClipBook(int userIdxByJwt, DeletePostsOfClipBookReq deletePostsOfClipBookReq) throws BaseException {
         try{
-            postDao.deleteClip(postId, userIdxByJwt);
-
+            postDao.deletePostsOfClipBook(userIdxByJwt, deletePostsOfClipBookReq);
         } catch(Exception exception){
             throw new BaseException(DELETE_CLIP_FAIL);
         }

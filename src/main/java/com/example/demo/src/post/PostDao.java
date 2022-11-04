@@ -76,11 +76,13 @@ public class PostDao {
         return this.jdbcTemplate.update(postClipQuery, postClipParams);
     }
 
-    // 스크랩 취소
-    public int deleteClip(int postId, int userIdxByJwt){
-        String deleteClipQuery = "delete from CLIP where POST_ID = ? and USER_ID = ?";
-        Object[] deleteClipParams = new Object[]{postId, userIdxByJwt};
-        return this.jdbcTemplate.update(deleteClipQuery, deleteClipParams);
+    // 스크랩북의 게시글 삭제
+    public void deletePostsOfClipBook(int userIdxByJwt, DeletePostsOfClipBookReq deletePostsOfClipBookReq){
+        for (int i=0 ; i < deletePostsOfClipBookReq.getPostId().size(); i++) {
+        String deletePostsOfClipBookQuery = "delete from CLIP where POST_ID =? and USER_ID = ?";
+        Object[] deletePostsOfClipBookParams = new Object[]{deletePostsOfClipBookReq.getPostId().get(i), userIdxByJwt};
+        this.jdbcTemplate.update(deletePostsOfClipBookQuery, deletePostsOfClipBookParams);
+    }
     }
 
     // 내 게시글 스크랩 조회 (최신순)
