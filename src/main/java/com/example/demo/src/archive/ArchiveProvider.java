@@ -46,7 +46,6 @@ public class ArchiveProvider {
                 return getArchiveQnaRes;
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
         }
@@ -65,7 +64,6 @@ public class ArchiveProvider {
                 return getArchiveQnaRes;
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
         }
@@ -82,9 +80,28 @@ public class ArchiveProvider {
             return getArchiveDailyRes;
         }
     } catch (Exception exception) {
-        exception.printStackTrace();
         throw new BaseException(DATABASE_ERROR);
     }
+    }
+
+    // 아카이브 문답 게시글 개수 API
+    public GetQnaPostCountRes getQnaPostCount(int userIdxByJwt) throws BaseException {
+        try {
+            GetQnaPostCountRes getQnaPostCountRes = archiveDao.getQnaPostCount(userIdxByJwt);
+            return getQnaPostCountRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 아카이브 일상 게시글 개수 API
+    public GetDailyPostCountRes getDailyPostCount(int userIdxByJwt) throws BaseException {
+        try {
+            GetDailyPostCountRes getDailyPostCountRes = archiveDao.getDailyPostCount(userIdxByJwt);
+            return getDailyPostCountRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
 
