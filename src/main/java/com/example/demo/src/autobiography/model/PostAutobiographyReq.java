@@ -25,12 +25,15 @@ public class PostAutobiographyReq {
     private String detail;
 
     @NotBlank(message = "표지 색상이 입력되지 않았습니다.")
-    @ApiModelProperty(value = "표지 색상", example ="kCGColorSpaceModelRGB ", required = true, dataType = "String")
+    @ApiModelProperty(value = "표지 색상", example ="#27F10038", required = true, dataType = "String")
     private String coverColor;
 
     @NotBlank(message = "제목 색상이 입력되지 않았습니다.")
-    @ApiModelProperty(value = "제목 색상", example ="kCGColorSpaceModelRGB ", required = true, dataType = "String")
+    @ApiModelProperty(value = "제목 색상", example ="#27F10038", required = true, dataType = "String")
     private String titleColor;
+
+    @ApiModelProperty(value = "오브제 색상", example ="2", required = true, dataType = "int")
+    private int objetColor;
 
 
     @ApiModelProperty(value = "게시글 id 리스트", example ="[1,5,19,4,6]", required = true, dataType = "List")
