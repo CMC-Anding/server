@@ -7,17 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel
-public class GetArchiveDailyRes {
-    private int postId;
-    private String dailyTitle;
-    private String dailyImage;
-    // @JsonFormat(pattern = "yyyy-MM-DD HH:mm:ss")
-    // private Date createdAt;
+public class GetQnaPostCountRes {
+    @ApiModelProperty(value = "아카이브의 문답 게시글 개수", example = "250", required = true, dataType = "int")
+    private int qnaPostCount;
 }

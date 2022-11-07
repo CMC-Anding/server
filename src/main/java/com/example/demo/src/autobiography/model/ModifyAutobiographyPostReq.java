@@ -19,7 +19,7 @@ import javax.validation.constraints.NotBlank;
 @ApiModel
 public class ModifyAutobiographyPostReq {
     @NotBlank(message = "자서전을 구성할 게시글을 선택해주세요.")
-    @ApiModelProperty(value = "자서전을 구성하는 게시글 ID (배열)", example ="20", required = true, dataType = "int")
+    @ApiModelProperty(value = "자서전을 구성하는 게시글 ID", example ="[20,14]", required = true, dataType = "int")
     private List<Integer> postId;
 
 } 

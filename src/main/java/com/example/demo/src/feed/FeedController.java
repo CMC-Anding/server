@@ -59,21 +59,19 @@ public class FeedController {
 
     /**
      * 피드 게시글 목록 조회 API
-     * [GET] /app/feeds?filter-id&chronological
+     * [GET] /app/feeds?filter-id
      * @return BaseResponse<List<GetFeedListRes>>
      */
     //Query String
     @ResponseBody
-    @GetMapping(" ") // (GET) 127.0.0.1:6660/app/feeds?filterId&chronological
-    public BaseResponse<List<GetFeedListRes>> getFeedList(@RequestParam(required = false) String filterId, @RequestParam(required = true, defaultValue="desc") String chronological) {
+    @GetMapping(" ") // (GET) 127.0.0.1:6660/app/feeds?filter-id
+    public BaseResponse<List<GetFeedListRes>> getFeedList(@RequestParam(value="filter-id", required = false) String filterId) {
         try{
-            // Get Feed List
             if(filterId == null){
-                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedList(chronological);
+                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedList();
                 return new BaseResponse<>(getFeedListRes);
             } else {
-                // Get Feed List By FilterId
-                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedListByFilterId(filterId, chronological);
+                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedListByFilterId(filterId);
                 return new BaseResponse<>(getFeedListRes);
             }
         } catch(BaseException exception){
