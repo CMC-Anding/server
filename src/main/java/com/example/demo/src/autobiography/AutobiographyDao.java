@@ -119,7 +119,7 @@ public class AutobiographyDao {
 
     /* 자서전 목록 조회 */
     public List<Autobiography> getMyAutobiographyList(int userId) {
-        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, CREATED_AT\n" +
+        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, OBJET_COLOR, CREATED_AT\n" +
                 "FROM AUTOBIOGRAPHY\n" +
                 "WHERE USER_ID=?";
 
@@ -130,6 +130,7 @@ public class AutobiographyDao {
                         rs.getString("DETAIL"),
                         rs.getString("COVER_COLOR"),
                         rs.getString("TITLE_COLOR"),
+                        rs.getInt("OBJET_COLOR"),
                         rs.getString("CREATED_AT")
                 ),
                 userId);
