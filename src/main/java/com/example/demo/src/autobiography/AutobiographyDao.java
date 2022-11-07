@@ -91,13 +91,13 @@ public class AutobiographyDao {
 
     /* 자서전 틀 생성*/
     public int createAutobiography(int userId, PostAutobiographyReq postAutobiographyReq) {
-        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR) values (?, ?, ?, ?, ?)";
-        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor()};
+        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, OBJET_COLOR) values (?, ?, ?, ?, ?, ?)";
+        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor(), postAutobiographyReq.getObjetColor()};
 
         this.jdbcTemplate.update(query, params);
 
-        String lastInserIdQuery = "select last_insert_id()";
-        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
 
     }
 
