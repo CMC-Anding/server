@@ -25,11 +25,14 @@ public class Autobiography {
     @ApiModelProperty(value = "추가설명", example ="2022.03.20 2022.06.23", required = true, dataType = "String")
     private String detail;
 
-    @ApiModelProperty(value = "표지 색상", example ="kCGColorSpaceModelRGB ", required = true, dataType = "String")
+    @ApiModelProperty(value = "표지 색상", example ="#27F10038", required = true, dataType = "String")
     private String coverColor;
 
-    @ApiModelProperty(value = "제목 색상", example ="kCGColorSpaceModelRGB ", required = true, dataType = "String")
+    @ApiModelProperty(value = "제목 색상", example ="#27F10038", required = true, dataType = "String")
     private String titleColor;
+
+    @ApiModelProperty(value = "오브제 색상", example ="1", required = true, dataType = "int")
+    private int objetColor;
 
     @ApiModelProperty(value = "작성 시간", example ="2022-10-24 21:46:23", required = true, dataType = "String")
     private String createdAt;
