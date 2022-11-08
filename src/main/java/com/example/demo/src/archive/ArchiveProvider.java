@@ -80,6 +80,7 @@ public class ArchiveProvider {
             return getArchiveDailyRes;
         }
     } catch (Exception exception) {
+        exception.printStackTrace();
         throw new BaseException(DATABASE_ERROR);
     }
     }
