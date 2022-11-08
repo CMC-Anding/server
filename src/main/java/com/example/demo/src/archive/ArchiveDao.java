@@ -89,7 +89,7 @@ public class ArchiveDao {
 
     //아카이브 일상 조회 API (최신순)
     public List<GetArchiveDailyRes> getArchiveDailyListReverseChronological(int userIdxByJwt){
-        String getArchiveDailyListQuery = "select ID as postId, DAILY_TITLE as dailyTitle, (select URL from POST_PHOTO where POST_ID = p.ID) as dailyImage FROM POST as p where USER_ID = ? and FILTER_ID = ? order by p.CREATED_AT desc";
+        String getArchiveDailyListQuery = "select p.ID as postId, p.DAILY_TITLE as dailyTitle, pp.URL as dailyImage FROM POST as p left join POST_PHOTO as pp on pp.POST_ID = p.ID where p.USER_ID = ? and p.FILTER_ID = ? order by p.CREATED_AT desc";
         return this.jdbcTemplate.query(getArchiveDailyListQuery,
                 (rs, rowNum) -> new GetArchiveDailyRes(
                     rs.getInt("postId"),
@@ -100,7 +100,7 @@ public class ArchiveDao {
 
     //아카이브 일상 조회 API (시간순)
     public List<GetArchiveDailyRes> getArchiveDailyListChronological(int userIdxByJwt){
-        String getArchiveDailyListQuery = "select ID as postId, DAILY_TITLE as dailyTitle, (select URL from POST_PHOTO where POST_ID = p.ID) as dailyImage FROM POST as p where USER_ID = ? and FILTER_ID = ? order by p.CREATED_AT";
+        String getArchiveDailyListQuery = "select p.ID as postId, p.DAILY_TITLE as dailyTitle, pp.URL as dailyImage FROM POST as p left join POST_PHOTO as pp on pp.POST_ID = p.ID where p.USER_ID = ? and p.FILTER_ID = ? order by p.CREATED_AT";
         return this.jdbcTemplate.query(getArchiveDailyListQuery,
                 (rs, rowNum) -> new GetArchiveDailyRes(
                     rs.getInt("postId"),
