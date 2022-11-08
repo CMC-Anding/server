@@ -1,5 +1,9 @@
 package com.example.demo.src.post.model;
 
+import java.time.LocalDate;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,4 +20,6 @@ public class GetPostDetailRes {
     private String qnaQuestion;
     private String dailyImage;
     private String qnaQuestionMadeFromUser;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date createdAt;
 }

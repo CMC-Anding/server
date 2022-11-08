@@ -55,7 +55,7 @@ public class PostDao {
 
     // 글 상세보기 
     public GetPostDetailRes getPostDetail(int postId){
-        String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST WHERE ID = ?";
+        String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, CREATED_AT as createdAt FROM POST WHERE ID = ?";
         return this.jdbcTemplate.queryForObject(getPostDetailQuery,
                 (rs, rowNum) -> new GetPostDetailRes(
                         rs.getString("contents"),
@@ -65,7 +65,8 @@ public class PostDao {
                         rs.getString("qnaQuestionId"),
                         rs.getString("qnaQuestion"),
                         rs.getString("dailyImage"),
-                        rs.getString("qnaQuestionMadeFromUser")),
+                        rs.getString("qnaQuestionMadeFromUser"),
+                        rs.getDate("createdAt")),
                     postId, postId, postId);
     }
     
@@ -84,6 +85,13 @@ public class PostDao {
         this.jdbcTemplate.update(deletePostsOfClipBookQuery, deletePostsOfClipBookParams);
     }
     }
+
+    // // 스크랩 하나씩 삭제
+    // public int deleteClip(int postId, int userIdxByJwt){
+    //     String deleteClipQuery = "delete from CLIP where POST_ID = ? and USER_ID = ?";
+    //     Object[] deleteClipParams = new Object[]{postId, userIdxByJwt};
+    //     return this.jdbcTemplate.update(deleteClipQuery, deleteClipParams);
+    // }
 
     // 내 게시글 스크랩 조회 (최신순)
     public List<GetMyClipRes> getMyPostClipReverseChronological(int userIdxByJwt){
