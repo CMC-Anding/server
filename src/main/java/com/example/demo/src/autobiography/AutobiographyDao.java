@@ -91,13 +91,13 @@ public class AutobiographyDao {
 
     /* 자서전 틀 생성*/
     public int createAutobiography(int userId, PostAutobiographyReq postAutobiographyReq) {
-        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR) values (?, ?, ?, ?, ?)";
-        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor()};
+        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, OBJET_COLOR) values (?, ?, ?, ?, ?, ?)";
+        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor(), postAutobiographyReq.getObjetColor()};
 
         this.jdbcTemplate.update(query, params);
 
-        String lastInserIdQuery = "select last_insert_id()";
-        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
 
     }
 
@@ -119,7 +119,7 @@ public class AutobiographyDao {
 
     /* 자서전 목록 조회 */
     public List<Autobiography> getMyAutobiographyList(int userId) {
-        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, CREATED_AT\n" +
+        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, OBJET_COLOR, CREATED_AT\n" +
                 "FROM AUTOBIOGRAPHY\n" +
                 "WHERE USER_ID=?";
 
@@ -130,6 +130,7 @@ public class AutobiographyDao {
                         rs.getString("DETAIL"),
                         rs.getString("COVER_COLOR"),
                         rs.getString("TITLE_COLOR"),
+                        rs.getInt("OBJET_COLOR"),
                         rs.getString("CREATED_AT")
                 ),
                 userId);
