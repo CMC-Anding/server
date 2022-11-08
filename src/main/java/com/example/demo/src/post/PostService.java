@@ -164,4 +164,14 @@ public class PostService {
             throw new BaseException(DELETE_CLIP_FAIL);
         }
     }
+
+    // // 스크랩 하나씩 삭제 API 
+    // public void deleteClip(int postId, int userIdxByJwt) throws BaseException {
+    //     try{
+    //         postDao.deleteClip(postId, userIdxByJwt);
+
+    //     } catch(Exception exception){
+    //         throw new BaseException(DELETE_CLIP_FAIL);
+    //     }
+    // }
 }
