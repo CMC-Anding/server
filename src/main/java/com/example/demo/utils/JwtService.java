@@ -25,7 +25,7 @@ public class JwtService {
     @param userIdx
     @return String
      */
-    public String createJwt(int userIdx){
+    public String createJwt(int userIdx) {
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("type", "jwt")
@@ -40,8 +40,8 @@ public class JwtService {
     Header에서 X-ACCESS-TOKEN 으로 JWT 추출
     @return String
      */
-    public String getJwt(){
-        HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+    public String getJwt() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         return request.getHeader("X-ACCESS-TOKEN");
     }
 
@@ -50,16 +50,16 @@ public class JwtService {
     @return int
     @throws BaseException
      */
-    public int getUserIdx() throws BaseException{
+    public int getUserIdx() throws BaseException {
         //1. JWT 추출
         String accessToken = getJwt();
-        if(accessToken == null || accessToken.length() == 0){
+        if (accessToken == null || accessToken.length() == 0) {
             throw new BaseException(EMPTY_JWT);
         }
 
         // 2. JWT parsing
         Jws<Claims> claims;
-        try{
+        try {
             claims = Jwts.parser()
                     .setSigningKey(Secret.JWT_ACCESS_SECRET_KEY)
                     .parseClaimsJws(accessToken);
@@ -68,9 +68,14 @@ public class JwtService {
         }
 
         // 3. userIdx 추출
-        return claims.getBody().get("userIdx",Integer.class);
+        return claims.getBody().get("userIdx", Integer.class);
     }
 
+    /*
+    JWT에서 userIdx 추출
+    @return int
+    @throws BaseException
+    */
     public String createRefreshJwt(int userIdx) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + Duration.ofDays(365).toMillis());
