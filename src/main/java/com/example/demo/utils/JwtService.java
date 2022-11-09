@@ -72,10 +72,10 @@ public class JwtService {
     }
 
     /*
-    JWT에서 userIdx 추출
-    @return int
-    @throws BaseException
-    */
+    Refresh Token 생성
+    @param userIdx
+    @return String
+     */
     public String createRefreshJwt(int userIdx) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + Duration.ofDays(365).toMillis());
@@ -86,5 +86,4 @@ public class JwtService {
                 .signWith(SignatureAlgorithm.HS256, Secret.JWT_REFRESH_SECRET_KEY)
                 .compact();
     }
-
 }
