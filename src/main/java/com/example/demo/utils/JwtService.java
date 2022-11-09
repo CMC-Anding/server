@@ -28,11 +28,11 @@ public class JwtService {
     public String createJwt(int userIdx){
         Date now = new Date();
         return Jwts.builder()
-                .setHeaderParam("type","jwt")
-                .claim("userIdx",userIdx)
+                .setHeaderParam("type", "jwt")
+                .claim("userIdx", userIdx)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + Duration.ofHours(24*365).toMillis()))
-                .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + Duration.ofHours(24 * 365).toMillis()))
+                .signWith(SignatureAlgorithm.HS256, Secret.JWT_ACCESS_SECRET_KEY)
                 .compact();
     }
 
@@ -61,7 +61,7 @@ public class JwtService {
         Jws<Claims> claims;
         try{
             claims = Jwts.parser()
-                    .setSigningKey(Secret.JWT_SECRET_KEY)
+                    .setSigningKey(Secret.JWT_ACCESS_SECRET_KEY)
                     .parseClaimsJws(accessToken);
         } catch (Exception ignored) {
             throw new BaseException(INVALID_JWT);
@@ -69,6 +69,17 @@ public class JwtService {
 
         // 3. userIdx 추출
         return claims.getBody().get("userIdx",Integer.class);
+    }
+
+    public String createRefreshJwt(int userIdx) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + Duration.ofDays(365).toMillis());
+        return Jwts.builder()
+                .claim("userIdx", userIdx)
+                .setIssuedAt(now)
+                .setExpiration(expiration)
+                .signWith(SignatureAlgorithm.HS256, Secret.JWT_REFRESH_SECRET_KEY)
+                .compact();
     }
 
 }
