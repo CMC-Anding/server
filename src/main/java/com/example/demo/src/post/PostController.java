@@ -65,7 +65,7 @@ public class PostController {
      */
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
-    public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
+    public BaseResponse<String> postPost(@RequestPart Posts posts,  @ApiParam(value = "file", type = "MultipartFile", required = false, example = "이미지 파일 url") @RequestPart(value="file", required=false) MultipartFile image) throws IOException{
 
         try{
             //jwt에서 idx 추출.
@@ -75,8 +75,8 @@ public class PostController {
             if(posts.getDailyTitle() != null) {
                 PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
                 int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                if(file.isEmpty() == false) {   
-                    postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
+                if(!image.isEmpty()) {   
+                    postService.fileUpload(image, lastInsertId); //후 (사진 업로드)
                 }
             }
             

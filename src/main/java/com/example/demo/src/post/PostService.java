@@ -1,8 +1,10 @@
 package com.example.demo.src.post;
 
+import com.example.demo.utils.S3Service;
 import com.example.demo.config.BaseException;
 import com.example.demo.src.post.model.*;
 import com.example.demo.utils.JwtService;
+import com.example.demo.utils.S3Service;
 import com.example.demo.utils.SHA256;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,19 +41,17 @@ public class PostService {
     private final PostDao postDao;
     private final PostProvider postProvider;
     private final JwtService jwtService;
+    private final S3Service s3Service;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    private final AmazonS3 amazonS3;
-
-
     @Autowired
-    public PostService(PostDao postDao, PostProvider postProvider, JwtService jwtService, AmazonS3 amazonS3) {
+    public PostService(PostDao postDao, PostProvider postProvider, JwtService jwtService, S3Service s3Service) {
         this.postDao = postDao;
         this.postProvider = postProvider;
         this.jwtService = jwtService;
-        this.amazonS3 = amazonS3;
+        this.s3Service = s3Service;
     }
 
 
@@ -104,24 +104,16 @@ public class PostService {
      * 게시글 등록 API 
      * 일상 게시글의 사진 업로드
     */
-    public String fileUpload(InputStream inputStream, String originalFilename, int postId) throws IOException,BaseException {
-        String s3FileName = UUID.randomUUID() + "-" + originalFilename;
-
-        ObjectMetadata objMeta = new ObjectMetadata();
-        objMeta.setContentLength(inputStream.available());
-
-        amazonS3.putObject(bucket, s3FileName, inputStream, objMeta);
-
-        String url = amazonS3.getUrl(bucket, s3FileName).toString();
-
+    public String fileUpload(MultipartFile image, int postId) throws IOException,BaseException {
+        String postImageUrl = "";
         try {
-            postDao.createImage(url, postId);
+            postImageUrl = s3Service.fileUpload(image);
+            postDao.createImage(postImageUrl, postId);
         }catch (Exception exception){
-            exception.printStackTrace();
+            logger.error("S3 ERROR", exception);
             throw new BaseException(DATABASE_ERROR);
         }
-
-        return amazonS3.getUrl(bucket, s3FileName).toString();
+        return postImageUrl;
     }    
 
     /* 
