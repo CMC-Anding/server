@@ -206,15 +206,17 @@ public class AutobiographyDao {
                 query +="AND P.CREATED_AT<?\n";
                 paramsList.add(lastCreatedAt);
             }
-            query +="ORDER BY P.CREATED_AT DESC\n" +
-                    "LIMIT 19;";
+            query +="ORDER BY P.CREATED_AT DESC\n";
+            /**페이지네이션
+            query +="LIMIT 19;";*/
         } else {
             if (lastCreatedAt != null) {
                 query +="AND P.CREATED_AT>?\n";
                 paramsList.add(lastCreatedAt);
             }
-            query +="ORDER BY P.CREATED_AT ASC\n" +
-                    "LIMIT 19;";
+            query +="ORDER BY P.CREATED_AT ASC\n";
+            /**페이지네이션
+             query +="LIMIT 19;";*/
         }
 
         Object[] params = paramsList.toArray();
