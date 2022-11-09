@@ -2,11 +2,9 @@ package com.example.demo.utils;
 
 
 import com.example.demo.config.BaseException;
+import com.example.demo.config.BaseResponseStatus;
 import com.example.demo.config.secret.Secret;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -86,4 +84,26 @@ public class JwtService {
                 .signWith(SignatureAlgorithm.HS256, Secret.JWT_REFRESH_SECRET_KEY)
                 .compact();
     }
+
+    /*
+    토큰의 유효기간 검증
+    @param token, isAccessToken
+    @return boolean
+     */
+    public boolean  validateAccessTokenExpiration(String  token, boolean isAccessToken) throws BaseException{
+        try{
+            // 토큰 파싱
+            Jws<Claims> claims = Jwts.parser()
+                    .setSigningKey(isAccessToken? Secret.JWT_ACCESS_SECRET_KEY:Secret.JWT_REFRESH_SECRET_KEY)
+                    .parseClaimsJws(token);
+
+            return claims.getBody().getExpiration().before(new Date()); // 현재보다 만료가 이전인지 확인
+        }
+        catch (ExpiredJwtException ignored){
+            return  true;
+        }catch (Exception e){
+            throw   new BaseException(BaseResponseStatus.INVALID_JWT); // 만약 올바르지 않은 토큰이라면 에러
+        }
+    }
+
 }
