@@ -104,6 +104,30 @@ public class PostProvider {
         }
     }
 
+    // 게시글 신고가 7회 이상인지 조회
+    public String checkReportCountForDelete(ReportPostReq reportPostReq) throws BaseException{
+        try {
+            CheckReportCountForDeleteRes checkReportCountForDeleteRes = postDao.getTotalReportCount(reportPostReq);
+            String resultForDelete = checkReportCountForDeleteRes.getShouldRemoveOrNot();
+            return resultForDelete;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(CHECK_REPORT_COUNT_ERROR);
+        }
+    }
+
+    // 일상 게시글인지, 문답 게시글인지 확인
+    public String checkDailyPostOrQnaPost(int postId) throws BaseException {
+        try {
+            CheckDailyPostOrQnaPostRes checkDailyPostOrQnaPostRes = postDao.checkDailyPostOrQnaPost(postId);
+            String dailyPostOrQna = checkDailyPostOrQnaPostRes.getDailyOrQna();
+            return dailyPostOrQna;
+        } catch(Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(CHECK_DAILY_OR_REPORT_ERROR);
+        }
+    }
+
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
     //         List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);

@@ -135,6 +135,38 @@ public class PostService {
         }
     }
 
+    // 게시글 삭제 API 
+    public void deletePost(int postId) throws BaseException {
+        try{
+            postDao.deletePost(postId);
+
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(POST_DELETE_ERROR);
+        }
+    }
+
+    // 게시글 신고 7회 이상시, 게시글 삭제 API
+    public void deletePostWhenReporting(int postId) throws BaseException {
+        try{
+            postDao.deletePostWhenReporting(postId);
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(POST_DELETE_WHEN_REPORTING_ERROR);
+        }
+    }
+
+    // 게시글 신고 7회 이상시, 일상 게시글의 사진 삭제 API
+    public void deletePhotoOfDailyPostWhenReporting(int postId) throws BaseException {
+        try{
+            postDao.deletePhotoOfDailyPostWhenReporting(postId);
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(PHOTO_DELETE_WHEN_REPORTING_ERROR);
+        }
+    }
+
+
     // 스크랩 API 
     public int postClip(int userIdxByJwt, int postId) throws BaseException {
         try{
@@ -165,6 +197,22 @@ public class PostService {
             throw new BaseException(DELETE_CLIP_FAIL);
         }
     }
+
+     // 게시글 신고하기 API 
+    public int reportPost(int userIdxByJwt,ReportPostReq reportPostReq) throws BaseException {
+        try{
+            int lastInsertId = postDao.reportPost(userIdxByJwt,reportPostReq);
+            if(lastInsertId == 0){
+                throw new BaseException(REPORT_POST_FAIL);
+            }
+        return lastInsertId;
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    
 
     // // 스크랩 하나씩 삭제 API 
     // public void deleteClip(int postId, int userIdxByJwt) throws BaseException {

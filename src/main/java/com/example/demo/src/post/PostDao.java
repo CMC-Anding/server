@@ -53,7 +53,46 @@ public class PostDao {
         return this.jdbcTemplate.update(postQnaPostQuery, postQnaPostParams);
     }
 
-    // 글 상세보기 
+    // 게시글 삭제 API
+    public void deletePost(int postId){
+        String deletePostQuery = "update POST SET STATUS = 'DELETED' WHERE ID = ?";
+        int deletePostParams = postId;
+        this.jdbcTemplate.update(deletePostQuery, deletePostParams);
+    }
+
+    // 게시글 신고 7회 이상시, 삭제
+    public void deletePostWhenReporting(int postId){
+        String deletePostWhenReportingQuery = "update POST SET STATUS = 'REPORTED' WHERE ID = ?";
+        int deletePostWhenReportingParams = postId;
+        this.jdbcTemplate.update(deletePostWhenReportingQuery, deletePostWhenReportingParams);
+    }
+    
+    // 일상 게시글인지, 문답 게시글인지 확인
+    public CheckDailyPostOrQnaPostRes checkDailyPostOrQnaPost(int postId) {
+        String checkDailyPostOrQnaPostQuery = "select if(FILTER_ID = 'e' , 'Daily', 'Qna') as dailyOrQna from POST where ID = ?";
+        int checkDailyPostOrQnaPostParams = postId;
+
+        return this.jdbcTemplate.queryForObject(checkDailyPostOrQnaPostQuery,
+                (rs, rowNum) -> new CheckDailyPostOrQnaPostRes(
+                    rs.getString("dailyOrQna")),
+                checkDailyPostOrQnaPostParams);
+    }
+
+    // 일상 게시글의 사진 삭제
+    public void deletePhotoOfDailyPost(int postId){
+        String deletePostQuery = "update POST_PHOTO SET STATUS = 'DELETED' WHERE ID = ?";
+        int deletePostParams = postId;
+        this.jdbcTemplate.update(deletePostQuery, deletePostParams);
+    }
+
+    // 게시글 신고 7회 이상시, 일상 게시글의 사진 삭제
+    public void deletePhotoOfDailyPostWhenReporting(int postId){
+        String deletePostWhenReportingQuery = "update POST_PHOTO SET STATUS = 'REPORTED' WHERE POST_ID = ?";
+        int deletePostWhenReportingParams = postId;
+        this.jdbcTemplate.update(deletePostWhenReportingQuery, deletePostWhenReportingParams);
+    }
+
+    // 글 상세보기 API
     public GetPostDetailRes getPostDetail(int postId){
         String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, CREATED_AT as createdAt FROM POST WHERE ID = ?";
         return this.jdbcTemplate.queryForObject(getPostDetailQuery,
@@ -70,14 +109,14 @@ public class PostDao {
                     postId, postId, postId);
     }
     
-    // 스크랩 
+    // 스크랩 API
     public int postClip(int userIdxByJwt, int postId){
         String postClipQuery = "insert into CLIP(USER_ID, WRITER_ID, POST_ID) values (?,(select USER_ID from POST where ID = ?),?)";
         Object[] postClipParams = new Object[]{userIdxByJwt, postId, postId};
         return this.jdbcTemplate.update(postClipQuery, postClipParams);
     }
 
-    // 스크랩 중복 확인
+    // 스크랩 중복 확인 
     public List<ClipDuplicateCheckRes> clipDuplicateCheck(int userIdxByJwt, int postId){
         String clipDuplicateCheckQuery = "select if(POST_ID ,'존재','없다') as duplicate from CLIP where USER_ID = ? and POST_ID = ?";
         Object[] clipDuplicateCheckParams = new Object[]{userIdxByJwt, postId};
@@ -88,7 +127,7 @@ public class PostDao {
                 userIdxByJwt, userIdxByJwt);
     }
 
-    // 스크랩북의 게시글 삭제
+    // 스크랩북의 게시글 삭제 API
     public void deletePostsOfClipBook(int userIdxByJwt, DeletePostsOfClipBookReq deletePostsOfClipBookReq){
         for (int i=0 ; i < deletePostsOfClipBookReq.getPostId().size(); i++) {
         String deletePostsOfClipBookQuery = "delete from CLIP where POST_ID =? and USER_ID = ?";
@@ -104,7 +143,7 @@ public class PostDao {
     //     return this.jdbcTemplate.update(deleteClipQuery, deleteClipParams);
     // }
 
-    // 내 게시글 스크랩 조회 (최신순)
+    // 내 게시글 스크랩 조회 (최신순) API
     public List<GetMyClipRes> getMyPostClipReverseChronological(int userIdxByJwt){
         String getMyPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT desc";
         return this.jdbcTemplate.query(getMyPostClipReverseChronologicalQuery,
@@ -120,7 +159,7 @@ public class PostDao {
                 userIdxByJwt, userIdxByJwt);
     }
 
-    // 내 게시글 스크랩 조회 (시간순)
+    // 내 게시글 스크랩 조회 (시간순) API
     public List<GetMyClipRes> getMyPostClipChronological(int userIdxByJwt){
         String getMyPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT";
         return this.jdbcTemplate.query(getMyPostClipChronologicalQuery,
@@ -136,7 +175,7 @@ public class PostDao {
                 userIdxByJwt, userIdxByJwt);
     }
 
-    // 타인 게시글 스크랩 조회 (최신순)
+    // 타인 게시글 스크랩 조회 (최신순) API
     public List<GetMyClipRes> getOtherPostClipReverseChronological(int userIdxByJwt){
         String getOtherPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) ORDER BY p.CREATED_AT desc";
         return this.jdbcTemplate.query(getOtherPostClipReverseChronologicalQuery,
@@ -152,7 +191,7 @@ public class PostDao {
                 userIdxByJwt, userIdxByJwt);
     }
 
-    // 타인 게시글 스크랩 조회 (시간순)
+    // 타인 게시글 스크랩 조회 (시간순) API
     public List<GetMyClipRes> getOtherPostClipChronological(int userIdxByJwt){
         String getOtherPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) ORDER BY p.CREATED_AT";
         return this.jdbcTemplate.query(getOtherPostClipChronologicalQuery,
@@ -168,7 +207,7 @@ public class PostDao {
                 userIdxByJwt, userIdxByJwt);
     }
 
-    // 스크랩북의 내 게시글 개수 
+    // 스크랩북의 내 게시글 개수 API
     public GetMyPostOfClipCountRes getMyPostOfClipCount(int userIdxByJwt) {
         String getMyPostOfClipCountQuery = "select count(*) as myPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID = ?";
         int getMyPostOfClipCountParam = userIdxByJwt;
@@ -180,7 +219,7 @@ public class PostDao {
     }
 
 
-    // 스크랩북의 타인 게시글 개수 
+    // 스크랩북의 타인 게시글 개수 API
     public GetOtherPostOfClipCountRes getOtherPostOfClipCount(int userIdxByJwt) {
         String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID != ?";
         int getOtherPostOfClipCountParam = userIdxByJwt;
@@ -191,7 +230,7 @@ public class PostDao {
             getOtherPostOfClipCountParam, getOtherPostOfClipCountParam);
     }
 
-    // 신고 항목 조회
+    // 신고 항목 조회 API
     public List<GetReportReasonRes> getReportReason() {
         String getReportReasonQuery = "select ID as reasonId , CONTENTS as reasonContents from REPORT_REASON";
 
@@ -199,6 +238,27 @@ public class PostDao {
             (rs,rowNum) -> new GetReportReasonRes(
                 rs.getInt("reasonId"),
                 rs.getString("reasonContents")));
+    }
+
+    // 게시글 신고하기 API
+    public int reportPost(int userIdxByJwt,ReportPostReq reportPostReq) {
+        String reportPostQuery = "insert REPORT_LIST (USER_ID, REASON_ID, POST_ID) values (?,?,?)";
+        Object[] reportPostParams = new Object[]{userIdxByJwt, reportPostReq.getReasonId(), reportPostReq.getPostId()};
+        this.jdbcTemplate.update(reportPostQuery, reportPostParams);
+
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
+    }
+
+    // 게시글 총 신고횟수 체크
+    public CheckReportCountForDeleteRes getTotalReportCount(ReportPostReq reportPostReq) {
+        String getTotalReportCountQuery = "select if(count(*)>6, '삭제조건도달', '삭제조건미달') as shouldRemoveOrNot from REPORT_LIST where POST_ID = ?";
+        int getTotalReportCountParam = reportPostReq.getPostId();
+
+        return this.jdbcTemplate.queryForObject(getTotalReportCountQuery, 
+            (rs,rowNum) -> new CheckReportCountForDeleteRes (
+                rs.getString("shouldRemoveOrNot")),
+            getTotalReportCountParam);
     }
 
     // public List<GetUserRes> getUsersByEmail(String email){

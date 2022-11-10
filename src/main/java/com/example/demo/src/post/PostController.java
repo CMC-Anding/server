@@ -167,11 +167,15 @@ public class PostController {
     }
 
     /**
-     * 신고 항목 조회 API
+     * 게시글 신고 항목 조회 API
      * [GET] /app/posts/report/reason
      * @return BaseResponse<List<GetReportReasonRes>>
      */
-    // Path-variable
+    @ApiOperation(value="게시글 신고 항목 조회 API", notes="게시글 신고 항목을 조회합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다.")}
+    )
     @ResponseBody
     @GetMapping("/report/reason") // (GET) 127.0.0.1:6660/app/posts/report/reason
     public BaseResponse<List<GetReportReasonRes>> getReportReason() {
@@ -180,6 +184,51 @@ public class PostController {
             return new BaseResponse<>(getReportReasonRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 게시글 신고하기 API
+     * [POST] /app/posts/report
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 신고하기 API", notes="게시글을 신고합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4651, message = "게시글 신고에 실패하였습니다."),
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패하였습니다."),
+        @ApiResponse(code = 4653, message = "게시글 신고횟수가 7회이상인지 확인하는데 실패하였습니다."),
+        @ApiResponse(code = 4656, message = "게시글 신고횟수가 7회이상일 때, 사진을 제외한 게시글 삭제에 실패하였습니다."),
+        @ApiResponse(code = 4657, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @PostMapping(value = "/report") // (POST) 127.0.0.1:6660/app/posts/report
+    public BaseResponse<String> reportPost(@RequestBody ReportPostReq reportPostReq) throws BaseException{
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            int postId = reportPostReq.getPostId();
+            String dailyOrQna = postProvider.checkDailyPostOrQnaPost(postId);
+
+            postService.reportPost(userIdxByJwt, reportPostReq);
+            
+            //신고 후, 신고횟수 7회 이상인지 조회
+            String resultForDelete = postProvider.checkReportCountForDelete(reportPostReq);
+
+            // 게시글 신고 7회 이상시, 게시글 삭제 
+            if(resultForDelete.equals("삭제조건도달")) {
+                postService.deletePostWhenReporting(postId);
+                //일상 게시글의 사진 삭제
+                if(dailyOrQna.equals("Daily")) {
+                    postService.deletePhotoOfDailyPostWhenReporting(postId);
+                }
+            }
+            String result = "게시글을 신고하였습니다.";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 

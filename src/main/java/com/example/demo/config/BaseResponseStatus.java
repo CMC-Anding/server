@@ -75,7 +75,15 @@ public enum BaseResponseStatus {
     DELETE_CLIP_FAIL(false, 4602, "스크랩북 수정(구성 게시글 삭제)에 실패하였습니다."),
 
     // 게시글 관련
-    POST_DAILY_POST_FAIL(false,4507,"일상게시글(사진 제외)을 등록하는데 실패하였습니다.");
+    POST_DAILY_POST_FAIL(false,4650,"일상게시글(사진 제외)을 등록하는데 실패하였습니다."),
+    REPORT_POST_FAIL(false,4651,"게시글 신고에 실패하였습니다."),
+    CHECK_DAILY_OR_REPORT_ERROR(false,4652,"일상 게시글인지, 문답 게시글인지 확인하는데 실패하였습니다."),
+    CHECK_REPORT_COUNT_ERROR(false, 4653, "게시글 신고횟수가 7회이상인지 확인하는데 실패하였습니다."),
+    POST_DELETE_ERROR(false, 4654, "사진을 제외한 게시글 삭제에 실패하였습니다."),
+    POST_DELETE_WHEN_REPORTING_ERROR(false, 4656, "게시글 신고횟수가 7회이상일 때, 사진을 제외한 게시글 삭제에 실패하였습니다."),
+    PHOTO_DELETE_WHEN_REPORTING_ERROR(false, 4657, "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패하였습니다.");
+
+
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요

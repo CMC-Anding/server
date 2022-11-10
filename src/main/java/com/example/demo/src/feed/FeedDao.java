@@ -21,7 +21,7 @@ public class FeedDao {
 
     // 피드의 전체 눌렀을 때 
     public List<GetFeedListRes> getFeedList(){
-        String getFeedListQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.FEED_SHARE = ? ORDER BY rand()";
+        String getFeedListQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.FEED_SHARE = ? and p.STATUS = ? ORDER BY rand()";
         return this.jdbcTemplate.query(getFeedListQuery,
                 (rs, rowNum) -> new GetFeedListRes(
                     rs.getInt("postId"),
@@ -32,12 +32,12 @@ public class FeedDao {
                     rs.getString("qnaQuestion"),
                     rs.getString("dailyImage"),
                     rs.getString("qnaQuestionMadeFromUser")),
-                "Y");
+                "Y", "ACTIVE");
     }
 
     //피드의 필터 눌렀을 때 
     public List<GetFeedListRes> getFeedListByFilterId(String filterId){
-        String getFeedListByFilterIdQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.FILTER_ID = ? and p.FEED_SHARE = ? ORDER BY rand()";
+        String getFeedListByFilterIdQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.FILTER_ID = ? and p.FEED_SHARE = ? and p.STATUS = ? ORDER BY rand()";
         String getFeedListByFilterIdParams = filterId;
         return this.jdbcTemplate.query(getFeedListByFilterIdQuery,
                 (rs, rowNum) -> new GetFeedListRes(
@@ -49,7 +49,7 @@ public class FeedDao {
                     rs.getString("qnaQuestion"),
                     rs.getString("dailyImage"),
                     rs.getString("qnaQuestionMadeFromUser")),
-                getFeedListByFilterIdParams, "Y");
+                getFeedListByFilterIdParams, "Y", "ACTIVE");
     }
 
 
