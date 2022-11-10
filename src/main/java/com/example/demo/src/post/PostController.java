@@ -199,14 +199,13 @@ public class PostController {
         @ApiResponse(code = 4651, message = "게시글 신고에 실패하였습니다."),
         @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패하였습니다."),
         @ApiResponse(code = 4653, message = "게시글 신고횟수가 7회이상인지 확인하는데 실패하였습니다."),
-        @ApiResponse(code = 4656, message = "게시글 신고횟수가 7회이상일 때, 사진을 제외한 게시글 삭제에 실패하였습니다."),
+        @ApiResponse(code = 4656, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패하였습니다."),
         @ApiResponse(code = 4657, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패하였습니다.")}
     )
     @ResponseBody
     @PostMapping(value = "/report") // (POST) 127.0.0.1:6660/app/posts/report
     public BaseResponse<String> reportPost(@RequestBody ReportPostReq reportPostReq) throws BaseException{
         try{
-            //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
             int postId = reportPostReq.getPostId();
             String dailyOrQna = postProvider.checkDailyPostOrQnaPost(postId);
@@ -228,6 +227,45 @@ public class PostController {
             return new BaseResponse<>(SUCCESS ,result); 
         }
         catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 게시글 삭제하기 API
+     * [PATCH] /app/posts/delete/:user-id
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 삭제하기 API", notes="게시글을 삭제합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패하였습니다."),
+        @ApiResponse(code = 4654, message = "일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패하였습니다."),
+        @ApiResponse(code = 4655, message = "일상 게시글의 사진 삭제에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @PatchMapping(value = "/delete/{user-id}") // (PATCH) 127.0.0.1:6660/app/posts/delete/:user-id
+    public BaseResponse<String> deletePost(@PathVariable("user-id") int userId, @ RequestBody DeletePostReq deletePostReq) throws BaseException{
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(userId != userIdxByJwt) {
+                return new BaseResponse<> (INVALID_USER_JWT);
+            }
+            String dailyOrQna = postProvider.checkDailyPostOrQnaPost(deletePostReq.getPostId());
+ 
+            postService.deletePost(deletePostReq.getPostId());
+            //일상 게시글의 사진 삭제
+            if(dailyOrQna.equals("Daily")) {
+                postService.deletePhotoOfDailyPost(deletePostReq.getPostId());
+            }
+            
+            String result = "게시글을 삭제하였습니다.";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            exception.printStackTrace();
             return new BaseResponse<>(exception.getStatus());
         }
     }
