@@ -19,18 +19,18 @@ public class QuestionDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-
     /*
      * 각 필터의 질문 가져오기 API
      */
     public GetQuestionRes getQuestion(String filterId, int userIdxByJwt){
-        String getQuestionQuery = "select ID as qnaQuestionId ,CONTENTS as question, (select COUNT(*) from QUESTION where FILTER_ID = ? and ID NOT IN (select QNA_QUESTION_ID from POST where USER_ID = ? and FILTER_ID = ?)) as numberOfRemaning from QUESTION where FILTER_ID = ? and ID NOT IN (select QNA_QUESTION_ID from POST where USER_ID = ? and FILTER_ID = ?) ORDER BY RAND() LIMIT 1;";
+        String getQuestionQuery = "select ID as qnaQuestionId, CONTENTS as question, COUNT(*) as remaningNumberOfFilter, (select count(*) from QUESTION where ID NOT IN (select QNA_QUESTION_ID from POST where USER_ID = ? and QNA_QUESTION_ID is not null)) as remaningNumberOfAll from QUESTION where FILTER_ID = ? and ID NOT IN (select QNA_QUESTION_ID from POST where USER_ID = ? and FILTER_ID = ?) ORDER BY RAND() LIMIT 1";
         return this.jdbcTemplate.queryForObject(getQuestionQuery,
                 (rs,rowNum) -> new GetQuestionRes(
                         rs.getString("qnaQuestionId"),
                         rs.getString("question"),
-                        rs.getInt("numberOfRemaning")),
-                filterId, userIdxByJwt, filterId, filterId, userIdxByJwt, filterId);
+                        rs.getInt("remaningNumberOfFilter"),
+                        rs.getInt("remaningNumberOfAll")),
+                userIdxByJwt, filterId, userIdxByJwt, filterId);
     }
 
     // public List<GetUserRes> getUsersByEmail(String email){
