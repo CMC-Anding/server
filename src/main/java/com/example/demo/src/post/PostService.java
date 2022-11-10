@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -137,6 +138,14 @@ public class PostService {
     // 스크랩 API 
     public int postClip(int userIdxByJwt, int postId) throws BaseException {
         try{
+            String checkDuplicate = "존재";
+            List<ClipDuplicateCheckRes> clipDuplicateCheck = postDao.clipDuplicateCheck(userIdxByJwt, postId);
+
+            for(int index = 0; index < clipDuplicateCheck.size(); index ++) {
+                if(clipDuplicateCheck.get(index).equals(checkDuplicate)) {
+                    throw new BaseException(CLIP_DUPLICATE);
+                }
+            }
             int lastInsertId = postDao.postClip(userIdxByJwt, postId);
 
             if(lastInsertId == 0){

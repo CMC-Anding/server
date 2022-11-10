@@ -66,11 +66,17 @@ public enum BaseResponseStatus {
     //[GET] /app/questions/:filter-id
     GET_QUESTION_ERROR(false,4501,"사용자가 작성하지않은 질문을 가져오는데에 실패하였습니다."),
 
-    MODIFY_FAIL_AUTOGRAPHY_ETC(false, 4502, "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다."),
-    DELETE_FAIL_AUTOGRAPHY_POST(false, 4503, "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
-    INSERT_FAIL_AUTOGRAPHY_POST(false, 4504, "자서전의 게시글 구성 생성에 실패하였습니다."),
-    CLIP_FAIL(false, 4505,"나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다."),
-    DELETE_CLIP_FAIL(false, 4506, "스크랩북 수정(구성 게시글 삭제)에 실패하였습니다."),
+    // 자서전 관련
+    MODIFY_FAIL_AUTOGRAPHY_ETC(false, 4550, "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다."),
+    DELETE_FAIL_AUTOGRAPHY_POST(false, 4551, "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
+    INSERT_FAIL_AUTOGRAPHY_POST(false, 4552, "자서전의 게시글 구성 생성에 실패하였습니다."),
+
+    // 스크랩 관련
+    CLIP_FAIL(false, 4600,"나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다."),
+    CLIP_DUPLICATE(false,4601,"이미 스크랩 한 게시글입니다."),
+    DELETE_CLIP_FAIL(false, 4602, "스크랩북 수정(구성 게시글 삭제)에 실패하였습니다."),
+
+    // 게시글 관련
     POST_DAILY_POST_FAIL(false,4507,"일상게시글(사진 제외)을 등록하는데 실패하였습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
