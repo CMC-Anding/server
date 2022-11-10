@@ -77,6 +77,17 @@ public class PostDao {
         return this.jdbcTemplate.update(postClipQuery, postClipParams);
     }
 
+    // 스크랩 중복 확인
+    public List<ClipDuplicateCheckRes> clipDuplicateCheck(int userIdxByJwt, int postId){
+        String clipDuplicateCheckQuery = "select if(POST_ID ,'존재','없다') as duplicate from CLIP where USER_ID = ? and POST_ID = ?";
+        Object[] clipDuplicateCheckParams = new Object[]{userIdxByJwt, postId};
+        
+        return this.jdbcTemplate.query(clipDuplicateCheckQuery,
+                (rs, rowNum) -> new ClipDuplicateCheckRes(
+                    rs.getString("duplicate")),
+                userIdxByJwt, userIdxByJwt);
+    }
+
     // 스크랩북의 게시글 삭제
     public void deletePostsOfClipBook(int userIdxByJwt, DeletePostsOfClipBookReq deletePostsOfClipBookReq){
         for (int i=0 ; i < deletePostsOfClipBookReq.getPostId().size(); i++) {
@@ -178,6 +189,16 @@ public class PostDao {
             (rs,rowNum) -> new GetOtherPostOfClipCountRes(
                 rs.getInt("otherPostOfClipCount")),
             getOtherPostOfClipCountParam, getOtherPostOfClipCountParam);
+    }
+
+    // 신고 항목 조회
+    public List<GetReportReasonRes> getReportReason() {
+        String getReportReasonQuery = "select ID as reasonId , CONTENTS as reasonContents from REPORT_REASON";
+
+        return this.jdbcTemplate.query(getReportReasonQuery, 
+            (rs,rowNum) -> new GetReportReasonRes(
+                rs.getInt("reasonId"),
+                rs.getString("reasonContents")));
     }
 
     // public List<GetUserRes> getUsersByEmail(String email){

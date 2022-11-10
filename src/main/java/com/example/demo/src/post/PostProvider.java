@@ -94,6 +94,16 @@ public class PostProvider {
         }
     }
 
+    // 신고 항목 조회
+    public List<GetReportReasonRes> getReportReason() throws BaseException {
+        try {
+            List<GetReportReasonRes> getReportReasonRes = postDao.getReportReason();
+            return getReportReasonRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
     //         List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);

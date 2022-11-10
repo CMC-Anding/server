@@ -72,7 +72,7 @@ public class AutobiographyController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4502 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다.")}
+        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다.")}
     )
     @ResponseBody
     @PatchMapping("/etc/{autobiography-id}")
@@ -96,8 +96,8 @@ public class AutobiographyController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4503 , message = "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
-        @ApiResponse(code = 4504 , message = "자서전의 게시글 구성 생성에 실패하였습니다.")}
+        @ApiResponse(code = 4551 , message = "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
+        @ApiResponse(code = 4552 , message = "자서전의 게시글 구성 생성에 실패하였습니다.")}
     )
     @ResponseBody
     @PatchMapping("/posts/{autobiography-id}")

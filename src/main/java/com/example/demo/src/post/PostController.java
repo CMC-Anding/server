@@ -122,7 +122,7 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4505, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
+        @ApiResponse(code = 4600, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
     )
     @ResponseBody
     @PostMapping(value = "/clip/{post-id}") // (POST) 127.0.0.1:6660/app/posts/clip/:post-id
@@ -150,7 +150,7 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4506, message = "스크랩북 수정(구성 게시글 삭제)에 실패하였습니다.")}
+        @ApiResponse(code = 4602, message = "스크랩북 수정(구성 게시글 삭제)에 실패하였습니다.")}
     )
     @ResponseBody
     @DeleteMapping(value = "/clip") // (DELETE) 127.0.0.1:6660/app/posts/clip
@@ -163,6 +163,23 @@ public class PostController {
         }
         catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 신고 항목 조회 API
+     * [GET] /app/posts/report/reason
+     * @return BaseResponse<List<GetReportReasonRes>>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/report/reason") // (GET) 127.0.0.1:6660/app/posts/report/reason
+    public BaseResponse<List<GetReportReasonRes>> getReportReason() {
+        try{
+            List<GetReportReasonRes> getReportReasonRes = postProvider.getReportReason();
+            return new BaseResponse<>(getReportReasonRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
         }
     }
 
