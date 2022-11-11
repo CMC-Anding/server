@@ -58,6 +58,21 @@ public class PostDao {
         String deletePostQuery = "update POST SET STATUS = 'DELETED' WHERE ID = ?";
         int deletePostParams = postId;
         this.jdbcTemplate.update(deletePostQuery, deletePostParams);
+
+        String deleteClipQuery = "update CLIP SET STATUS = 'DELETED' WHERE POST_ID = ?";
+        int deleteClipParams = postId;
+        this.jdbcTemplate.update(deleteClipQuery, deleteClipParams);
+
+        String deleteAutobiographyQuery = "update AUTOBIOGRAPHY_POST SET STATUS = 'DELETED' WHERE POST_ID = ?";
+        int deleteAutobiographyParams = postId;
+        this.jdbcTemplate.update(deleteAutobiographyQuery, deleteAutobiographyParams);
+    }
+
+    // 일상 게시글의 사진 삭제
+    public void deletePhotoOfDailyPost(int postId){
+        String deletePhotoOfDailyPostQuery = "update POST_PHOTO SET STATUS = 'DELETED' WHERE POST_ID = ?";
+        int deletePhotoOfDailyPostParams = postId;
+        this.jdbcTemplate.update(deletePhotoOfDailyPostQuery, deletePhotoOfDailyPostParams);
     }
 
     // 게시글 신고 7회 이상시, 삭제
@@ -65,6 +80,21 @@ public class PostDao {
         String deletePostWhenReportingQuery = "update POST SET STATUS = 'REPORTED' WHERE ID = ?";
         int deletePostWhenReportingParams = postId;
         this.jdbcTemplate.update(deletePostWhenReportingQuery, deletePostWhenReportingParams);
+
+        String deleteClipWhenReportingQuery = "update CLIP SET STATUS = 'REPORTED' WHERE POST_ID = ?";
+        int deleteClipWhenReportingParams = postId;
+        this.jdbcTemplate.update(deleteClipWhenReportingQuery, deleteClipWhenReportingParams);
+
+        String deleteAutobiographyWhenReportingQuery = "update AUTOBIOGRAPHY_POST SET STATUS = 'REPORTED' WHERE POST_ID = ?";
+        int deleteAutobiographyWhenReportingParams = postId;
+        this.jdbcTemplate.update(deleteAutobiographyWhenReportingQuery, deleteAutobiographyWhenReportingParams);
+    }
+
+    // 게시글 신고 7회 이상시, 일상 게시글의 사진 삭제
+    public void deletePhotoOfDailyPostWhenReporting(int postId){
+        String deletePhotoOfDailyPostWhenReportingQuery = "update POST_PHOTO SET STATUS = 'REPORTED' WHERE POST_ID = ?";
+        int deletePhotoOfDailyPostWhenReportingParams = postId;
+        this.jdbcTemplate.update(deletePhotoOfDailyPostWhenReportingQuery, deletePhotoOfDailyPostWhenReportingParams);
     }
     
     // 일상 게시글인지, 문답 게시글인지 확인
@@ -76,20 +106,6 @@ public class PostDao {
                 (rs, rowNum) -> new CheckDailyPostOrQnaPostRes(
                     rs.getString("dailyOrQna")),
                 checkDailyPostOrQnaPostParams);
-    }
-
-    // 일상 게시글의 사진 삭제
-    public void deletePhotoOfDailyPost(int postId){
-        String deletePostQuery = "update POST_PHOTO SET STATUS = 'DELETED' WHERE ID = ?";
-        int deletePostParams = postId;
-        this.jdbcTemplate.update(deletePostQuery, deletePostParams);
-    }
-
-    // 게시글 신고 7회 이상시, 일상 게시글의 사진 삭제
-    public void deletePhotoOfDailyPostWhenReporting(int postId){
-        String deletePostWhenReportingQuery = "update POST_PHOTO SET STATUS = 'REPORTED' WHERE POST_ID = ?";
-        int deletePostWhenReportingParams = postId;
-        this.jdbcTemplate.update(deletePostWhenReportingQuery, deletePostWhenReportingParams);
     }
 
     // 글 상세보기 API

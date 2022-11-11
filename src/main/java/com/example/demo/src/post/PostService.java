@@ -139,10 +139,19 @@ public class PostService {
     public void deletePost(int postId) throws BaseException {
         try{
             postDao.deletePost(postId);
-
         } catch(Exception exception){
             exception.printStackTrace();
             throw new BaseException(POST_DELETE_ERROR);
+        }
+    }
+
+    // 일상 게시글의 사진 삭제 API
+    public void deletePhotoOfDailyPost(int postId) throws BaseException {
+        try{
+            postDao.deletePhotoOfDailyPost(postId);
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(PHOTO_DELETE_ERROR);
         }
     }
 
