@@ -1,6 +1,7 @@
 package com.example.demo.utils;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.demo.config.BaseException;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,23 @@ import java.util.UUID;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
+import com.amazonaws.AmazonServiceException;
 @RequiredArgsConstructor
 @Service
 public class S3Service {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    
     @Value("${cloud.aws.s3.bucket}")    // application.yml
     private String bucket;
+
+    @Value("${cloud.aws.credentials.access-key}")
+    private String accessKey;
+
+    @Value("${cloud.aws.credentials.secret-key}")
+    private String secretKey;
+
+    @Value("${cloud.aws.region.static}")
+    private String region;
 
     private final AmazonS3 amazonS3;
 
@@ -46,4 +57,21 @@ public class S3Service {
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
+    //파일 삭제
+    public void fileDelete(String fileUrl) throws BaseException {
+        try{
+            String fileKey = fileUrl.substring(58);
+            String key = fileKey; // 폴더/파일.확장자
+            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(region).build();
+            try {
+                s3.deleteObject(bucket, key);
+            } catch (AmazonServiceException e) {
+                System.err.println(e.getErrorMessage());
+                System.exit(1);
+            }
+            System.out.println(String.format("[%s] deletion complete", key));
+        } catch (Exception exception) {
+            throw new BaseException(S3_DELETE_ERROR);
+        }
+    }
 }

@@ -128,6 +128,18 @@ public class PostProvider {
         }
     }
 
+    // 게시글 작성자 ID 조회 
+    public int getWriterId(int postId) throws BaseException {
+        try {
+            GetPostWriterIdRes getPostWriterIdRes = postDao.getWriterId(postId);
+            int writerId = getPostWriterIdRes.getUserId();
+            return writerId;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(GET_USER_ID_ERROR);
+        }
+    }
+
     // public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
     //     try{
     //         List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);

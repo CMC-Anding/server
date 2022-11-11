@@ -39,9 +39,6 @@ public class QuestionController {
     @Autowired
     private final JwtService jwtService;
 
-
-
-
     public QuestionController(QuestionProvider questionProvider, QuestionService questionService, JwtService jwtService){
         this.questionProvider = questionProvider;
         this.questionService = questionService;
