@@ -320,34 +320,6 @@ public class PostController {
         }
     }
 
-    // /**
-    //  * 스크랩 취소 API
-    //  * [DELETE] /app/posts/clip/:post-id
-    //  * @return BaseResponse<String>
-    //  */
-    // @ApiOperation(value="스크랩 취소 API", notes="내가 작성한 글과 다른 사용자가 작성한 글의 스크랩을 취소합니다.") // swagger annotation
-    // @ApiResponses({
-    //     @ApiResponse(code = 1000 , message = "요청성공"),
-    //     @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-    //     @ApiResponse(code = 4506, message = "스크랩 취소에 실패하였습니다.")}
-    // )
-    // @ResponseBody
-    // @DeleteMapping(value = "/clip/{post-id}") // (DELETE) 127.0.0.1:6660/app/posts/clip/:post-id
-    // public BaseResponse<String> deleteClip(@PathVariable("post-id") int postId) throws BaseException{
-    //     try{
-
-    //         int userIdxByJwt = jwtService.getUserIdx();
-            
-    //         postService.deleteClip(postId, userIdxByJwt);
-
-    //         String result = "스크랩을 취소하였습니다!";
-    //         return new BaseResponse<>(SUCCESS ,result); 
-    //     }
-    //     catch (BaseException exception){
-    //         return new BaseResponse<>(exception.getStatus());
-    //     }
-    // }
-
     /**
      * 내 게시글 스크랩 조회 API
      * [GET] /app/posts/my-clip?chronological
