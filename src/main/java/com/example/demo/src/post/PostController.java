@@ -122,7 +122,7 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4600, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
+        @ApiResponse(code = 4600, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패했습니다.")}
     )
     @ResponseBody
     @PostMapping(value = "/clip/{post-id}") // (POST) 127.0.0.1:6660/app/posts/clip/:post-id
@@ -149,8 +149,8 @@ public class PostController {
     @ApiOperation(value="스크랩북의 게시글 삭제 API", notes="스크랩북에서 내가 원하는 게시글을 삭제합니다.(내 게시글, 타인 게시글 모두 가능)") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4602, message = "스크랩북 수정(구성 게시글 삭제)에 실패하였습니다.")}
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패했습니다."),
+        @ApiResponse(code = 4602, message = "스크랩북 수정(구성 게시글 삭제)에 실패했습니다.")}
     )
     @ResponseBody
     @DeleteMapping(value = "/clip") // (DELETE) 127.0.0.1:6660/app/posts/clip
@@ -196,11 +196,11 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4651, message = "게시글 신고에 실패하였습니다."),
-        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패하였습니다."),
-        @ApiResponse(code = 4653, message = "게시글 신고횟수가 7회이상인지 확인하는데 실패하였습니다."),
-        @ApiResponse(code = 4656, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패하였습니다."),
-        @ApiResponse(code = 4657, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패하였습니다.")}
+        @ApiResponse(code = 4651, message = "게시글 신고에 실패했습니다."),
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4653, message = "게시글 신고횟수가 7회이상인지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4656, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
+        @ApiResponse(code = 4657, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패했습니다.")}
     )
     @ResponseBody
     @PostMapping(value = "/report") // (POST) 127.0.0.1:6660/app/posts/report
@@ -223,7 +223,7 @@ public class PostController {
                     postService.deletePhotoOfDailyPostWhenReporting(postId);
                 }
             }
-            String result = "게시글을 신고하였습니다.";
+            String result = "해당 게시글이 신고되었습니다.";
             return new BaseResponse<>(SUCCESS ,result); 
         }
         catch (BaseException exception){
@@ -232,8 +232,8 @@ public class PostController {
     }
 
     /**
-     * 게시글 삭제하기 API
-     * [PATCH] /app/posts/delete/:user-id
+     * 게시글 삭제 API
+     * [PATCH] /app/posts/delete
      * @return BaseResponse<String>
      */
     @ApiOperation(value="게시글 삭제하기 API", notes="게시글을 삭제합니다.") // swagger annotation
@@ -241,16 +241,17 @@ public class PostController {
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패하였습니다."),
-        @ApiResponse(code = 4654, message = "일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패하였습니다."),
-        @ApiResponse(code = 4655, message = "일상 게시글의 사진 삭제에 실패하였습니다.")}
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4654, message = "일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
+        @ApiResponse(code = 4655, message = "일상 게시글의 사진 삭제에 실패했습니다.")}
     )
     @ResponseBody
-    @PatchMapping(value = "/delete/{user-id}") // (PATCH) 127.0.0.1:6660/app/posts/delete/:user-id
-    public BaseResponse<String> deletePost(@PathVariable("user-id") int userId, @ RequestBody DeletePostReq deletePostReq) throws BaseException{
+    @PatchMapping(value = "/delete") // (PATCH) 127.0.0.1:6660/app/posts/delete
+    public BaseResponse<String> deletePost(@ RequestBody DeletePostReq deletePostReq) throws BaseException, IOException{
         try{
             int userIdxByJwt = jwtService.getUserIdx();
-            if(userId != userIdxByJwt) {
+            int writerId = postProvider.getWriterId(deletePostReq.getPostId());
+            if(writerId != userIdxByJwt) {
                 return new BaseResponse<> (INVALID_USER_JWT);
             }
             String dailyOrQna = postProvider.checkDailyPostOrQnaPost(deletePostReq.getPostId());
@@ -258,6 +259,7 @@ public class PostController {
             postService.deletePost(deletePostReq.getPostId());
             //일상 게시글의 사진 삭제
             if(dailyOrQna.equals("Daily")) {
+                postService.s3ObjectDelete(deletePostReq.getPostId());
                 postService.deletePhotoOfDailyPost(deletePostReq.getPostId());
             }
             
@@ -266,6 +268,54 @@ public class PostController {
         }
         catch (BaseException exception){
             exception.printStackTrace();
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 게시글 수정 API
+     * [PUT] /app/posts/update/:post-id
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 수정하기 API", notes="게시글을 수정합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패했습니다."),
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),}
+    )
+    @ResponseBody
+    @PutMapping(value = "/update/{post-id}") // (PUT) 127.0.0.1:6660/app/posts/update/:post-id
+    public BaseResponse<String> updatePost(@PathVariable("post-id") int postId, @RequestPart Posts posts,  @ApiParam(value = "file", type = "MultipartFile", required = false, example = "이미지 파일 url") @RequestPart(value="file", required=false) MultipartFile image) throws IOException{
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            int writerId = postProvider.getWriterId(postId);
+            if(writerId != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            String dailyOrQna = postProvider.checkDailyPostOrQnaPost(postId);
+            // 일상 게시글 
+            if(dailyOrQna.equals("Daily")) {
+                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
+                postService.updateDailyPost(postDailyPostReq, postId); //선 (사진제외 업데이트)
+                postService.s3ObjectDelete(postId); // s3 기존 객체 삭제
+                if(!image.isEmpty()) {   
+                    postService.fileUpdate(image, postId); //후 (사진 업데이트)
+                }
+                if(image.isEmpty()) {
+                    postService.deletePhotoOfDailyPost(postId);
+                }
+            }
+            // 문답 게시글 
+            else if(dailyOrQna.equals("Qna")) {
+                PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser(), posts.getFeedShare());
+                postService.updateQnaPost(postQnaPostReq, postId);
+            }
+            String result = "게시글이 수정되었습니다!";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }

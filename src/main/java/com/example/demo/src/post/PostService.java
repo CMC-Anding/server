@@ -85,14 +85,14 @@ public class PostService {
 
     /* 
      * 게시글 등록 API 
-     * 일상 게시글
+     * 일상 게시글 (사진 제외)
     */
     public int postDailyPost(PostDailyPostReq postDailyPostReq) throws IOException,BaseException {
         try{
             int lastInsertId = postDao.postDailyPost(postDailyPostReq);
 
             if(lastInsertId == 0){
-                throw new BaseException(POST_DAILY_POST_FAIL);
+                throw new BaseException(POST_DAILY_POST_ERROR);
             }
         return lastInsertId;
         } catch(Exception exception){
@@ -111,8 +111,8 @@ public class PostService {
             postImageUrl = s3Service.fileUpload(image);
             postDao.createImage(postImageUrl, postId);
         }catch (Exception exception){
-            logger.error("S3 ERROR", exception);
-            throw new BaseException(DATABASE_ERROR);
+            exception.printStackTrace();
+            throw new BaseException(S3_FILE_POST_REQ_ERROR);
         }
         return postImageUrl;
     }    
@@ -126,12 +126,69 @@ public class PostService {
             int lastInsertId = postDao.postQnaPost(postQnaPostReq);
 
             if(lastInsertId == 0){
-                throw new BaseException(MODIFY_FAIL_USERNAME);
+                throw new BaseException(POST_QNA_POST_ERROR);
             }
         return lastInsertId;
         } catch(Exception exception){
             exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /* 
+     * 게시글 수정 API 
+     * 일상 게시글 (사진 제외)
+    */
+    public void updateDailyPost(PostDailyPostReq postDailyPostReq, int postId) throws IOException,BaseException {
+        try{
+            postDao.updateDailyPost(postDailyPostReq, postId);
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(UPDATE_DAILY_POST_ERROR);
+        }
+    }
+
+    /* 
+     * 게시글 수정 API 
+     * s3에서 객체 삭제
+    */
+    public void s3ObjectDelete(int postId) throws IOException,BaseException {
+        try {
+            GetImageUrlRes getImageUrlRes = postDao.getImageUrl(postId);
+            String imageUrl = getImageUrlRes.getImageUrl();
+            s3Service.fileDelete(imageUrl);
+        }catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(S3_FILE_DELETE_REQ_ERROR);
+        }
+    }
+
+    /* 
+     * 게시글 수정 API 
+     * 일상 게시글의 사진 수정
+    */
+    public String fileUpdate(MultipartFile image, int postId) throws IOException,BaseException {
+        String updateImageUrl = "";
+        try {
+            updateImageUrl = s3Service.fileUpload(image);
+            postDao.updateImage(updateImageUrl, postId);
+        }catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(UPDATE_IMAGE_ERROR);
+        }
+        return updateImageUrl;
+    }  
+
+    /* 
+     * 게시글 수정 API 
+     * 문답 게시글
+    */
+    public void updateQnaPost(PostQnaPostReq postQnaPostReq, int postId) throws IOException,BaseException {
+        try{
+            postDao.updateQnaPost(postQnaPostReq, postId);
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(UPDATE_QNA_POST_ERROR);
         }
     }
 
@@ -194,6 +251,7 @@ public class PostService {
             }
         return lastInsertId;
         } catch(Exception exception){
+            exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -203,6 +261,7 @@ public class PostService {
         try{
             postDao.deletePostsOfClipBook(userIdxByJwt, deletePostsOfClipBookReq);
         } catch(Exception exception){
+            exception.printStackTrace();
             throw new BaseException(DELETE_CLIP_FAIL);
         }
     }
@@ -212,7 +271,7 @@ public class PostService {
         try{
             int lastInsertId = postDao.reportPost(userIdxByJwt,reportPostReq);
             if(lastInsertId == 0){
-                throw new BaseException(REPORT_POST_FAIL);
+                throw new BaseException(REPORT_POST_ERROR);
             }
         return lastInsertId;
         } catch(Exception exception){

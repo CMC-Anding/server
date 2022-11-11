@@ -70,7 +70,7 @@ public class PostDao {
 
     // 일상 게시글의 사진 삭제
     public void deletePhotoOfDailyPost(int postId){
-        String deletePhotoOfDailyPostQuery = "update POST_PHOTO SET STATUS = 'DELETED' WHERE POST_ID = ?";
+        String deletePhotoOfDailyPostQuery = "delete from POST_PHOTO where POST_ID = ?";
         int deletePhotoOfDailyPostParams = postId;
         this.jdbcTemplate.update(deletePhotoOfDailyPostQuery, deletePhotoOfDailyPostParams);
     }
@@ -110,9 +110,10 @@ public class PostDao {
 
     // 글 상세보기 API
     public GetPostDetailRes getPostDetail(int postId){
-        String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, CREATED_AT as createdAt FROM POST WHERE ID = ?";
+        String getPostDetailQuery = "select u.NICKNAME as nickname, CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, p.QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION as q WHERE q.ID = (select QNA_QUESTION_ID FROM POST as p WHERE p.ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, p.CREATED_AT as createdAt FROM POST as p left join USER as u on p.USER_ID = u.ID where p.ID = ?";
         return this.jdbcTemplate.queryForObject(getPostDetailQuery,
                 (rs, rowNum) -> new GetPostDetailRes(
+                        rs.getString("nickname"),
                         rs.getString("contents"),
                         rs.getString("dailyTitle"),
                         rs.getString("qnaBackgroundColor"),
@@ -276,6 +277,51 @@ public class PostDao {
                 rs.getString("shouldRemoveOrNot")),
             getTotalReportCountParam);
     }
+
+    // 게시글 작성자 ID 조회
+    public GetPostWriterIdRes getWriterId(int postId) {
+        String getPostWriterIdQuery = "select USER_ID as userId from POST where ID= ?";
+        int getPostWriterIdParams = postId;
+        return this.jdbcTemplate.queryForObject(getPostWriterIdQuery, 
+            (rs,rowNum) -> new GetPostWriterIdRes(
+                rs.getInt("userId")),
+            getPostWriterIdParams);
+    }
+
+    // 일상 게시글 수정 (사진 제외)
+    public void updateDailyPost(PostDailyPostReq postDailyPostReq, int postId){
+        String updateDailyPostQuery = "update POST set USER_ID = ? , FILTER_ID = 'e', DAILY_TITLE = ?, CONTENTS = ?, FEED_SHARE = ? where ID = ?";
+        Object[] updateDailyPostParams = new Object[]{postDailyPostReq.getUserId(), postDailyPostReq.getDailyTitle(), postDailyPostReq.getContents(), postDailyPostReq.getFeedShare(), postId};
+        this.jdbcTemplate.update(updateDailyPostQuery,updateDailyPostParams);
+    }
+
+    // 문답 게시글 수정
+    public void updateQnaPost(PostQnaPostReq postQnaPostReq, int postId){
+        String updateQnaPostQuery = "update POST set USER_ID = ? , FILTER_ID = ?, QNA_QUESTION_ID = ?, CONTENTS= ?, QNA_BACKGROUND_COLOR = ?, FEED_SHARE = ? where ID = ?";
+        Object[] updateQnaPostParams = new Object[]{postQnaPostReq.getUserId(), postQnaPostReq.getFilterId(), postQnaPostReq.getQnaQuestionId(), postQnaPostReq.getContents(), postQnaPostReq.getQnaBackgroundColor(), postQnaPostReq.getFeedShare(), postId};
+        this.jdbcTemplate.update(updateQnaPostQuery,updateQnaPostParams);
+    }
+
+    /* 
+     * 게시글 수정 
+     * 일상 게시글의 사진 수정
+    */
+    public void updateImage(String url, int postId){
+        String createImageQuery = "update POST_PHOTO set URL = ? where POST_ID = ?";
+        Object[] createImageParams = new Object[]{url, postId};
+        this.jdbcTemplate.update(createImageQuery, createImageParams);
+    }
+
+    // 일상 게시글 이미지 url 조회
+    public GetImageUrlRes getImageUrl(int postId) {
+        String getImageUrlQuery = "select URL as imageUrl from POST_PHOTO where POST_ID = ?";
+        int getImageUrlParams = postId;
+        return this.jdbcTemplate.queryForObject(getImageUrlQuery, 
+            (rs,rowNum) -> new GetImageUrlRes(
+                rs.getString("imageUrl")),
+            getImageUrlParams);
+    }
+
 
     // public List<GetUserRes> getUsersByEmail(String email){
     //     String getUsersByEmailQuery = "select * from UserInfo where email =?";

@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetPostDetailRes {
+    private String nickname;
     private String contents;
     private String dailyTitle;
     private String qnaBackgroundColor;
