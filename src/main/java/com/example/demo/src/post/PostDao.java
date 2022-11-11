@@ -110,9 +110,10 @@ public class PostDao {
 
     // 글 상세보기 API
     public GetPostDetailRes getPostDetail(int postId){
-        String getPostDetailQuery = "select CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION WHERE ID = (select QNA_QUESTION_ID FROM POST WHERE ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, CREATED_AT as createdAt FROM POST WHERE ID = ?";
+        String getPostDetailQuery = "select u.NICKNAME as nickname, CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, p.QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION as q WHERE q.ID = (select QNA_QUESTION_ID FROM POST as p WHERE p.ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, p.CREATED_AT as createdAt FROM POST as p left join USER as u on p.USER_ID = u.ID where p.ID = ?";
         return this.jdbcTemplate.queryForObject(getPostDetailQuery,
                 (rs, rowNum) -> new GetPostDetailRes(
+                        rs.getString("nickname"),
                         rs.getString("contents"),
                         rs.getString("dailyTitle"),
                         rs.getString("qnaBackgroundColor"),
