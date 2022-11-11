@@ -135,14 +135,13 @@ public class PostDao {
     }
 
     // 스크랩 중복 확인 
-    public List<ClipDuplicateCheckRes> clipDuplicateCheck(int userIdxByJwt, int postId){
-        String clipDuplicateCheckQuery = "select if(POST_ID ,'존재','없다') as duplicate from CLIP where USER_ID = ? and POST_ID = ?";
+    public ClipDuplicateCheckRes clipDuplicateCheck(int userIdxByJwt, int postId){
+        String clipDuplicateCheckQuery = "select count(ID) as clipCount from CLIP where USER_ID = ? and POST_ID = ?";
         Object[] clipDuplicateCheckParams = new Object[]{userIdxByJwt, postId};
-        
-        return this.jdbcTemplate.query(clipDuplicateCheckQuery,
+        return this.jdbcTemplate.queryForObject(clipDuplicateCheckQuery,
                 (rs, rowNum) -> new ClipDuplicateCheckRes(
-                    rs.getString("duplicate")),
-                userIdxByJwt, userIdxByJwt);
+                    rs.getInt("clipCount")),
+                clipDuplicateCheckParams);
     }
 
     // 스크랩북의 게시글 삭제 API

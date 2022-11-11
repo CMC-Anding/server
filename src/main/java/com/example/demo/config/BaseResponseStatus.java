@@ -72,8 +72,9 @@ public enum BaseResponseStatus {
 
     // 스크랩 관련
     CLIP_FAIL(false, 4600,"나의 글 혹은 익명의 글을 스크랩하는데 실패했습니다."),
-    CLIP_DUPLICATE(false,4601,"이미 스크랩 한 게시글입니다."),
+    CLIP_DUPLICATE_CHECK_ERROR(false,4601,"중복 스크랩 확인에 실패했습니다."),
     DELETE_CLIP_FAIL(false, 4602, "스크랩북 수정(구성 게시글 삭제)에 실패했습니다."),
+    DUPLICATED_CLIP(false,4603,"이미 스크랩 한 게시글입니다."),
 
     // 게시글 관련
     POST_DAILY_POST_ERROR(false,4650,"일상게시글(사진 제외)을 등록하는데 실패했습니다."),

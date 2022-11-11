@@ -130,9 +130,11 @@ public class PostController {
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
-
+            String checkDuplicate = postService.clipDuplicateCheck(userIdxByJwt, postId);
+            if(checkDuplicate.equals("존재")) {
+                return new BaseResponse<>(DUPLICATED_CLIP);
+            }
             postService.postClip(userIdxByJwt, postId);
-
             String result = "스크랩에 성공했습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
         }

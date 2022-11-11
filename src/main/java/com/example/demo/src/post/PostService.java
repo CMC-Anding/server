@@ -236,23 +236,32 @@ public class PostService {
     // 스크랩 API 
     public int postClip(int userIdxByJwt, int postId) throws BaseException {
         try{
-            String checkDuplicate = "존재";
-            List<ClipDuplicateCheckRes> clipDuplicateCheck = postDao.clipDuplicateCheck(userIdxByJwt, postId);
-
-            for(int index = 0; index < clipDuplicateCheck.size(); index ++) {
-                if(clipDuplicateCheck.get(index).equals(checkDuplicate)) {
-                    throw new BaseException(CLIP_DUPLICATE);
-                }
-            }
             int lastInsertId = postDao.postClip(userIdxByJwt, postId);
 
             if(lastInsertId == 0){
                 throw new BaseException(CLIP_FAIL);
             }
-        return lastInsertId;
+            return lastInsertId;
         } catch(Exception exception){
             exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 스크랩 중복 확인
+    public String clipDuplicateCheck(int userIdxByJwt, int postId) throws BaseException {
+        try {
+            String checkDuplicate = "존재";
+            ClipDuplicateCheckRes clipDuplicateCheckRes = postDao.clipDuplicateCheck(userIdxByJwt, postId);
+            Integer clipCount = clipDuplicateCheckRes.getClipCount();
+            if(clipCount > 0) {
+                return checkDuplicate;
+            }
+            checkDuplicate = "없다";
+            return checkDuplicate;
+        }catch (Exception exception) {
+            throw new BaseException(CLIP_DUPLICATE_CHECK_ERROR);
+
         }
     }
 
