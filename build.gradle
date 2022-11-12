@@ -67,6 +67,10 @@ dependencies {
     annotationProcessor ('org.springframework.boot:spring-boot-configuration-processor')
     //S3
     implementation ('org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE')
+
+    // assertJ
+    // https://mvnrepository.com/artifact/org.assertj/assertj-core
+    testImplementation("org.assertj:assertj-core:3.23.1")
 }
 
 springBoot {
