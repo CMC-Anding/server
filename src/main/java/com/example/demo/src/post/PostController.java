@@ -65,7 +65,7 @@ public class PostController {
      */
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
-    public BaseResponse<String> postPost(@RequestPart Posts posts, @RequestPart(value="file", required=false) MultipartFile file) throws IOException{
+    public BaseResponse<String> postPost(@RequestPart Posts posts,  @ApiParam(value = "file", type = "MultipartFile", required = false, example = "이미지 파일 url") @RequestPart(value="file", required=false) MultipartFile image) throws IOException{
 
         try{
             //jwt에서 idx 추출.
@@ -75,8 +75,8 @@ public class PostController {
             if(posts.getDailyTitle() != null) {
                 PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
                 int lastInsertId = postService.postDailyPost(postDailyPostReq); //선 (사진제외 업로드)
-                if(file.isEmpty() == false) {   
-                    postService.fileUpload(file.getInputStream(), file.getOriginalFilename(), lastInsertId); //후 (사진 업로드)
+                if(!image.isEmpty()) {   
+                    postService.fileUpload(image, lastInsertId); //후 (사진 업로드)
                 }
             }
             
@@ -111,7 +111,6 @@ public class PostController {
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
-
     }
 
     /**
@@ -123,7 +122,7 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4505, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다.")}
+        @ApiResponse(code = 4600, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패했습니다.")}
     )
     @ResponseBody
     @PostMapping(value = "/clip/{post-id}") // (POST) 127.0.0.1:6660/app/posts/clip/:post-id
@@ -131,9 +130,11 @@ public class PostController {
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
-
+            String checkDuplicate = postService.clipDuplicateCheck(userIdxByJwt, postId);
+            if(checkDuplicate.equals("존재")) {
+                return new BaseResponse<>(DUPLICATED_CLIP);
+            }
             postService.postClip(userIdxByJwt, postId);
-
             String result = "스크랩에 성공했습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
         }
@@ -143,26 +144,177 @@ public class PostController {
     }
 
     /**
-     * 스크랩 취소 API
-     * [DELETE] /app/posts/clip/:post-id
+     * 스크랩북의 게시글 삭제 API
+     * [DELETE] /app/posts/clip
      * @return BaseResponse<String>
      */
-    @ApiOperation(value="스크랩 취소 API", notes="내가 작성한 글과 다른 사용자가 작성한 글의 스크랩을 취소합니다.") // swagger annotation
+    @ApiOperation(value="스크랩북의 게시글 삭제 API", notes="스크랩북에서 내가 원하는 게시글을 삭제합니다.(내 게시글, 타인 게시글 모두 가능)") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패했습니다."),
+        @ApiResponse(code = 4602, message = "스크랩북 수정(구성 게시글 삭제)에 실패했습니다.")}
+    )
+    @ResponseBody
+    @DeleteMapping(value = "/clip") // (DELETE) 127.0.0.1:6660/app/posts/clip
+    public BaseResponse<String> deletePostsOfClipBook(@RequestBody DeletePostsOfClipBookReq deletePostsOfClipBookReq) throws BaseException{
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            postService.deletePostsOfClipBook(userIdxByJwt, deletePostsOfClipBookReq);
+            String result = "스크랩북을 수정(구성 게시글 삭제)하였습니다!";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 게시글 신고 항목 조회 API
+     * [GET] /app/posts/report/reason
+     * @return BaseResponse<List<GetReportReasonRes>>
+     */
+    @ApiOperation(value="게시글 신고 항목 조회 API", notes="게시글 신고 항목을 조회합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @GetMapping("/report/reason") // (GET) 127.0.0.1:6660/app/posts/report/reason
+    public BaseResponse<List<GetReportReasonRes>> getReportReason() {
+        try{
+            List<GetReportReasonRes> getReportReasonRes = postProvider.getReportReason();
+            return new BaseResponse<>(getReportReasonRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 게시글 신고하기 API
+     * [POST] /app/posts/report
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 신고하기 API", notes="게시글을 신고합니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4506, message = "스크랩 취소에 실패하였습니다.")}
+        @ApiResponse(code = 4651, message = "게시글 신고에 실패했습니다."),
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4653, message = "게시글 신고횟수가 7회이상인지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4656, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
+        @ApiResponse(code = 4657, message = "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패했습니다.")}
     )
     @ResponseBody
-    @DeleteMapping(value = "/clip/{post-id}") // (DELETE) 127.0.0.1:6660/app/posts/clip/:post-id
-    public BaseResponse<String> deleteClip(@PathVariable("post-id") int postId) throws BaseException{
+    @PostMapping(value = "/report") // (POST) 127.0.0.1:6660/app/posts/report
+    public BaseResponse<String> reportPost(@RequestBody ReportPostReq reportPostReq) throws BaseException{
         try{
-
             int userIdxByJwt = jwtService.getUserIdx();
-            
-            postService.deleteClip(postId, userIdxByJwt);
+            int postId = reportPostReq.getPostId();
+            String dailyOrQna = postProvider.checkDailyPostOrQnaPost(postId);
 
-            String result = "스크랩을 취소하였습니다!";
+            postService.reportPost(userIdxByJwt, reportPostReq);
+            
+            //신고 후, 신고횟수 7회 이상인지 조회
+            String resultForDelete = postProvider.checkReportCountForDelete(reportPostReq);
+
+            // 게시글 신고 7회 이상시, 게시글 삭제 
+            if(resultForDelete.equals("삭제조건도달")) {
+                postService.deletePostWhenReporting(postId);
+                //일상 게시글의 사진 삭제
+                if(dailyOrQna.equals("Daily")) {
+                    postService.deletePhotoOfDailyPostWhenReporting(postId);
+                }
+            }
+            String result = "해당 게시글이 신고되었습니다.";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 게시글 삭제 API
+     * [PATCH] /app/posts/delete
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 삭제하기 API", notes="게시글을 삭제합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4654, message = "일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
+        @ApiResponse(code = 4655, message = "일상 게시글의 사진 삭제에 실패했습니다.")}
+    )
+    @ResponseBody
+    @PatchMapping(value = "/delete") // (PATCH) 127.0.0.1:6660/app/posts/delete
+    public BaseResponse<String> deletePost(@ RequestBody DeletePostReq deletePostReq) throws BaseException, IOException{
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            int writerId = postProvider.getWriterId(deletePostReq.getPostId());
+            if(writerId != userIdxByJwt) {
+                return new BaseResponse<> (INVALID_USER_JWT);
+            }
+            String dailyOrQna = postProvider.checkDailyPostOrQnaPost(deletePostReq.getPostId());
+ 
+            postService.deletePost(deletePostReq.getPostId());
+            //일상 게시글의 사진 삭제
+            if(dailyOrQna.equals("Daily")) {
+                postService.s3ObjectDelete(deletePostReq.getPostId());
+                postService.deletePhotoOfDailyPost(deletePostReq.getPostId());
+            }
+            
+            String result = "게시글을 삭제하였습니다.";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            exception.printStackTrace();
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 게시글 수정 API
+     * [PUT] /app/posts/update/:post-id
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 수정하기 API", notes="게시글을 수정합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패했습니다."),
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),}
+    )
+    @ResponseBody
+    @PutMapping(value = "/update/{post-id}") // (PUT) 127.0.0.1:6660/app/posts/update/:post-id
+    public BaseResponse<String> updatePost(@PathVariable("post-id") int postId, @RequestPart Posts posts,  @ApiParam(value = "file", type = "MultipartFile", required = false, example = "이미지 파일 url") @RequestPart(value="file", required=false) MultipartFile image) throws IOException{
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            int writerId = postProvider.getWriterId(postId);
+            if(writerId != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            String dailyOrQna = postProvider.checkDailyPostOrQnaPost(postId);
+            // 일상 게시글 
+            if(dailyOrQna.equals("Daily")) {
+                PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
+                postService.updateDailyPost(postDailyPostReq, postId); //선 (사진제외 업데이트)
+                postService.s3ObjectDelete(postId); // s3 기존 객체 삭제
+                if(!image.isEmpty()) {   
+                    postService.fileUpdate(image, postId); //후 (사진 업데이트)
+                }
+                if(image.isEmpty()) {
+                    postService.deletePhotoOfDailyPost(postId);
+                }
+            }
+            // 문답 게시글 
+            else if(dailyOrQna.equals("Qna")) {
+                PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser(), posts.getFeedShare());
+                postService.updateQnaPost(postQnaPostReq, postId);
+            }
+            String result = "게시글이 수정되었습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
         }
         catch (BaseException exception){
@@ -172,32 +324,81 @@ public class PostController {
 
     /**
      * 내 게시글 스크랩 조회 API
-     * [GET] /app/posts/my-clip
+     * [GET] /app/posts/my-clip?chronological
      * @return BaseResponse<GetPostDetailRes>
      */
     // Path-variable
     @ResponseBody
-    @GetMapping("/my-clip") // (GET) 127.0.0.1:6660/app/posts/my-clip
-    public BaseResponse<List<GetMyClipRes>> getMyPostClip() throws BaseException{
+    @GetMapping("/my-clip") // (GET) 127.0.0.1:6660/app/posts/my-clip?chronological
+    public BaseResponse<List<GetMyClipRes>> getMyPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
 
         int userIdxByJwt = jwtService.getUserIdx();
         
         try{
-            List<GetMyClipRes> getMyClipRes = postProvider.getMyPostClip(userIdxByJwt);
+            List<GetMyClipRes> getMyClipRes = postProvider.getMyPostClip(userIdxByJwt, chronological);
             return new BaseResponse<>(getMyClipRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
-
     }
 
     /**
      * 상대 게시글 스크랩 조회 API
-     * [GET] /app/posts/other-clip
+     * [GET] /app/posts/other-clip?chronological
      * @return BaseResponse<GetPostDetailRes>
      */
     // Path-variable
-    
+    @ResponseBody
+    @GetMapping("/other-clip") // (GET) 127.0.0.1:6660/app/posts/other-clip?chronological
+    public BaseResponse<List<GetMyClipRes>> getOtherPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
+
+        int userIdxByJwt = jwtService.getUserIdx();
+        
+        try{
+            List<GetMyClipRes> getMyClipRes = postProvider.getOtherPostClip(userIdxByJwt, chronological);
+            return new BaseResponse<>(getMyClipRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 스크랩북의 내 게시글 개수 API
+     * [GET] /app/posts/clip/my-post/cnt
+     * @return BaseResponse<GetMyPostOfClipCountRes>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/clip/my-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/my-post/cnt
+    public BaseResponse<GetMyPostOfClipCountRes> getMyPostOfClipCount() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            GetMyPostOfClipCountRes getMyPostOfClipCountRes = postProvider.getMyPostOfClipCount(userIdxByJwt);
+
+            return new BaseResponse<>(getMyPostOfClipCountRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 스크랩북의 타인 게시글 개수 API
+     * [GET] /app/posts/clip/other-post/cnt
+     * @return BaseResponse<GetArchiveCntRes>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/clip/other-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/other-post/cnt
+    public BaseResponse<GetOtherPostOfClipCountRes> getOtherPostOfClipCount() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            GetOtherPostOfClipCountRes getOtherPostOfClipCountRes = postProvider.getOtherPostOfClipCount(userIdxByJwt);
+
+            return new BaseResponse<>(getOtherPostOfClipCountRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
     // /**
     //  * 회원가입 API

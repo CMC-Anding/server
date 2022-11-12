@@ -4,12 +4,17 @@ import com.example.demo.config.BaseException;
 import com.example.demo.src.autobiography.model.*;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.SHA256;
+
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import static com.example.demo.config.BaseResponseStatus.*;
 
 import java.util.List;
@@ -69,6 +74,34 @@ public class AutobiographyService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    // public int giftAutobiography(int autobiographyId) throws BaseException {
+        
+    //     LocalDateTime nowDateTime = LocalDateTime.now();
+    //     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    //     String dateTimeValueOfGiftCode = nowDateTime.format(formatter);
+
+    //     System.out.println(dateTimeValueOfGiftCode);
+
+    //     String giftCodeBeforeCipher = autobiographyId + "gift" + dateTimeValueOfGiftCode ;
+
+    //     try{   
+    //         String giftCodeAfterCipher = new SHA256().encrypt(giftCodeBeforeCipher);
+
+
+    //     } catch (Exception exception) {
+
+    //     }
+
+    //     try{
+    //         int lastInsertId = autobiographyDao.giftAutobiography(autobiographyId);
+    //         if(lastInsertId == 0){
+    //             throw new BaseException(INSERT_GIFT_CODE_FAIL);
+    //         }
+    //     }catch(Exception exception) {
+    //         throw new BaseException(DATABASE_ERROR);
+    //     }
+    // }
 
     // //POST
     // public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {

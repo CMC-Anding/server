@@ -33,8 +33,6 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
     POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
 
-
-
     /**
      * 3000 : Response 오류
      */
@@ -56,6 +54,7 @@ public enum BaseResponseStatus {
     DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
     SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
     S3_UPLOAD_ERROR(false, 4002, "S3 업로드에 실패했습니다."),
+    S3_DELETE_ERROR(false, 4003, "S3 객체 삭제에 실패했습니다."),
 
     //[PATCH] /users/{userIdx}
     MODIFY_FAIL_USERNAME(false,4014,"유저네임 수정 실패"),
@@ -64,14 +63,37 @@ public enum BaseResponseStatus {
     PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
 
     //[GET] /app/questions/:filter-id
-    GET_QUESTION_ERROR(false,4501,"사용자가 작성하지않은 질문을 가져오는데에 실패하였습니다."),
+    GET_QUESTION_ERROR(false,4501,"사용자가 작성하지않은 질문을 가져오는데에 실패했습니다."),
 
-    MODIFY_FAIL_AUTOGRAPHY_ETC(false, 4502, "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다."),
-    DELETE_FAIL_AUTOGRAPHY_POST(false, 4503, "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
-    INSERT_FAIL_AUTOGRAPHY_POST(false, 4504, "자서전의 게시글 구성 생성에 실패하였습니다."),
-    CLIP_FAIL(false, 4505,"나의 글 혹은 익명의 글을 스크랩하는데 실패하였습니다."),
-    DELETE_CLIP_FAIL(false, 4506, "스크랩 취소에 실패하였습니다."),
-    POST_DAILY_POST_FAIL(false,4507,"일상게시글(사진 제외)을 등록하는데 실패하였습니다.");
+    // 자서전 관련
+    MODIFY_FAIL_AUTOGRAPHY_ETC(false, 4550, "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다."),
+    DELETE_FAIL_AUTOGRAPHY_POST(false, 4551, "기존 자서전의 게시글 구성 삭제에 실패했습니다."),
+    INSERT_FAIL_AUTOGRAPHY_POST(false, 4552, "자서전의 게시글 구성 생성에 실패했습니다."),
+
+    // 스크랩 관련
+    CLIP_FAIL(false, 4600,"나의 글 혹은 익명의 글을 스크랩하는데 실패했습니다."),
+    CLIP_DUPLICATE_CHECK_ERROR(false,4601,"중복 스크랩 확인에 실패했습니다."),
+    DELETE_CLIP_FAIL(false, 4602, "스크랩북 수정(구성 게시글 삭제)에 실패했습니다."),
+    DUPLICATED_CLIP(false,4603,"이미 스크랩 한 게시글입니다."),
+
+    // 게시글 관련
+    POST_DAILY_POST_ERROR(false,4650,"일상게시글(사진 제외)을 등록하는데 실패했습니다."),
+    REPORT_POST_ERROR(false,4651,"게시글 신고에 실패했습니다."),
+    CHECK_DAILY_OR_REPORT_ERROR(false,4652,"일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
+    CHECK_REPORT_COUNT_ERROR(false, 4653, "게시글 신고횟수가 7회이상인지 확인하는데 실패했습니다."),
+    POST_DELETE_ERROR(false, 4654, "일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
+    PHOTO_DELETE_ERROR(false,4655,"일상 게시글의 사진 삭제에 실패했습니다."),
+    POST_DELETE_WHEN_REPORTING_ERROR(false, 4656, "게시글 신고횟수가 7회이상일 때, 일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
+    PHOTO_DELETE_WHEN_REPORTING_ERROR(false, 4657, "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패했습니다."),
+    POST_QNA_POST_ERROR(false, 4658, "문답 게시글 등록에 실패했습니다."),
+    UPDATE_DAILY_POST_ERROR(false, 4659, "일상 게시글 수정에 실패했습니다."),
+    UPDATE_QNA_POST_ERROR(false, 4660, "문답 게시글 수정에 실패했습니다."),
+    S3_FILE_DELETE_REQ_ERROR(false, 4661, "일상 게시글의 이미지에 대한 S3 파일 삭제요청에 실패했습니다."),
+    S3_FILE_POST_REQ_ERROR(false,4662,"일상 게시글의 이미지에 대한 S3 파일 업로드요청에 실패했습니다."),
+    UPDATE_IMAGE_ERROR(false, 4663, "일상 게시글의 이미지 수정에 실패했습니다."),
+    GET_USER_ID_ERROR(false, 4664, "게시글의 작성자 id를 조회하는데 실패했습니다.");
+
+
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요

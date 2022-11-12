@@ -116,17 +116,28 @@ public class AutobiographyProvider {
             List<Post> postList = autobiographyDao.getPostsForAutography(userId, filterId, sort, lastCreatedAt);
 
             GetPostsForAutographyRes getPostsForAutographyRes = new GetPostsForAutographyRes();
-
-            // 다음페이지 존재 여부에 따른 반환 객체 데이터 작성
-            if (postList.size() < 19) {
-                getPostsForAutographyRes.setHasMorePost(false);
-                getPostsForAutographyRes.setPostList(postList);
-                getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size()-1).getCreatedAt());
-            } else {
-                getPostsForAutographyRes.setHasMorePost(true);
-                getPostsForAutographyRes.setPostList(postList.subList(0,postList.size()-1));
-                getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size()-2).getCreatedAt());
+            getPostsForAutographyRes.setHasMorePost(false);
+            getPostsForAutographyRes.setPostList(postList);
+            if (postList.size() > 0) {
+                getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size() - 1).getCreatedAt());
             }
+
+
+
+            // 페이지네이션 용도
+            // 다음페이지 존재 여부에 따른 반환 객체 데이터 작성
+//            if (postList.size() < 19) {
+//                getPostsForAutographyRes.setHasMorePost(false);
+//                getPostsForAutographyRes.setPostList(postList);
+//                if (postList.size() > 0) {
+//                    getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size() - 1).getCreatedAt());
+//                }
+//
+//            } else {
+//                getPostsForAutographyRes.setHasMorePost(true);
+//                getPostsForAutographyRes.setPostList(postList.subList(0,postList.size()-1));
+//                getPostsForAutographyRes.setLastCreatedAt(postList.get(postList.size()-2).getCreatedAt());
+//            }
 
             return getPostsForAutographyRes;
 

@@ -72,7 +72,7 @@ public class AutobiographyController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4502 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패하였습니다.")}
+        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
     )
     @ResponseBody
     @PatchMapping("/etc/{autobiography-id}")
@@ -96,8 +96,8 @@ public class AutobiographyController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4503 , message = "기존 자서전의 게시글 구성 삭제에 실패하였습니다."),
-        @ApiResponse(code = 4504 , message = "자서전의 게시글 구성 생성에 실패하였습니다.")}
+        @ApiResponse(code = 4551 , message = "기존 자서전의 게시글 구성 삭제에 실패했습니다."),
+        @ApiResponse(code = 4552 , message = "자서전의 게시글 구성 생성에 실패했습니다.")}
     )
     @ResponseBody
     @PatchMapping("/posts/{autobiography-id}")
@@ -111,6 +111,33 @@ public class AutobiographyController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /*
+     * 자서전 선물하기 API
+     * [POST] /app/autobiographies/gift/:autobiography-id
+     * @return BaseResponse<String>
+     */
+    // Body
+    // @ApiOperation(value="자서전 선물하기 API", notes="사용자가 선물하고싶은 자서전의 일회성 선물코드를 생성합니다.") // swagger annotation
+    // @ApiResponses({
+    //     @ApiResponse(code = 1000 , message = "요청성공"),
+    //     @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다.")}
+    // )
+    // @ResponseBody
+    // @PostMapping("/gift/{autobiography-id}")
+    // public BaseResponse<PostGiftAutobiographyRes> giftAutobiography(@PathVariable("autobiography-id") int autobiographyId) {
+    //     try{
+    //         //jwt에서 idx 추출.
+    //         int userIdxByJwt = jwtService.getUserIdx();
+
+    //         autobiographyService.giftAutobiography(autobiographyId);
+    //         PostGiftAutobiographyRes postGiftAutobiographyRes = autobiographyProvider.getGiftCode();
+
+    //         return new BaseResponse<>(postGiftAutobiographyRes);
+    //     } catch(BaseException exception){
+    //         return new BaseResponse<>((exception.getStatus()));
+    //     }
+    // }
 
 
 

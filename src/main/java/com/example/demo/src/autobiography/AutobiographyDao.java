@@ -91,13 +91,13 @@ public class AutobiographyDao {
 
     /* 자서전 틀 생성*/
     public int createAutobiography(int userId, PostAutobiographyReq postAutobiographyReq) {
-        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR) values (?, ?, ?, ?, ?)";
-        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor()};
+        String query = "insert into AUTOBIOGRAPHY(USER_ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, OBJET_COLOR) values (?, ?, ?, ?, ?, ?)";
+        Object[] params = new Object[]{userId, postAutobiographyReq.getTitle(), postAutobiographyReq.getDetail(), postAutobiographyReq.getCoverColor(), postAutobiographyReq.getTitleColor(), postAutobiographyReq.getObjetColor()};
 
         this.jdbcTemplate.update(query, params);
 
-        String lastInserIdQuery = "select last_insert_id()";
-        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
 
     }
 
@@ -119,7 +119,7 @@ public class AutobiographyDao {
 
     /* 자서전 목록 조회 */
     public List<Autobiography> getMyAutobiographyList(int userId) {
-        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, CREATED_AT\n" +
+        String query = "SELECT ID, TITLE, DETAIL, COVER_COLOR, TITLE_COLOR, OBJET_COLOR, CREATED_AT\n" +
                 "FROM AUTOBIOGRAPHY\n" +
                 "WHERE USER_ID=?";
 
@@ -130,6 +130,7 @@ public class AutobiographyDao {
                         rs.getString("DETAIL"),
                         rs.getString("COVER_COLOR"),
                         rs.getString("TITLE_COLOR"),
+                        rs.getInt("OBJET_COLOR"),
                         rs.getString("CREATED_AT")
                 ),
                 userId);
@@ -189,6 +190,7 @@ public class AutobiographyDao {
                 "LEFT JOIN POST_PHOTO PP on P.ID = PP.POST_ID\n" +
                 "LEFT JOIN QUESTION Q on P.QNA_QUESTION_ID = Q.ID\n" +
                 "WHERE USER_ID=? AND P.STATUS='ACTIVE'\n";
+
         List<Object> paramsList = new ArrayList<>();
         paramsList.add(userId);
 
@@ -204,17 +206,18 @@ public class AutobiographyDao {
                 query +="AND P.CREATED_AT<?\n";
                 paramsList.add(lastCreatedAt);
             }
-            query +="ORDER BY P.CREATED_AT DESC\n" +
-                    "LIMIT 19;";
+            query +="ORDER BY P.CREATED_AT DESC\n";
+            /**페이지네이션
+            query +="LIMIT 19;";*/
         } else {
             if (lastCreatedAt != null) {
                 query +="AND P.CREATED_AT>?\n";
                 paramsList.add(lastCreatedAt);
             }
-            query +="ORDER BY P.CREATED_AT ASC\n" +
-                    "LIMIT 19;";
+            query +="ORDER BY P.CREATED_AT ASC\n";
+            /**페이지네이션
+             query +="LIMIT 19;";*/
         }
-
 
         Object[] params = paramsList.toArray();
         return this.jdbcTemplate.query(query,
