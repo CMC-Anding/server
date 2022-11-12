@@ -1,6 +1,5 @@
 package com.example.demo.src.post;
 
-
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponseStatus;
 import com.example.demo.src.post.model.*;
@@ -10,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-
 import static com.example.demo.config.BaseResponseStatus.*;
 
 //Provider : Read의 비즈니스 로직 처리
@@ -94,6 +91,52 @@ public class PostProvider {
             return getOtherPostOfClipCountRes;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 신고 항목 조회
+    public List<GetReportReasonRes> getReportReason() throws BaseException {
+        try {
+            List<GetReportReasonRes> getReportReasonRes = postDao.getReportReason();
+            return getReportReasonRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 게시글 신고가 7회 이상인지 조회
+    public String checkReportCountForDelete(ReportPostReq reportPostReq) throws BaseException{
+        try {
+            CheckReportCountForDeleteRes checkReportCountForDeleteRes = postDao.getTotalReportCount(reportPostReq);
+            String resultForDelete = checkReportCountForDeleteRes.getShouldRemoveOrNot();
+            return resultForDelete;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(CHECK_REPORT_COUNT_ERROR);
+        }
+    }
+
+    // 일상 게시글인지, 문답 게시글인지 확인
+    public String checkDailyPostOrQnaPost(int postId) throws BaseException {
+        try {
+            CheckDailyPostOrQnaPostRes checkDailyPostOrQnaPostRes = postDao.checkDailyPostOrQnaPost(postId);
+            String dailyPostOrQna = checkDailyPostOrQnaPostRes.getDailyOrQna();
+            return dailyPostOrQna;
+        } catch(Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(CHECK_DAILY_OR_REPORT_ERROR);
+        }
+    }
+
+    // 게시글 작성자 ID 조회 
+    public int getWriterId(int postId) throws BaseException {
+        try {
+            GetPostWriterIdRes getPostWriterIdRes = postDao.getWriterId(postId);
+            int writerId = getPostWriterIdRes.getUserId();
+            return writerId;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(GET_USER_ID_ERROR);
         }
     }
 
