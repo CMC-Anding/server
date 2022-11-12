@@ -211,7 +211,7 @@ public class UserDao {
 
     /* 회원 탈퇴 */
     public void deleteUser(int userId) {
-        String query = "UPDATE USER SET PHONE_NUMBER = '0' WHERE ID = ? ";
+        String query = "DELETE FROM USER WHERE ID = ? ";
         this.jdbcTemplate.update(query,userId);
     }
 }
