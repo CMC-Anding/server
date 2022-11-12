@@ -208,4 +208,10 @@ public class UserDao {
                 ),
                 userId);
     }
+
+    /* 회원 탈퇴 */
+    public void deleteUser(int userId) {
+        String query = "UPDATE USER SET PHONE_NUMBER = '0' WHERE ID = ? ";
+        this.jdbcTemplate.update(query,userId);
+    }
 }

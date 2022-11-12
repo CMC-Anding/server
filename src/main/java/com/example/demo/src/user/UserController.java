@@ -449,25 +449,31 @@ public class UserController {
     }
 
     /**
-     * 멀티파트폼 테스트 API
-     * [PATCH] /app/users/profile-test
+     * 회원탈퇴 API
+     * [DELETE] /app/users/withdrawl
      * @return BaseResponse
      */
+    @ApiOperation(value="회원탈퇴 API", notes="해당 회원의 계정을 삭제합니다") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2000 , message = "입력값 오류."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
     @ResponseBody
-    @PatchMapping(value = "/profile-test", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public BaseResponse testModifyUserProfile(@RequestPart(value="userProfile", required=false) UserProfile userProfile, @RequestPart(value="image", required=false) MultipartFile image) throws IOException {
-        System.out.println(image==null);
-        System.out.println(Objects.isNull(image));
-        System.out.println(image);
+    @DeleteMapping("/withdrawl")
+    public BaseResponse deleteUser() {
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
 
-        System.out.println(userProfile);
-        System.out.println(userProfile==null);
-        System.out.println(userProfile.getIntroduction());
-        System.out.println(userProfile.getNickname());
-
-
-
-        return new BaseResponse(SUCCESS);
-
+            userService.deleteUser(userId);
+            return new BaseResponse<>(SUCCESS);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
     }
+
+
+
 }

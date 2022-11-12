@@ -76,6 +76,17 @@ public class UserService {
 
     }
 
+    /* 회원 탈퇴 */
+    public void deleteUser(int userId) throws BaseException {
+        try {
+            userDao.deleteUser(userId);
+        } catch (Exception exception) {
+            logger.error("deleteUser 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
 //    public void modifyUserName(PatchUserReq patchUserReq) throws BaseException {
 //        try{
 //            int result = userDao.modifyUserName(patchUserReq);
