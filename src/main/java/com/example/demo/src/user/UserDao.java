@@ -214,4 +214,5 @@ public class UserDao {
         String query = "DELETE FROM USER WHERE ID = ? ";
         this.jdbcTemplate.update(query,userId);
     }
+
 }
