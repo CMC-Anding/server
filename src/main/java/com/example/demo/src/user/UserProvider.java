@@ -164,4 +164,17 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public void checkPhoneNumberDuplicated(String phoneNumber) throws BaseException {
+        try {
+            if (userDao.checkPhoneNumber(phoneNumber) != 0) {
+                throw new BaseException(DUPLICATED_PHONE_NUMBER);
+            }
+        } catch (BaseException baseException) {
+            throw baseException;
+        } catch (Exception exception) {
+            logger.error("checkPhoneNumberDuplicated 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

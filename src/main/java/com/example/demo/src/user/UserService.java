@@ -37,6 +37,9 @@ public class UserService {
 
     /* 회원가입 */
     public void createUser(PostUserReq postUserReq) throws BaseException {
+        //전화번호 중복 체크
+        userProvider.checkPhoneNumberDuplicated(postUserReq.getPhone());
+
         //아이디 중복 체크
         userProvider.checkUserId(postUserReq.getUserId());
 

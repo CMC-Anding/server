@@ -150,8 +150,12 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
             @ApiResponse(code = 2000 , message = "입력값 오류."),
+            @ApiResponse(code = 3015, message ="이미 등록된 아이디입니다."),
+            @ApiResponse(code = 3016, message ="이미 등록된 닉네임입니다."),
+            @ApiResponse(code = 3018 , message = "이미 가입된 전화번호입니다."),
             @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
-            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다."),
+            @ApiResponse(code = 4011 , message = "비밀번호 암호화에 실패하였습니다.")}
     )
     @ResponseBody
     @PostMapping("/join")
