@@ -20,7 +20,6 @@ public class PostAutobiographyReq {
     @ApiModelProperty(value = "자서전 제목", example ="조이의 자서전", required = true, dataType = "String")
     private String title;
 
-    @NotBlank(message = "추가설명이 입력되지 않았습니다.")
     @ApiModelProperty(value = "추가설명", example ="2022.03.20 2022.06.23", required = true, dataType = "String")
     private String detail;
 
