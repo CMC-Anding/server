@@ -14,6 +14,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @ApiModel
 public class ClipDuplicateCheckRes {
-    private String duplicate;
+    private int clipCount;
     
 }

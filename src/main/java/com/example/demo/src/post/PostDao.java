@@ -110,7 +110,7 @@ public class PostDao {
 
     // 글 상세보기 API
     public GetPostDetailRes getPostDetail(int postId){
-        String getPostDetailQuery = "select u.NICKNAME as nickname, CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, p.QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION as q WHERE q.ID = (select QNA_QUESTION_ID FROM POST as p WHERE p.ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, p.CREATED_AT as createdAt FROM POST as p left join USER as u on p.USER_ID = u.ID where p.ID = ?";
+        String getPostDetailQuery = "select u.NICKNAME as nickname, CONTENTS as contents , DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, p.QNA_QUESTION_ID as qnaQuestionId, (select CONTENTS FROM QUESTION as q WHERE q.ID = (select QNA_QUESTION_ID FROM POST as p WHERE p.ID =?)) as qnaQuestion,(select URL FROM POST_PHOTO WHERE POST_ID = ?) as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser, p.STATUS as status ,p.CREATED_AT as createdAt FROM POST as p left join USER as u on p.USER_ID = u.ID where p.ID = ?";
         return this.jdbcTemplate.queryForObject(getPostDetailQuery,
                 (rs, rowNum) -> new GetPostDetailRes(
                         rs.getString("nickname"),
@@ -122,6 +122,7 @@ public class PostDao {
                         rs.getString("qnaQuestion"),
                         rs.getString("dailyImage"),
                         rs.getString("qnaQuestionMadeFromUser"),
+                        rs.getString("status"),
                         rs.getDate("createdAt")),
                     postId, postId, postId);
     }
@@ -134,14 +135,13 @@ public class PostDao {
     }
 
     // 스크랩 중복 확인 
-    public List<ClipDuplicateCheckRes> clipDuplicateCheck(int userIdxByJwt, int postId){
-        String clipDuplicateCheckQuery = "select if(POST_ID ,'존재','없다') as duplicate from CLIP where USER_ID = ? and POST_ID = ?";
+    public ClipDuplicateCheckRes clipDuplicateCheck(int userIdxByJwt, int postId){
+        String clipDuplicateCheckQuery = "select count(ID) as clipCount from CLIP where USER_ID = ? and POST_ID = ?";
         Object[] clipDuplicateCheckParams = new Object[]{userIdxByJwt, postId};
-        
-        return this.jdbcTemplate.query(clipDuplicateCheckQuery,
+        return this.jdbcTemplate.queryForObject(clipDuplicateCheckQuery,
                 (rs, rowNum) -> new ClipDuplicateCheckRes(
-                    rs.getString("duplicate")),
-                userIdxByJwt, userIdxByJwt);
+                    rs.getInt("clipCount")),
+                clipDuplicateCheckParams);
     }
 
     // 스크랩북의 게시글 삭제 API
@@ -162,7 +162,7 @@ public class PostDao {
 
     // 내 게시글 스크랩 조회 (최신순) API
     public List<GetMyClipRes> getMyPostClipReverseChronological(int userIdxByJwt){
-        String getMyPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT desc";
+        String getMyPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) and p.STATUS = 'ACTIVE' ORDER BY p.CREATED_AT desc";
         return this.jdbcTemplate.query(getMyPostClipReverseChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
                     rs.getInt("postId"),
@@ -178,7 +178,7 @@ public class PostDao {
 
     // 내 게시글 스크랩 조회 (시간순) API
     public List<GetMyClipRes> getMyPostClipChronological(int userIdxByJwt){
-        String getMyPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) ORDER BY p.CREATED_AT";
+        String getMyPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) and p.STATUS = 'ACTIVE' ORDER BY p.CREATED_AT";
         return this.jdbcTemplate.query(getMyPostClipChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
                     rs.getInt("postId"),
@@ -194,7 +194,7 @@ public class PostDao {
 
     // 타인 게시글 스크랩 조회 (최신순) API
     public List<GetMyClipRes> getOtherPostClipReverseChronological(int userIdxByJwt){
-        String getOtherPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) ORDER BY p.CREATED_AT desc";
+        String getOtherPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) and p.STATUS = 'ACTIVE' ORDER BY p.CREATED_AT desc";
         return this.jdbcTemplate.query(getOtherPostClipReverseChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
                     rs.getInt("postId"),
@@ -210,7 +210,7 @@ public class PostDao {
 
     // 타인 게시글 스크랩 조회 (시간순) API
     public List<GetMyClipRes> getOtherPostClipChronological(int userIdxByJwt){
-        String getOtherPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) ORDER BY p.CREATED_AT";
+        String getOtherPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) and p.STATUS = 'ACTIVE' ORDER BY p.CREATED_AT";
         return this.jdbcTemplate.query(getOtherPostClipChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
                     rs.getInt("postId"),
@@ -226,7 +226,7 @@ public class PostDao {
 
     // 스크랩북의 내 게시글 개수 API
     public GetMyPostOfClipCountRes getMyPostOfClipCount(int userIdxByJwt) {
-        String getMyPostOfClipCountQuery = "select count(*) as myPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID = ?";
+        String getMyPostOfClipCountQuery = "select count(*) as myPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID = ? and STATUS = 'ACTIVE'";
         int getMyPostOfClipCountParam = userIdxByJwt;
 
         return this.jdbcTemplate.queryForObject(getMyPostOfClipCountQuery, 
@@ -238,7 +238,7 @@ public class PostDao {
 
     // 스크랩북의 타인 게시글 개수 API
     public GetOtherPostOfClipCountRes getOtherPostOfClipCount(int userIdxByJwt) {
-        String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID != ?";
+        String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID != ? and STATUS = 'ACTIVE'";
         int getOtherPostOfClipCountParam = userIdxByJwt;
 
         return this.jdbcTemplate.queryForObject(getOtherPostOfClipCountQuery, 

@@ -21,6 +21,7 @@ public class GetPostDetailRes {
     private String qnaQuestion;
     private String dailyImage;
     private String qnaQuestionMadeFromUser;
+    private String status;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
 }
