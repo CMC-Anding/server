@@ -48,6 +48,7 @@ public enum BaseResponseStatus {
 
     UNREGISTERED_PHONE_NUMBER(false, 3017, "등록되지 않은 전화번호 입니다."),
     DUPLICATED_PHONE_NUMBER(false, 3018, "이미 가입된 전화번호입니다."),
+    FAILED_TO_DELETE_ACCOUNT(false,3019,"이미 삭제되었거나 존재하지 않는 계정입니다."),
 
     /**
      * 4000 : Database, Server 오류

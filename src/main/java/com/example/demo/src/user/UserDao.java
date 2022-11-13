@@ -210,9 +210,9 @@ public class UserDao {
     }
 
     /* 회원 탈퇴 */
-    public void deleteUser(int userId) {
+    public int deleteUser(int userId) {
         String query = "DELETE FROM USER WHERE ID = ? ";
-        this.jdbcTemplate.update(query,userId);
+        return this.jdbcTemplate.update(query,userId);
     }
 
 }
