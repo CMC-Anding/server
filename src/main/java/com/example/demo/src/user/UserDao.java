@@ -174,7 +174,7 @@ public class UserDao {
     public int getNumberOfMyPosts(int userId) {
         String query = "SELECT COUNT(ID)\n" +
                 "FROM POST\n" +
-                "WHERE USER_ID = ?;";
+                "WHERE USER_ID = ? AND STATUS = 'ACTIVE';";
 
         return this.jdbcTemplate.queryForObject(query, int.class, userId);
     }
@@ -183,7 +183,7 @@ public class UserDao {
     public int getNumberOfMyAutobiographies(int userId) {
         String query = "SELECT COUNT(ID)\n" +
                 "FROM AUTOBIOGRAPHY\n" +
-                "WHERE USER_ID = ?";
+                "WHERE USER_ID = ? AND STATUS = 'ACTIVE'";
 
         return this.jdbcTemplate.queryForObject(query, int.class, userId);
     }
