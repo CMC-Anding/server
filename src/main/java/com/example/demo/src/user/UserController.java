@@ -461,6 +461,7 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
             @ApiResponse(code = 2000 , message = "입력값 오류."),
+            @ApiResponse(code = 3019 , message = "이미 삭제되었거나 존재하지 않는 계정입니다."),
             @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
             @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
     )
