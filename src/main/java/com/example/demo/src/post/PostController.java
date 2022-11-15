@@ -300,7 +300,7 @@ public class PostController {
             if(dailyOrQna.equals("Daily")) {
                 PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
                 postService.updateDailyPost(postDailyPostReq, postId); //선 (사진제외 업데이트)
-                if(image.isEmpty()) { //기존 이미지 사용
+                if(image==null || image.isEmpty()) { //기존 이미지 사용
                     return new BaseResponse<>(SUCCESS ,"게시글이 수정되었습니다!"); 
                 } else if(!image.isEmpty()) {
                     postService.s3ObjectDelete(postId);

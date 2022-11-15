@@ -82,7 +82,11 @@ public class UserService {
     /* 회원 탈퇴 */
     public void deleteUser(int userId) throws BaseException {
         try {
-            userDao.deleteUser(userId);
+            if (userDao.deleteUser(userId) == 0) {
+                throw new BaseException(FAILED_TO_DELETE_ACCOUNT);
+            }
+        } catch (BaseException baseException) {
+            throw baseException;
         } catch (Exception exception) {
             logger.error("deleteUser 에러", exception);
             throw new BaseException(DATABASE_ERROR);
