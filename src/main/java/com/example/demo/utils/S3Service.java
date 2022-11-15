@@ -10,19 +10,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-
 import java.util.UUID;
-
 import static com.example.demo.config.BaseResponseStatus.*;
-
 import com.amazonaws.AmazonServiceException;
+
 @RequiredArgsConstructor
 @Service
 public class S3Service {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
     
-    @Value("${cloud.aws.s3.bucket}")    // application.yml
+     // application.yml
+    @Value("${cloud.aws.s3.bucket}")   
     private String bucket;
 
     @Value("${cloud.aws.credentials.access-key}")
@@ -63,13 +61,16 @@ public class S3Service {
             String fileKey = fileUrl.substring(58);
             String key = fileKey; // 폴더/파일.확장자
             final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(region).build();
+
             try {
                 s3.deleteObject(bucket, key);
             } catch (AmazonServiceException e) {
                 System.err.println(e.getErrorMessage());
                 System.exit(1);
             }
+
             System.out.println(String.format("[%s] deletion complete", key));
+
         } catch (Exception exception) {
             throw new BaseException(S3_DELETE_ERROR);
         }

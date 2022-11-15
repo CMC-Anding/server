@@ -66,7 +66,6 @@ public class PostController {
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
     public BaseResponse<String> postPost(@RequestPart Posts posts,  @ApiParam(value = "file", type = "MultipartFile", required = false, example = "이미지 파일 url") @RequestPart(value="file", required=false) MultipartFile image) throws IOException{
-
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
@@ -301,7 +300,7 @@ public class PostController {
             if(dailyOrQna.equals("Daily")) {
                 PostDailyPostReq postDailyPostReq = new PostDailyPostReq(userIdxByJwt, posts.getDailyTitle(), posts.getContents(), posts.getFeedShare());
                 postService.updateDailyPost(postDailyPostReq, postId); //선 (사진제외 업데이트)
-                if(image.isEmpty()) { //기존 이미지 사용
+                if(image==null || image.isEmpty()) { //기존 이미지 사용
                     return new BaseResponse<>(SUCCESS ,"게시글이 수정되었습니다!"); 
                 } else if(!image.isEmpty()) {
                     postService.s3ObjectDelete(postId);
