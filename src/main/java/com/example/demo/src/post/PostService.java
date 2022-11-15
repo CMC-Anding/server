@@ -1,36 +1,17 @@
 package com.example.demo.src.post;
 
+import static com.example.demo.config.BaseResponseStatus.*;
 import com.example.demo.utils.S3Service;
 import com.example.demo.config.BaseException;
 import com.example.demo.src.post.model.*;
 import com.example.demo.utils.JwtService;
-import com.example.demo.utils.S3Service;
-import com.example.demo.utils.SHA256;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import static com.example.demo.config.BaseResponseStatus.*;
-
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-
 import org.springframework.transaction.annotation.Transactional;
 
 // Service Create, Update, Delete 의 로직 처리
@@ -54,34 +35,6 @@ public class PostService {
         this.jwtService = jwtService;
         this.s3Service = s3Service;
     }
-
-
-
-    // //POST
-    // public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
-    //     //중복
-    //     if(userProvider.checkEmail(postUserReq.getEmail()) ==1){
-    //         throw new BaseException(POST_USERS_EXISTS_EMAIL);
-    //     }
-
-    //     String pwd;
-    //     try{
-    //         //암호화
-    //         pwd = new SHA256().encrypt(postUserReq.getPassword());
-    //         postUserReq.setPassword(pwd);
-
-    //     } catch (Exception ignored) {
-    //         throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
-    //     }
-    //     try{
-    //         int userIdx = userDao.createUser(postUserReq);
-    //         //jwt 발급.
-    //         String jwt = jwtService.createJwt(userIdx);
-    //         return new PostUserRes(jwt,userIdx);
-    //     } catch (Exception exception) {
-    //         throw new BaseException(DATABASE_ERROR);
-    //     }
-    // }
 
     /* 
      * 게시글 등록 API 
@@ -288,16 +241,4 @@ public class PostService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
-    
-
-    // // 스크랩 하나씩 삭제 API 
-    // public void deleteClip(int postId, int userIdxByJwt) throws BaseException {
-    //     try{
-    //         postDao.deleteClip(postId, userIdxByJwt);
-
-    //     } catch(Exception exception){
-    //         throw new BaseException(DELETE_CLIP_FAIL);
-    //     }
-    // }
 }

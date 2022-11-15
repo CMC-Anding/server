@@ -66,7 +66,6 @@ public class PostController {
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
     public BaseResponse<String> postPost(@RequestPart Posts posts,  @ApiParam(value = "file", type = "MultipartFile", required = false, example = "이미지 파일 url") @RequestPart(value="file", required=false) MultipartFile image) throws IOException{
-
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
