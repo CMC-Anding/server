@@ -479,6 +479,31 @@ public class UserController {
         }
     }
 
+    /**
+     * 사용자 차단 API
+     * [POST] /app/users/block
+     * @return BaseResponse
+     */
+    @ApiOperation(value="사용자 차단 API", notes="해당 회원의 계정을 차단합니다") // swagger annotation
+    @ApiResponses({
+            @ApiResponse(code = 1000 , message = "요청에 성공하였습니다."),
+            @ApiResponse(code = 2000 , message = "입력값 오류."),
+            @ApiResponse(code = 3019 , message = "이미 삭제되었거나 존재하지 않는 계정입니다."),
+            @ApiResponse(code = 4000 , message = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(code = 4001 , message = "서버와의 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @PostMapping("/block/{nickname}")
+    public BaseResponse blockUser(@ApiParam(value = "nickname", required = true, example = "독산동물주먹") @PathVariable(value = "nickname", required = true) String nickname) {
+        try{
+            //jwt에서 id 추출.
+            int userId = jwtService.getUserIdx();
 
+            userService.blockUser(userId, nickname);
+            return new BaseResponse<>(SUCCESS);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 }
