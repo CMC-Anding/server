@@ -4,7 +4,6 @@ package com.example.demo.src.user;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.user.model.*;
-import com.example.demo.utils.JwtService;
 import com.example.demo.utils.S3Service;
 import com.example.demo.utils.SHA256;
 import org.slf4j.Logger;
@@ -91,6 +90,17 @@ public class UserService {
             logger.error("deleteUser 에러", exception);
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    /* 사용자 차단 */
+    public void blockUser(int userId, String nickname) throws BaseException {
+        try {
+            userDao.blockUser(userId, nickname);
+        } catch (Exception exception) {
+            logger.error("blockUser 에러", exception);
+            throw new BaseException(DATABASE_ERROR);
+        }
+
     }
 
 

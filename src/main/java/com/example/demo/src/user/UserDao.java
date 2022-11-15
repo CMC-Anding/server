@@ -215,4 +215,15 @@ public class UserDao {
         return this.jdbcTemplate.update(query,userId);
     }
 
+    /* 사용자 차단 */
+    public void blockUser(int userId, String nickname) {
+        String query = "INSERT IGNORE INTO BLOCK_USER (USER_ID, BLOCKED_USER_ID) VALUES (?,\n" +
+                "                                                                    (SELECT ID\n" +
+                "                                                                     FROM USER\n" +
+                "                                                                     WHERE NICKNAME=?)\n" +
+                "                                                                 )";
+        Object[] params = new Object[]{userId, nickname};
+
+        this.jdbcTemplate.update(query,params);
+    }
 }
