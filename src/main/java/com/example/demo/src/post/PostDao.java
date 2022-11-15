@@ -150,13 +150,6 @@ public class PostDao {
     }
     }
 
-    // // 스크랩 하나씩 삭제
-    // public int deleteClip(int postId, int userIdxByJwt){
-    //     String deleteClipQuery = "delete from CLIP where POST_ID = ? and USER_ID = ?";
-    //     Object[] deleteClipParams = new Object[]{postId, userIdxByJwt};
-    //     return this.jdbcTemplate.update(deleteClipQuery, deleteClipParams);
-    // }
-
     // 내 게시글 스크랩 조회 (최신순) API
     public List<GetMyClipRes> getMyPostClipReverseChronological(int userIdxByJwt){
         String getMyPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID = ?) and p.STATUS = 'ACTIVE' ORDER BY p.CREATED_AT desc";
@@ -319,29 +312,13 @@ public class PostDao {
             getImageUrlParams);
     }
 
+    //게시글 가리기
+    public void hidingPost(int userIdxByJwt, int postId) {
+        String hidingPostQuery = "insert into HIDDEN_POST(USER_ID, POST_ID) values (?,?)";
+        Object[] hidingPostParams = new Object[]{userIdxByJwt, postId};
+        this.jdbcTemplate.update(hidingPostQuery, hidingPostParams);
+    }
 
-    // public List<GetUserRes> getUsersByEmail(String email){
-    //     String getUsersByEmailQuery = "select * from UserInfo where email =?";
-    //     String getUsersByEmailParams = email;
-    //     return this.jdbcTemplate.query(getUsersByEmailQuery,
-    //             (rs, rowNum) -> new GetUserRes(
-    //                     rs.getInt("userIdx"),
-    //                     rs.getString("userName"),
-    //                     rs.getString("ID"),
-    //                     rs.getString("Email"),
-    //                     rs.getString("password")),
-    //             getUsersByEmailParams);
-    // }
-    
-
-    // public int createUser(PostUserReq postUserReq){
-    //     String createUserQuery = "insert into UserInfo (userName, ID, password, email) VALUES (?,?,?,?)";
-    //     Object[] createUserParams = new Object[]{postUserReq.getUserName(), postUserReq.getId(), postUserReq.getPassword(), postUserReq.getEmail()};
-    //     this.jdbcTemplate.update(createUserQuery, createUserParams);
-
-    //     String lastInserIdQuery = "select last_insert_id()";
-    //     return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
-    // }
 
     // public int checkEmail(String email){
     //     String checkEmailQuery = "select exists(select email from UserInfo where email = ?)";
@@ -357,23 +334,6 @@ public class PostDao {
     //     Object[] modifyUserNameParams = new Object[]{patchUserReq.getUserName(), patchUserReq.getUserIdx()};
 
     //     return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
-    // }
-
-    // public User getPwd(PostLoginReq postLoginReq){
-    //     String getPwdQuery = "select userIdx, password,email,userName,ID from UserInfo where ID = ?";
-    //     String getPwdParams = postLoginReq.getId();
-
-    //     return this.jdbcTemplate.queryForObject(getPwdQuery,
-    //             (rs,rowNum)-> new User(
-    //                     rs.getInt("userIdx"),
-    //                     rs.getString("ID"),
-    //                     rs.getString("userName"),
-    //                     rs.getString("password"),
-    //                     rs.getString("email")
-    //             ),
-    //             getPwdParams
-    //             );
-
     // }
 
 

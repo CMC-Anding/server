@@ -241,4 +241,14 @@ public class PostService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    //게시글 가리기
+    public void hidingPost(int userIdxByJwt, int postId) throws BaseException {
+        try{
+            postDao.hidingPost(userIdxByJwt, postId);
+        }catch(Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

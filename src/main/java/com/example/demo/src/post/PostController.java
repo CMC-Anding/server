@@ -398,6 +398,31 @@ public class PostController {
         }
     }
 
+     /**
+     * 게시글 가리기 API
+     * [POST] /app/posts/hiding/:post-id
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 가리기 API", notes="사용자가 보고싶지않은 특정 게시글을 가리면 해당 게시글은 더이상 사용자에게 뜨지 않습니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다.")}
+    )
+    @ResponseBody
+    @PostMapping(value = "/hiding/{post-id}") // (POST) 127.0.0.1:6660/app/posts/hiding/:post-id
+    public BaseResponse<String> hidingPost(@PathVariable("post-id") int postId) throws BaseException{
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            postService.hidingPost(userIdxByJwt, postId);
+            String result = "선택한 게시글을 가렸습니다!";
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
     // /**
     //  * 회원가입 API
     //  * [POST] /users
