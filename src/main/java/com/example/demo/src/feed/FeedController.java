@@ -67,11 +67,12 @@ public class FeedController {
     @GetMapping(" ") // (GET) 127.0.0.1:6660/app/feeds?filter-id
     public BaseResponse<List<GetFeedListRes>> getFeedList(@RequestParam(value="filter-id", required = false) String filterId) {
         try{
+            int userIdxByJwt = jwtService.getUserIdx();
             if(filterId == null){
-                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedList();
+                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedList(userIdxByJwt);
                 return new BaseResponse<>(getFeedListRes);
             } else {
-                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedListByFilterId(filterId);
+                List<GetFeedListRes> getFeedListRes = feedProvider.getFeedListByFilterId(filterId, userIdxByJwt);
                 return new BaseResponse<>(getFeedListRes);
             }
         } catch(BaseException exception){

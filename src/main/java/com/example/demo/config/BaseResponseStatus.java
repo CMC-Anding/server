@@ -94,9 +94,10 @@ public enum BaseResponseStatus {
     S3_FILE_DELETE_REQ_ERROR(false, 4661, "일상 게시글의 이미지에 대한 S3 파일 삭제요청에 실패했습니다."),
     S3_FILE_POST_REQ_ERROR(false,4662,"일상 게시글의 이미지에 대한 S3 파일 업로드요청에 실패했습니다."),
     UPDATE_IMAGE_ERROR(false, 4663, "일상 게시글의 이미지 수정에 실패했습니다."),
-    GET_USER_ID_ERROR(false, 4664, "게시글의 작성자 id를 조회하는데 실패했습니다.");
-
-
+    GET_USER_ID_ERROR(false, 4664, "게시글의 작성자 id를 조회하는데 실패했습니다."),
+    CHECK_IF_USER_WRITER_MATCH(false,4665,"게시글 작성자 id와 사용자 id가 일치하는지 확인하는데 실패했습니다."),
+    HIDING_POST_FAIL(false,4666,"게시글 가리기에 실패했습니다."),
+    CANNOT_HIDE_MY_POST(false,4667,"나의 게시글은 가릴 수 없습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요

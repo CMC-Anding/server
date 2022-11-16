@@ -326,6 +326,12 @@ public class PostController {
      * @return BaseResponse<GetPostDetailRes>
      */
     // Path-variable
+    @ApiOperation(value="내 게시글 스크랩 조회 API", notes="내 스크랩북에서 내 게시글의 목록을 조회합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+    )
     @ResponseBody
     @GetMapping("/my-clip") // (GET) 127.0.0.1:6660/app/posts/my-clip?chronological
     public BaseResponse<List<GetMyClipRes>> getMyPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
@@ -346,6 +352,12 @@ public class PostController {
      * @return BaseResponse<GetPostDetailRes>
      */
     // Path-variable
+    @ApiOperation(value="상대 게시글 스크랩 조회 API", notes="내 스크랩북에서 상대 게시글의 목록을 조회합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+    )
     @ResponseBody
     @GetMapping("/other-clip") // (GET) 127.0.0.1:6660/app/posts/other-clip?chronological
     public BaseResponse<List<GetMyClipRes>> getOtherPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
@@ -366,6 +378,12 @@ public class PostController {
      * @return BaseResponse<GetMyPostOfClipCountRes>
      */
     //Query String
+    @ApiOperation(value="스크랩북의 내 게시글 개수 API", notes="스크랩북의 내 게시글 개수를 조회합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+    )
     @ResponseBody
     @GetMapping("/clip/my-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/my-post/cnt
     public BaseResponse<GetMyPostOfClipCountRes> getMyPostOfClipCount() {
@@ -385,6 +403,12 @@ public class PostController {
      * @return BaseResponse<GetArchiveCntRes>
      */
     //Query String
+    @ApiOperation(value="스크랩북의 타인 게시글 개수 API", notes="스크랩북의 타인 게시글 개수를 조회합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+    )
     @ResponseBody
     @GetMapping("/clip/other-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/other-post/cnt
     public BaseResponse<GetOtherPostOfClipCountRes> getOtherPostOfClipCount() {
@@ -395,6 +419,40 @@ public class PostController {
             return new BaseResponse<>(getOtherPostOfClipCountRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+     /**
+     * 게시글 가리기 API
+     * [POST] /app/posts/hiding/:post-id
+     * @return BaseResponse<String>
+     */
+    @ApiOperation(value="게시글 가리기 API", notes="사용자가 보고싶지않은 특정 게시글을 가리면 해당 게시글은 더이상 사용자에게 뜨지 않습니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4665, message= "게시글 작성자 id와 사용자 id가 일치하는지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4666, message = "게시글 가리기에 실패했습니다."),
+        @ApiResponse(code = 4667, message = "나의 게시글은 가릴 수 없습니다."),}
+    )
+    @ResponseBody
+    @PostMapping(value = "/hiding/{post-id}") // (POST) 127.0.0.1:6660/app/posts/hiding/:post-id
+    public BaseResponse<String> hidingPost(@PathVariable("post-id") int postId) throws BaseException{
+        String result = "";
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            String userIdMatchResult = postService.checkIfUserIdAndWriterIdMatch(postId,userIdxByJwt);
+            if(userIdMatchResult.equals("본인게시글")) {
+                return new BaseResponse<>(CANNOT_HIDE_MY_POST);
+            }
+            if(userIdMatchResult.equals("타인게시글")) {
+                postService.hidingPost(userIdxByJwt, postId);
+                result = "선택한 게시글을 가렸습니다!";
+            }
+            return new BaseResponse<>(SUCCESS ,result); 
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
