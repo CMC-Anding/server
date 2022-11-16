@@ -283,7 +283,7 @@ public class PostController {
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패했습니다."),
-        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),}
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다.")}
     )
     @ResponseBody
     @PutMapping(value = "/update/{post-id}") // (PUT) 127.0.0.1:6660/app/posts/update/:post-id
@@ -330,14 +330,12 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+        @ApiResponse(code = 4672, message = "스크랩북의 내 게시글 조회에 실패했습니다.")}
     )
     @ResponseBody
     @GetMapping("/my-clip") // (GET) 127.0.0.1:6660/app/posts/my-clip?chronological
     public BaseResponse<List<GetMyClipRes>> getMyPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
-
         int userIdxByJwt = jwtService.getUserIdx();
-        
         try{
             List<GetMyClipRes> getMyClipRes = postProvider.getMyPostClip(userIdxByJwt, chronological);
             return new BaseResponse<>(getMyClipRes);
@@ -356,14 +354,12 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+        @ApiResponse(code = 4671, message = "스크랩북의 타인 게시글 조회에 실패했습니다.")}
     )
     @ResponseBody
     @GetMapping("/other-clip") // (GET) 127.0.0.1:6660/app/posts/other-clip?chronological
     public BaseResponse<List<GetMyClipRes>> getOtherPostClip(@RequestParam(required = true, defaultValue="desc") String chronological) throws BaseException{
-
         int userIdxByJwt = jwtService.getUserIdx();
-        
         try{
             List<GetMyClipRes> getMyClipRes = postProvider.getOtherPostClip(userIdxByJwt, chronological);
             return new BaseResponse<>(getMyClipRes);
@@ -382,7 +378,7 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+        @ApiResponse(code = 4670 , message = "스크랩북의 나의 게시글 개수를 가져오는데 실패했습니다.")}
     )
     @ResponseBody
     @GetMapping("/clip/my-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/my-post/cnt
@@ -390,7 +386,6 @@ public class PostController {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
             GetMyPostOfClipCountRes getMyPostOfClipCountRes = postProvider.getMyPostOfClipCount(userIdxByJwt);
-
             return new BaseResponse<>(getMyPostOfClipCountRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -407,7 +402,7 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4550 , message = "자서전의 제목, 세부설명, 색상의 정보 수정에 실패했습니다.")}
+        @ApiResponse(code = 4668 , message = "내 스크랩북의 타인 게시글 개수를 가져오는데 실패했습니다.")}
     )
     @ResponseBody
     @GetMapping("/clip/other-post/cnt") // (GET) 127.0.0.1:6660/app/posts/clip/other-post/cnt
@@ -415,7 +410,6 @@ public class PostController {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
             GetOtherPostOfClipCountRes getOtherPostOfClipCountRes = postProvider.getOtherPostOfClipCount(userIdxByJwt);
-
             return new BaseResponse<>(getOtherPostOfClipCountRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));

@@ -202,6 +202,7 @@ public class PostDao {
                 "                        from USER u\n" +
                 "                                 join BLOCK_USER bu on u.ID = bu.USER_ID\n" +
                 "                        where u.ID = ?)\n" +
+                "  and p.ID not in (select POST_ID from HIDDEN_POST where USER_ID = ?)\n" +
                 "ORDER BY p.CREATED_AT desc";
         return this.jdbcTemplate.query(getOtherPostClipReverseChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
@@ -213,7 +214,7 @@ public class PostDao {
                     rs.getString("qnaQuestion"),
                     rs.getString("dailyImage"),
                     rs.getString("qnaQuestionMadeFromUser")),
-                userIdxByJwt, userIdxByJwt, userIdxByJwt);
+                userIdxByJwt, userIdxByJwt, userIdxByJwt, userIdxByJwt);
     }
 
     // 타인 게시글 스크랩 조회 (시간순) API
@@ -364,17 +365,6 @@ public class PostDao {
         Object[] hidingPostParams = new Object[]{userIdxByJwt, postId};
         this.jdbcTemplate.update(hidingPostQuery, hidingPostParams);
     }
-
-    // //게시글 작성자 id 추출
-    // public GetWriterIdRes getWriterId(int postId) {
-    //     String getWriterIdQuery = "";
-    //     int getWriterIdParams = postId;
-    //     return this.jdbcTemplate.queryForObject(getWriterIdQuery, 
-    //         (rs,rowNum) -> new GetWriterIdRes(
-    //             rs.getInt("writerId")),
-    //         getWriterIdParams);
-    // }
-
 
     // public int checkEmail(String email){
     //     String checkEmailQuery = "select exists(select email from UserInfo where email = ?)";

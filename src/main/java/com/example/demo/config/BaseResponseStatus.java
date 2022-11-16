@@ -97,7 +97,12 @@ public enum BaseResponseStatus {
     GET_USER_ID_ERROR(false, 4664, "게시글의 작성자 id를 조회하는데 실패했습니다."),
     CHECK_IF_USER_WRITER_MATCH(false,4665,"게시글 작성자 id와 사용자 id가 일치하는지 확인하는데 실패했습니다."),
     HIDING_POST_FAIL(false,4666,"게시글 가리기에 실패했습니다."),
-    CANNOT_HIDE_MY_POST(false,4667,"나의 게시글은 가릴 수 없습니다.");
+    CANNOT_HIDE_MY_POST(false,4667,"나의 게시글은 가릴 수 없습니다."),
+    GET_CLIPBOOK_OTHER_POST_COUNT_FAIL(false, 4668, "스크랩북의 타인 게시글 개수를 가져오는데 실패했습니다."),
+    GET_REPORT_REASON_FAIL(false,4669,"신고 항목 불러오기에 실패했습니다."),
+    GET_CLIPBOOK_MY_POST_COUNT_FAIL(false,4670,"스크랩북의 나의 게시글 개수를 가져오는데 실패했습니다."),
+    GET_OTHER_POST_OF_CLIPBOOK_FAIL(false,4671,"스크랩북의 타인 게시글 조회에 실패했습니다."),
+    GET_MY_POST_OF_CLIPBOOK_FAIL(false,4672,"스크랩북의 내 게시글 조회에 실패했습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요
