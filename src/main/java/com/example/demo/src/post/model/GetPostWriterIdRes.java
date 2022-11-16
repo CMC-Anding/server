@@ -13,5 +13,5 @@ import lombok.Setter;
 @ApiModel
 public class GetPostWriterIdRes {
     @ApiModelProperty(value = "게시글 작성자 id", example = "8", required = true, dataType = "int")
-    private int userId;
+    private int writerId;
 }

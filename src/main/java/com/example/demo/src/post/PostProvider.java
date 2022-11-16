@@ -132,7 +132,7 @@ public class PostProvider {
     public int getWriterId(int postId) throws BaseException {
         try {
             GetPostWriterIdRes getPostWriterIdRes = postDao.getWriterId(postId);
-            int writerId = getPostWriterIdRes.getUserId();
+            int writerId = getPostWriterIdRes.getWriterId();
             return writerId;
         } catch (Exception exception) {
             exception.printStackTrace();

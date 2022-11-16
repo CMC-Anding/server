@@ -2,6 +2,7 @@ package com.example.demo.src.post;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 import com.example.demo.utils.S3Service;
+import com.google.common.util.concurrent.ExecutionError;
 import com.example.demo.config.BaseException;
 import com.example.demo.src.post.model.*;
 import com.example.demo.utils.JwtService;
@@ -240,5 +241,34 @@ public class PostService {
             exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    //게시글 가리기
+    public void hidingPost(int userIdxByJwt, int postId) throws BaseException {
+        try{
+            postDao.hidingPost(userIdxByJwt, postId);
+        }catch(Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //게시글 작성자 id와 사용자 id가 일치하는지 확인
+    public String checkIfUserIdAndWriterIdMatch(int postId, int userIdxByJwt) throws BaseException{
+        String result = "";
+        try{
+            GetPostWriterIdRes getPostWriterIdRes = postDao.getWriterId(postId);
+            int writerId =  getPostWriterIdRes.getWriterId();
+            if(writerId == userIdxByJwt) {
+                result = "본인게시글";
+            }
+            else if(writerId != userIdxByJwt) {
+                result = "타인게시글";
+            }          
+            return result;
+        }catch(Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
     }
 }
