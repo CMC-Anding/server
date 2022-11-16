@@ -411,11 +411,19 @@ public class PostController {
     @ResponseBody
     @PostMapping(value = "/hiding/{post-id}") // (POST) 127.0.0.1:6660/app/posts/hiding/:post-id
     public BaseResponse<String> hidingPost(@PathVariable("post-id") int postId) throws BaseException{
+        String result = "";
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
-            postService.hidingPost(userIdxByJwt, postId);
-            String result = "선택한 게시글을 가렸습니다!";
+            String userIdMatchResult = postService.checkIfUserIdAndWriterIdMatch(postId,userIdxByJwt);
+            if(userIdMatchResult.equals("본인게시글")) {
+                result = "본인 게시글은 가릴 수 없습니다";
+                return  new BaseResponse<>(REQUEST_FAIL, result);
+            }
+            if(userIdMatchResult.equals("타인게시글")) {
+                postService.hidingPost(userIdxByJwt, postId);
+                result = "선택한 게시글을 가렸습니다!";
+            }
             return new BaseResponse<>(SUCCESS ,result); 
         }
         catch (BaseException exception){

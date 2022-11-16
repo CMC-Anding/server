@@ -200,7 +200,7 @@ public class PostDao {
 
     // 타인 게시글 스크랩 조회 (시간순) API
     public List<GetMyClipRes> getOtherPostClipChronological(int userIdxByJwt){
-        String getOtherPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) and p.STATUS = 'ACTIVE' ORDER BY p.CREATED_AT";
+        String getOtherPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) and p.STATUS = 'ACTIVE' and p.ID not in (select POST_ID from HIDDEN_POST where USER_ID = ?) ORDER BY p.CREATED_AT";
         return this.jdbcTemplate.query(getOtherPostClipChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
                     rs.getInt("postId"),
@@ -211,7 +211,7 @@ public class PostDao {
                     rs.getString("qnaQuestion"),
                     rs.getString("dailyImage"),
                     rs.getString("qnaQuestionMadeFromUser")),
-                userIdxByJwt, userIdxByJwt);
+                userIdxByJwt, userIdxByJwt, userIdxByJwt);
     }
 
     // 스크랩북의 내 게시글 개수 API
@@ -228,13 +228,13 @@ public class PostDao {
 
     // 스크랩북의 타인 게시글 개수 API
     public GetOtherPostOfClipCountRes getOtherPostOfClipCount(int userIdxByJwt) {
-        String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID != ? and STATUS = 'ACTIVE'";
+        String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID != ? and STATUS = 'ACTIVE' and POST_ID not in (select POST_ID from HIDDEN_POST where USER_ID = ?)";
         int getOtherPostOfClipCountParam = userIdxByJwt;
 
         return this.jdbcTemplate.queryForObject(getOtherPostOfClipCountQuery, 
             (rs,rowNum) -> new GetOtherPostOfClipCountRes(
                 rs.getInt("otherPostOfClipCount")),
-            getOtherPostOfClipCountParam, getOtherPostOfClipCountParam);
+            getOtherPostOfClipCountParam, getOtherPostOfClipCountParam, userIdxByJwt);
     }
 
     // 신고 항목 조회 API
@@ -270,11 +270,11 @@ public class PostDao {
 
     // 게시글 작성자 ID 조회
     public GetPostWriterIdRes getWriterId(int postId) {
-        String getPostWriterIdQuery = "select USER_ID as userId from POST where ID= ?";
+        String getPostWriterIdQuery = "select USER_ID as writerId from POST where ID= ?";
         int getPostWriterIdParams = postId;
         return this.jdbcTemplate.queryForObject(getPostWriterIdQuery, 
             (rs,rowNum) -> new GetPostWriterIdRes(
-                rs.getInt("userId")),
+                rs.getInt("writerId")),
             getPostWriterIdParams);
     }
 
@@ -318,6 +318,16 @@ public class PostDao {
         Object[] hidingPostParams = new Object[]{userIdxByJwt, postId};
         this.jdbcTemplate.update(hidingPostQuery, hidingPostParams);
     }
+
+    // //게시글 작성자 id 추출
+    // public GetWriterIdRes getWriterId(int postId) {
+    //     String getWriterIdQuery = "";
+    //     int getWriterIdParams = postId;
+    //     return this.jdbcTemplate.queryForObject(getWriterIdQuery, 
+    //         (rs,rowNum) -> new GetWriterIdRes(
+    //             rs.getInt("writerId")),
+    //         getWriterIdParams);
+    // }
 
 
     // public int checkEmail(String email){
