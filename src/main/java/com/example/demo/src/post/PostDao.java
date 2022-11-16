@@ -184,7 +184,25 @@ public class PostDao {
 
     // 타인 게시글 스크랩 조회 (최신순) API
     public List<GetMyClipRes> getOtherPostClipReverseChronological(int userIdxByJwt){
-        String getOtherPostClipReverseChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) and p.STATUS = 'ACTIVE' ORDER BY p.CREATED_AT desc";
+        String getOtherPostClipReverseChronologicalQuery = "select" +
+                "       p.ID                        as postId,\n" +
+                "       DAILY_TITLE                 as dailyTitle,\n" +
+                "       QNA_BACKGROUND_COLOR        as qnaBackgroundColor,\n" +
+                "       p.FILTER_ID                 as filterId,\n" +
+                "       QNA_QUESTION_ID             as qnaQuestionId,\n" +
+                "       q.CONTENTS                  as qnaQuestion,\n" +
+                "       pp.URL                      as dailyImage,\n" +
+                "       QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser\n" +
+                "FROM POST as p\n" +
+                "         LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID\n" +
+                "         LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID\n" +
+                "where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?)\n" +
+                "  and p.STATUS = 'ACTIVE'\n" +
+                "  and p.USER_ID not in (select bu.BLOCKED_USER_ID\n" +
+                "                        from USER u\n" +
+                "                                 join BLOCK_USER bu on u.ID = bu.USER_ID\n" +
+                "                        where u.ID = ?)\n" +
+                "ORDER BY p.CREATED_AT desc";
         return this.jdbcTemplate.query(getOtherPostClipReverseChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
                     rs.getInt("postId"),
@@ -195,7 +213,7 @@ public class PostDao {
                     rs.getString("qnaQuestion"),
                     rs.getString("dailyImage"),
                     rs.getString("qnaQuestionMadeFromUser")),
-                userIdxByJwt, userIdxByJwt);
+                userIdxByJwt, userIdxByJwt, userIdxByJwt);
     }
 
     // 타인 게시글 스크랩 조회 (시간순) API
