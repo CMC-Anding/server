@@ -95,7 +95,11 @@ public class UserService {
     /* 사용자 차단 */
     public void blockUser(int userId, String nickname) throws BaseException {
         try {
-            userDao.blockUser(userId, nickname);
+            if (userDao.blockUser(userId, nickname) != 1) {
+                throw new BaseException(FAILED_TO_BLOCK_ACCOUNT);
+            }
+        } catch (BaseException baseException) {
+            throw baseException;
         } catch (Exception exception) {
             logger.error("blockUser 에러", exception);
             throw new BaseException(DATABASE_ERROR);
