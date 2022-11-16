@@ -265,13 +265,22 @@ public class PostDao {
 
     // 스크랩북의 타인 게시글 개수 API
     public GetOtherPostOfClipCountRes getOtherPostOfClipCount(int userIdxByJwt) {
-        String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount from CLIP where USER_ID = ? and WRITER_ID != ? and STATUS = 'ACTIVE' and POST_ID not in (select POST_ID from HIDDEN_POST where USER_ID = ?)";
+        String getOtherPostOfClipCountQuery = "select count(*) as otherPostOfClipCount\n" +
+                "from CLIP\n" +
+                "where USER_ID = ?\n" +
+                "  and WRITER_ID != ?\n" +
+                "  and STATUS = 'ACTIVE'\n" +
+                "  and POST_ID not in (select POST_ID from HIDDEN_POST where USER_ID = ?)\n" +
+                "  and WRITER_ID not in (select bu.BLOCKED_USER_ID\n" +
+                "                        from USER u\n" +
+                "                                 join BLOCK_USER bu on u.ID = bu.USER_ID\n" +
+                "                        where u.ID = ?)";
         int getOtherPostOfClipCountParam = userIdxByJwt;
 
         return this.jdbcTemplate.queryForObject(getOtherPostOfClipCountQuery, 
             (rs,rowNum) -> new GetOtherPostOfClipCountRes(
                 rs.getInt("otherPostOfClipCount")),
-            getOtherPostOfClipCountParam, getOtherPostOfClipCountParam, userIdxByJwt);
+            getOtherPostOfClipCountParam, getOtherPostOfClipCountParam, userIdxByJwt, userIdxByJwt);
     }
 
     // 신고 항목 조회 API
