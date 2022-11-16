@@ -249,7 +249,7 @@ public class PostService {
             postDao.hidingPost(userIdxByJwt, postId);
         }catch(Exception exception) {
             exception.printStackTrace();
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(HIDING_POST_FAIL);
         }
     }
 
@@ -267,7 +267,7 @@ public class PostService {
             }          
             return result;
         }catch(Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(CHECK_IF_USER_WRITER_MATCH);
         }
 
     }
