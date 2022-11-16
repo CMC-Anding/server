@@ -52,7 +52,7 @@ public class PostProvider {
                 return getMyClipRes;
             }
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(GET_MY_POST_OF_CLIPBOOK_FAIL);
         }
     }
 
@@ -70,7 +70,7 @@ public class PostProvider {
                 return getMyClipRes;
             }
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(GET_OTHER_POST_OF_CLIPBOOK_FAIL);
         }
     }
 
@@ -80,7 +80,7 @@ public class PostProvider {
             GetMyPostOfClipCountRes getMyPostOfClipCountRes = postDao.getMyPostOfClipCount(userIdxByJwt);
             return getMyPostOfClipCountRes;
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(GET_CLIPBOOK_MY_POST_COUNT_FAIL);
         }
     }
 
@@ -90,7 +90,7 @@ public class PostProvider {
             GetOtherPostOfClipCountRes getOtherPostOfClipCountRes = postDao.getOtherPostOfClipCount(userIdxByJwt);
             return getOtherPostOfClipCountRes;
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(GET_CLIPBOOK_OTHER_POST_COUNT_FAIL);
         }
     }
 
@@ -100,7 +100,7 @@ public class PostProvider {
             List<GetReportReasonRes> getReportReasonRes = postDao.getReportReason();
             return getReportReasonRes;
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(GET_REPORT_REASON_FAIL);
         }
     }
 
