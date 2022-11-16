@@ -199,19 +199,38 @@ public class PostDao {
     }
 
     // 타인 게시글 스크랩 조회 (시간순) API
-    public List<GetMyClipRes> getOtherPostClipChronological(int userIdxByJwt){
-        String getOtherPostClipChronologicalQuery = "select p.ID as postId, DAILY_TITLE as dailyTitle, QNA_BACKGROUND_COLOR as qnaBackgroundColor, p.FILTER_ID as filterId, QNA_QUESTION_ID as qnaQuestionId, q.CONTENTS as qnaQuestion, pp.URL as dailyImage, QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser FROM POST as p LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?) and p.STATUS = 'ACTIVE' and p.ID not in (select POST_ID from HIDDEN_POST where USER_ID = ?) ORDER BY p.CREATED_AT";
+    public List<GetMyClipRes> getOtherPostClipChronological(int userIdxByJwt) {
+        String getOtherPostClipChronologicalQuery = "select p.ID                        as postId,\n" +
+                "       DAILY_TITLE                 as dailyTitle,\n" +
+                "       QNA_BACKGROUND_COLOR        as qnaBackgroundColor,\n" +
+                "       p.FILTER_ID                 as filterId,\n" +
+                "       QNA_QUESTION_ID             as qnaQuestionId,\n" +
+                "       q.CONTENTS                  as qnaQuestion,\n" +
+                "       pp.URL                      as dailyImage,\n" +
+                "       QNA_QUESTION_MADE_FROM_USER as qnaQuestionMadeFromUser\n" +
+                "FROM POST as p\n" +
+                "         LEFT JOIN QUESTION as q ON p.QNA_QUESTION_ID = q.ID\n" +
+                "         LEFT JOIN POST_PHOTO as pp ON p.ID = pp.POST_ID\n" +
+                "where p.ID in (select POST_ID from CLIP where USER_ID = ? and WRITER_ID != ?)\n" +
+                "  and p.STATUS = 'ACTIVE'\n" +
+                "  and p.USER_ID not in (select bu.BLOCKED_USER_ID\n" +
+                "                        from USER u\n" +
+                "                                 join BLOCK_USER bu on u.ID = bu.USER_ID\n" +
+                "                        where u.ID = ?)\n" +
+                "  and p.ID not in (select POST_ID from HIDDEN_POST where USER_ID = ?)\n" +
+                "ORDER BY p.CREATED_AT;";
+
         return this.jdbcTemplate.query(getOtherPostClipChronologicalQuery,
                 (rs, rowNum) -> new GetMyClipRes(
-                    rs.getInt("postId"),
-                    rs.getString("dailyTitle"),
-                    rs.getString("qnaBackgroundColor"),
-                    rs.getString("filterId"),
-                    rs.getString("qnaQuestionId"),
-                    rs.getString("qnaQuestion"),
-                    rs.getString("dailyImage"),
-                    rs.getString("qnaQuestionMadeFromUser")),
-                userIdxByJwt, userIdxByJwt, userIdxByJwt);
+                        rs.getInt("postId"),
+                        rs.getString("dailyTitle"),
+                        rs.getString("qnaBackgroundColor"),
+                        rs.getString("filterId"),
+                        rs.getString("qnaQuestionId"),
+                        rs.getString("qnaQuestion"),
+                        rs.getString("dailyImage"),
+                        rs.getString("qnaQuestionMadeFromUser")),
+                userIdxByJwt,userIdxByJwt,userIdxByJwt,userIdxByJwt);
     }
 
     // 스크랩북의 내 게시글 개수 API
