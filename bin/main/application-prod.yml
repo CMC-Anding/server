@@ -1,0 +1,37 @@
+### Development ###
+# port: 6660
+# MySQL Database 설정
+# url: AWS RDS 엔드포인트 & 스키마명
+# username: DB의 ID
+# password: DB의 Password
+
+server:
+  port: 6660
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://benjamin-db.csls5xasyfqc.ap-northeast-2.rds.amazonaws.com/ANDING_PROD?autoReconnect=true
+    username: 
+    password: 
+    driver-class-name: com.mysql.cj.jdbc.Driver # mysql 8버전
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ben-today-s-house
+      # dir: S3 디렉토리 이름 # ex) /gyunny
+    credentials:
+      access-key: AKIAT5PZU2X6AU2MFEFL
+      secret-key: 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
+    stack:
+      auto: false
+
+      

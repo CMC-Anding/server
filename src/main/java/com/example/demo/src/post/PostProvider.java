@@ -124,7 +124,7 @@ public class PostProvider {
             return dailyPostOrQna;
         } catch(Exception exception) {
             exception.printStackTrace();
-            throw new BaseException(CHECK_DAILY_OR_REPORT_ERROR);
+            throw new BaseException(CHECK_DAILY_OR_REPORT_FAIL);
         }
     }
 
@@ -136,7 +136,7 @@ public class PostProvider {
             return writerId;
         } catch (Exception exception) {
             exception.printStackTrace();
-            throw new BaseException(GET_USER_ID_ERROR);
+            throw new BaseException(GET_USER_ID_FAIL);
         }
     }
 

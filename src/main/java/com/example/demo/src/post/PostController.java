@@ -241,10 +241,12 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4664, message = "게시글의 작성자 id를 조회하는데 실패했습니다."),
         @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
         @ApiResponse(code = 4654, message = "일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
-        @ApiResponse(code = 4655, message = "일상 게시글의 사진 삭제에 실패했습니다.")}
+        @ApiResponse(code = 4655, message = "일상 게시글의 사진 삭제에 실패했습니다."),
+        @ApiResponse(code = 4661, message = "일상 게시글의 이미지에 대한 S3 파일 삭제요청에 실패했습니다."),
+        @ApiResponse(code = 4003 , message = "S3 객체 삭제에 실패했습니다.")}
     )
     @ResponseBody
     @PatchMapping(value = "/delete") // (PATCH) 127.0.0.1:6660/app/posts/delete
@@ -256,14 +258,12 @@ public class PostController {
                 return new BaseResponse<> (INVALID_USER_JWT);
             }
             String dailyOrQna = postProvider.checkDailyPostOrQnaPost(deletePostReq.getPostId());
- 
             postService.deletePost(deletePostReq.getPostId());
             //일상 게시글의 사진 삭제
             if(dailyOrQna.equals("Daily")) {
                 postService.s3ObjectDelete(deletePostReq.getPostId());
                 postService.deletePhotoOfDailyPost(deletePostReq.getPostId());
             }
-            
             String result = "게시글을 삭제하였습니다.";
             return new BaseResponse<>(SUCCESS ,result); 
         }
@@ -282,8 +282,13 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 2003, message = "권한이 없는 유저의 접근입니다."),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패했습니다."),
-        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다.")}
+        @ApiResponse(code = 4652, message = "일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
+        @ApiResponse(code = 4664, message = "게시글의 작성자 id를 조회하는데 실패했습니다."),
+        @ApiResponse(code = 4659, message = "일상 게시글 수정에 실패했습니다."),
+        @ApiResponse(code = 4660, message = "문답 게시글 수정에 실패했습니다."),
+        @ApiResponse(code = 4663, message = "일상 게시글의 이미지 수정에 실패했습니다."),
+        @ApiResponse(code = 4002, message = "S3 업로드에 실패했습니다."),
+        @ApiResponse(code = 4003 , message = "S3 객체 삭제에 실패했습니다.")}
     )
     @ResponseBody
     @PutMapping(value = "/update/{post-id}") // (PUT) 127.0.0.1:6660/app/posts/update/:post-id
@@ -329,7 +334,6 @@ public class PostController {
     @ApiOperation(value="내 게시글 스크랩 조회 API", notes="내 스크랩북에서 내 게시글의 목록을 조회합니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
         @ApiResponse(code = 4672, message = "스크랩북의 내 게시글 조회에 실패했습니다.")}
     )
     @ResponseBody
@@ -353,7 +357,6 @@ public class PostController {
     @ApiOperation(value="상대 게시글 스크랩 조회 API", notes="내 스크랩북에서 상대 게시글의 목록을 조회합니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
         @ApiResponse(code = 4671, message = "스크랩북의 타인 게시글 조회에 실패했습니다.")}
     )
     @ResponseBody
@@ -377,7 +380,6 @@ public class PostController {
     @ApiOperation(value="스크랩북의 내 게시글 개수 API", notes="스크랩북의 내 게시글 개수를 조회합니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
         @ApiResponse(code = 4670 , message = "스크랩북의 나의 게시글 개수를 가져오는데 실패했습니다.")}
     )
     @ResponseBody
@@ -401,7 +403,6 @@ public class PostController {
     @ApiOperation(value="스크랩북의 타인 게시글 개수 API", notes="스크랩북의 타인 게시글 개수를 조회합니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
         @ApiResponse(code = 4668 , message = "내 스크랩북의 타인 게시글 개수를 가져오는데 실패했습니다.")}
     )
     @ResponseBody
@@ -424,7 +425,6 @@ public class PostController {
     @ApiOperation(value="게시글 가리기 API", notes="사용자가 보고싶지않은 특정 게시글을 가리면 해당 게시글은 더이상 사용자에게 뜨지 않습니다.") // swagger annotation
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
         @ApiResponse(code = 4665, message= "게시글 작성자 id와 사용자 id가 일치하는지 확인하는데 실패했습니다."),
         @ApiResponse(code = 4666, message = "게시글 가리기에 실패했습니다."),
         @ApiResponse(code = 4667, message = "나의 게시글은 가릴 수 없습니다."),}

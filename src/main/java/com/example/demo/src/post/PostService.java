@@ -66,7 +66,7 @@ public class PostService {
             postDao.createImage(postImageUrl, postId);
         }catch (Exception exception){
             exception.printStackTrace();
-            throw new BaseException(S3_FILE_POST_REQ_ERROR);
+            throw new BaseException(S3_FILE_POST_REQ_FAIL);
         }
         return postImageUrl;
     }    
@@ -98,7 +98,7 @@ public class PostService {
             postDao.updateDailyPost(postDailyPostReq, postId);
         } catch(Exception exception){
             exception.printStackTrace();
-            throw new BaseException(UPDATE_DAILY_POST_ERROR);
+            throw new BaseException(UPDATE_DAILY_POST_FAIL);
         }
     }
 
@@ -113,7 +113,7 @@ public class PostService {
             s3Service.fileDelete(imageUrl);
         }catch (Exception exception){
             exception.printStackTrace();
-            throw new BaseException(S3_FILE_DELETE_REQ_ERROR);
+            throw new BaseException(S3_FILE_DELETE_REQ_FAIL);
         }
     }
 
@@ -128,7 +128,7 @@ public class PostService {
             postDao.updateImage(updateImageUrl, postId);
         }catch (Exception exception){
             exception.printStackTrace();
-            throw new BaseException(UPDATE_IMAGE_ERROR);
+            throw new BaseException(UPDATE_IMAGE_FAIL);
         }
         return updateImageUrl;
     }  
@@ -142,7 +142,7 @@ public class PostService {
             postDao.updateQnaPost(postQnaPostReq, postId);
         } catch(Exception exception){
             exception.printStackTrace();
-            throw new BaseException(UPDATE_QNA_POST_ERROR);
+            throw new BaseException(UPDATE_QNA_POST_FAIL);
         }
     }
 

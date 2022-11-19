@@ -18,7 +18,7 @@ import com.amazonaws.AmazonServiceException;
 @Service
 public class S3Service {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
+
      // application.yml
     @Value("${cloud.aws.s3.bucket}")   
     private String bucket;
@@ -49,7 +49,7 @@ public class S3Service {
         } catch (Exception e){
             logger.error("S3 ERROR", e);
             // 이미지 업로드 에러
-            throw new BaseException(S3_UPLOAD_ERROR);
+            throw new BaseException(S3_UPLOAD_FAIL);
         }
 
         return amazonS3.getUrl(bucket, fileName).toString();
@@ -72,7 +72,7 @@ public class S3Service {
             System.out.println(String.format("[%s] deletion complete", key));
 
         } catch (Exception exception) {
-            throw new BaseException(S3_DELETE_ERROR);
+            throw new BaseException(S3_DELETE_FAIL);
         }
     }
 }
