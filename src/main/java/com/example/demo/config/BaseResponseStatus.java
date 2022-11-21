@@ -80,7 +80,7 @@ public enum BaseResponseStatus {
     DUPLICATED_CLIP(false,4603,"이미 스크랩 한 게시글입니다."),
 
     // 게시글 관련
-    POST_DAILY_POST_ERROR(false,4650,"일상게시글(사진 제외)을 등록하는데 실패했습니다."),
+    POST_DAILY_POST_FAIL(false,4650,"일상게시글(사진 제외)을 등록하는데 실패했습니다."),
     REPORT_POST_ERROR(false,4651,"게시글 신고에 실패했습니다."),
     CHECK_DAILY_OR_REPORT_FAIL(false,4652,"일상 게시글인지, 문답 게시글인지 확인하는데 실패했습니다."),
     CHECK_REPORT_COUNT_ERROR(false, 4653, "게시글 신고횟수가 7회이상인지 확인하는데 실패했습니다."),
@@ -88,7 +88,7 @@ public enum BaseResponseStatus {
     PHOTO_DELETE_ERROR(false,4655,"일상 게시글의 사진 삭제에 실패했습니다."),
     POST_DELETE_WHEN_REPORTING_ERROR(false, 4656, "게시글 신고횟수가 7회이상일 때, 일상 게시글(사진 제외) 혹은 문답 게시글 삭제에 실패했습니다."),
     PHOTO_DELETE_WHEN_REPORTING_ERROR(false, 4657, "게시글 신고횟수가 7회이상일 때, 일상 게시글의 사진 삭제에 실패했습니다."),
-    POST_QNA_POST_ERROR(false, 4658, "문답 게시글 등록에 실패했습니다."),
+    POST_QNA_POST_FAIL(false, 4658, "문답 게시글 등록에 실패했습니다."),
     UPDATE_DAILY_POST_FAIL(false, 4659, "일상 게시글 수정에 실패했습니다."),
     UPDATE_QNA_POST_FAIL(false, 4660, "문답 게시글 수정에 실패했습니다."),
     S3_FILE_DELETE_REQ_FAIL(false, 4661, "일상 게시글의 이미지에 대한 S3 파일 삭제요청에 실패했습니다."),
@@ -102,7 +102,8 @@ public enum BaseResponseStatus {
     GET_REPORT_REASON_FAIL(false,4669,"신고 항목 불러오기에 실패했습니다."),
     GET_CLIPBOOK_MY_POST_COUNT_FAIL(false,4670,"스크랩북의 나의 게시글 개수를 가져오는데 실패했습니다."),
     GET_OTHER_POST_OF_CLIPBOOK_FAIL(false,4671,"스크랩북의 타인 게시글 조회에 실패했습니다."),
-    GET_MY_POST_OF_CLIPBOOK_FAIL(false,4672,"스크랩북의 내 게시글 조회에 실패했습니다.");
+    GET_MY_POST_OF_CLIPBOOK_FAIL(false,4672,"스크랩북의 내 게시글 조회에 실패했습니다."),
+    GET_POST_DETAIL_FAIL(false,4673,"게시글 상세정보를 가져오는데 실패했습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요

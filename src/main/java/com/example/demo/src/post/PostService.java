@@ -46,7 +46,7 @@ public class PostService {
             int lastInsertId = postDao.postDailyPost(postDailyPostReq);
 
             if(lastInsertId == 0){
-                throw new BaseException(POST_DAILY_POST_ERROR);
+                throw new BaseException(POST_DAILY_POST_FAIL);
             }
         return lastInsertId;
         } catch(Exception exception){
@@ -80,7 +80,7 @@ public class PostService {
             int lastInsertId = postDao.postQnaPost(postQnaPostReq);
 
             if(lastInsertId == 0){
-                throw new BaseException(POST_QNA_POST_ERROR);
+                throw new BaseException(POST_QNA_POST_FAIL);
             }
         return lastInsertId;
         } catch(Exception exception){

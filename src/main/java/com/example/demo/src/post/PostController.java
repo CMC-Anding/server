@@ -8,35 +8,27 @@ import com.example.demo.src.post.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 import static com.example.demo.config.BaseResponseStatus.*;
-import static com.example.demo.utils.ValidationRegex.isRegexEmail;
-
 import org.springframework.http.MediaType;
-// swagger add!!!
+import java.io.IOException;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import lombok.RequiredArgsConstructor;
+// swagger add
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-
-import java.io.IOException;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import lombok.RequiredArgsConstructor;
 
 //@RequiredArgsConstructor
 @RestController
@@ -63,6 +55,14 @@ public class PostController {
      * [POST] /app/posts
      * @return BaseResponse<String>
      */
+    @ApiOperation(value="게시글 등록 API", notes="게시글을 등록합니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 1000 , message = "요청성공"),
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4650, message = "일상게시글(사진 제외)을 등록하는데 실패했습니다."),
+        @ApiResponse(code = 4662, message = "일상 게시글의 이미지에 대한 S3 파일 업로드요청에 실패했습니다."),
+        @ApiResponse(code = 4658, message = "문답 게시글 등록에 실패했습니다.")}
+    )
     @ResponseBody
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // (POST) 127.0.0.1:6660/app/posts
     public BaseResponse<String> postPost(@RequestPart Posts posts,  @ApiParam(value = "file", type = "MultipartFile", required = false, example = "이미지 파일 url") @RequestPart(value="file", required=false) MultipartFile image) throws IOException{
@@ -78,14 +78,12 @@ public class PostController {
                     postService.fileUpload(image, lastInsertId); //후 (사진 업로드)
                 }
             }
-            
+
             // 문답 게시글 
             else {
                 PostQnaPostReq postQnaPostReq = new PostQnaPostReq(userIdxByJwt, posts.getFilterId(), posts.getQnaQuestionId(), posts.getContents(), posts.getQnaBackgroundColor(), posts.getQnaQuestionMadeFromUser(), posts.getFeedShare());
-
                 postService.postQnaPost(postQnaPostReq);
             }
-
             String result = "게시글이 등록되었습니다!";
             return new BaseResponse<>(SUCCESS ,result); 
         }
@@ -100,6 +98,11 @@ public class PostController {
      * @return BaseResponse<GetPostDetailRes>
      */
     // Path-variable
+    @ApiOperation(value="글 상세보기 API", notes="글의 작성자, 내용, 제목, 이미지 등 상세내용을 가져옵니다.") // swagger annotation
+    @ApiResponses({
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4673, message = "게시글 상세정보를 가져오는데 실패했습니다.")}
+    )
     @ResponseBody
     @GetMapping("/detail/{post-id}") // (GET) 127.0.0.1:6660/app/posts/detail/:post-id
     public BaseResponse<GetPostDetailRes> getPostDetail(@PathVariable("post-id") int postId) {
@@ -121,7 +124,9 @@ public class PostController {
     @ApiResponses({
         @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
-        @ApiResponse(code = 4600, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패했습니다.")}
+        @ApiResponse(code = 4600, message = "나의 글 혹은 익명의 글을 스크랩하는데 실패했습니다."),
+        @ApiResponse(code = 4601, message = "중복 스크랩 확인에 실패했습니다."),
+        @ApiResponse(code = 4603, message = "이미 스크랩 한 게시글입니다.")}
     )
     @ResponseBody
     @PostMapping(value = "/clip/{post-id}") // (POST) 127.0.0.1:6660/app/posts/clip/:post-id
@@ -174,8 +179,8 @@ public class PostController {
      */
     @ApiOperation(value="게시글 신고 항목 조회 API", notes="게시글 신고 항목을 조회합니다.") // swagger annotation
     @ApiResponses({
-        @ApiResponse(code = 1000 , message = "요청성공"),
-        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다.")}
+        @ApiResponse(code = 4000, message = "데이터베이스 연결에 실패하였습니다."),
+        @ApiResponse(code = 4669 , message = "신고 항목 불러오기에 실패했습니다.")}
     )
     @ResponseBody
     @GetMapping("/report/reason") // (GET) 127.0.0.1:6660/app/posts/report/reason
@@ -333,7 +338,6 @@ public class PostController {
     // Path-variable
     @ApiOperation(value="내 게시글 스크랩 조회 API", notes="내 스크랩북에서 내 게시글의 목록을 조회합니다.") // swagger annotation
     @ApiResponses({
-        @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4672, message = "스크랩북의 내 게시글 조회에 실패했습니다.")}
     )
     @ResponseBody
@@ -356,7 +360,6 @@ public class PostController {
     // Path-variable
     @ApiOperation(value="상대 게시글 스크랩 조회 API", notes="내 스크랩북에서 상대 게시글의 목록을 조회합니다.") // swagger annotation
     @ApiResponses({
-        @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4671, message = "스크랩북의 타인 게시글 조회에 실패했습니다.")}
     )
     @ResponseBody
@@ -379,7 +382,6 @@ public class PostController {
     //Query String
     @ApiOperation(value="스크랩북의 내 게시글 개수 API", notes="스크랩북의 내 게시글 개수를 조회합니다.") // swagger annotation
     @ApiResponses({
-        @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4670 , message = "스크랩북의 나의 게시글 개수를 가져오는데 실패했습니다.")}
     )
     @ResponseBody
@@ -402,7 +404,6 @@ public class PostController {
     //Query String
     @ApiOperation(value="스크랩북의 타인 게시글 개수 API", notes="스크랩북의 타인 게시글 개수를 조회합니다.") // swagger annotation
     @ApiResponses({
-        @ApiResponse(code = 1000 , message = "요청성공"),
         @ApiResponse(code = 4668 , message = "내 스크랩북의 타인 게시글 개수를 가져오는데 실패했습니다.")}
     )
     @ResponseBody
@@ -417,7 +418,7 @@ public class PostController {
         }
     }
 
-     /**
+    /**
      * 게시글 가리기 API
      * [POST] /app/posts/hiding/:post-id
      * @return BaseResponse<String>
@@ -449,58 +450,4 @@ public class PostController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
-    // /**
-    //  * 회원가입 API
-    //  * [POST] /users
-    //  * @return BaseResponse<PostUserRes>
-    //  */
-    // // Body
-    // @ResponseBody
-    // @PostMapping("")
-    // public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
-    //     // TODO: email 관련한 짧은 validation 예시입니다. 그 외 더 부가적으로 추가해주세요!
-    //     if(postUserReq.getEmail() == null){
-    //         return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
-    //     }
-    //     //이메일 정규표현
-    //     if(!isRegexEmail(postUserReq.getEmail())){
-    //         return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
-    //     }
-    //     try{
-    //         PostUserRes postUserRes = userService.createUser(postUserReq);
-    //         return new BaseResponse<>(postUserRes);
-    //     } catch(BaseException exception){
-    //         return new BaseResponse<>((exception.getStatus()));
-    //     }
-    // }
-    
-
-    /**
-     * 유저정보변경 API
-     * [PATCH] /users/:userIdx
-     * @return BaseResponse<String>
-     */
-    // @ResponseBody
-    // @PatchMapping("/{userIdx}")
-    // public BaseResponse<String> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody User user){
-    //     try {
-    //         //jwt에서 idx 추출.
-    //         int userIdxByJwt = jwtService.getUserIdx();
-    //         //userIdx와 접근한 유저가 같은지 확인
-    //         if(userIdx != userIdxByJwt){
-    //             return new BaseResponse<>(INVALID_USER_JWT);
-    //         }
-    //         //같다면 유저네임 변경
-    //         PatchUserReq patchUserReq = new PatchUserReq(userIdx,user.getUserName());
-    //         userService.modifyUserName(patchUserReq);
-
-    //         String result = "";
-    //     return new BaseResponse<>(result);
-    //     } catch (BaseException exception) {
-    //         return new BaseResponse<>((exception.getStatus()));
-    //     }
-    // }
-
-
 }

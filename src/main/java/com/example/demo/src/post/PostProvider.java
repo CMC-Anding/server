@@ -34,7 +34,7 @@ public class PostProvider {
             GetPostDetailRes getPostDetailRes = postDao.getPostDetail(postId);
             return getPostDetailRes;
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(GET_POST_DETAIL_FAIL);
         }
     }
 
