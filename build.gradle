@@ -1,0 +1,82 @@
+plugins {
+    id 'org.springframework.boot' version '2.4.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:19.0.0'
+
+
+    // Spring Boot Starter
+    testImplementation ('org.springframework.boot:spring-boot-starter-test')
+
+    // Lombok
+    implementation ('org.projectlombok:lombok')
+    compileOnly ('org.projectlombok:lombok:1.18.16')
+    annotationProcessor ('org.projectlombok:lombok:1.18.16')
+
+    // DB
+    runtimeOnly ('mysql:mysql-connector-java') //mysql8
+    //runtimeOnly 'mysql:mysql-connector-java:5.1.47' //mysql5
+    implementation ('org.springframework.boot:spring-boot-starter-jdbc')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa') //mysql 5버전의 경우 삭제.
+
+
+
+    // Web
+    implementation ('org.springframework.boot:spring-boot-starter-web')
+
+    // Security, Authentication
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    compile(group: 'io.jsonwebtoken', name: 'jjwt', version: '0.7.0')
+    compile('io.jsonwebtoken:jjwt:0.9.0')
+
+    implementation('org.springframework.boot:spring-boot-starter')
+    compile('org.springframework.boot:spring-boot-starter-web')
+
+    // Validation
+    implementation('org.springframework.boot:spring-boot-starter-validation:2.7.2')
+
+    // coolSMS
+    implementation 'net.nurigo:sdk:4.2.3'
+
+    //swagger
+    implementation ('io.springfox:springfox-swagger2:2.9.2')
+    implementation ('io.springfox:springfox-swagger-ui:2.9.2')
+    
+    // Use ConfigurationProperties
+    annotationProcessor ('org.springframework.boot:spring-boot-configuration-processor')
+    //S3
+    implementation ('org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE')
+
+    // assertJ
+    // https://mvnrepository.com/artifact/org.assertj/assertj-core
+    testImplementation("org.assertj:assertj-core:3.23.1")
+}
+
+springBoot {
+    mainClassName = ('com.example.demo.DemoApplication')
+}
+
+test {
+    useJUnitPlatform()
+}
